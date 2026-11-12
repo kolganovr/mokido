@@ -13,7 +13,7 @@ canvas, then closes the loop by handing the rendered PNG back to the model for v
 [![MCP](https://img.shields.io/badge/MCP-JSON--RPC%202.0-8b5cf6.svg)](https://modelcontextprotocol.io/)
 [![Node.js](https://img.shields.io/badge/Node.js-18%2B-green.svg)](https://nodejs.org)
 [![Dependencies](https://img.shields.io/badge/npm%20dependencies-0-brightgreen.svg)](#engineering-notes)
-[![Tools](https://img.shields.io/badge/MCP%20tools-23-6366f1.svg)](#tool-reference)
+[![Tools](https://img.shields.io/badge/MCP%20tools-21-6366f1.svg)](#tool-reference)
 [![Works on](https://img.shields.io/badge/Figma%20plan-Free%20included-F24E1E.svg)](#how-its-different)
 
 </div>
@@ -305,16 +305,16 @@ to what's actually usable:
 
 | Tier | Count | Registered when |
 |---|:---:|---|
-| **Core** | 8 | always |
+| **Core** | 9 | always |
 | **Extended** | 5 | always |
 | **REST** | 7 | only with `FIGMA_PERSONAL_ACCESS_TOKEN` set |
 | **Legacy** | 3 | only with `FIGMA_MCP_LEGACY_TOOLS=1` |
 
-Without a REST token an agent sees **13 tools instead of 23** — and never wastes a call on
+Without a REST token an agent sees **14 tools instead of 21** — and never wastes a call on
 something that would only return `REST_TOKEN_MISSING`.
 
 <details>
-<summary><b>All 23 tools</b></summary>
+<summary><b>All 24 tools (21 + 3 legacy)</b></summary>
 
 #### Core — live canvas
 

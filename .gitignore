@@ -23,3 +23,6 @@ figma/instructions.md
 
 # local dev notes for coding agents
 CLAUDE.md
+
+# local agent settings and worktrees (bench stand lives in .claude/worktrees/bench)
+.claude/
