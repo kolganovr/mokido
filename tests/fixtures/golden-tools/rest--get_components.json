@@ -1,0 +1,39 @@
+{
+  "call": {
+    "tool": "get_components",
+    "arguments": {
+      "file_key": "AbC123"
+    }
+  },
+  "sent_to_plugin": [],
+  "rest_requests": [
+    {
+      "method": "GET",
+      "path": "/files/AbC123/components",
+      "headers": {
+        "X-Figma-Token": "test",
+        "Content-Type": "application/json"
+      },
+      "body": null
+    }
+  ],
+  "reply": {
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "meta": {
+            "components": [
+              {
+                "key": "c1",
+                "name": "Button",
+                "node_id": "5:5"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

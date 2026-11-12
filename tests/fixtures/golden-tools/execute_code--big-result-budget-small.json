@@ -1,0 +1,261 @@
+{
+  "call": {
+    "tool": "figma_execute_code",
+    "arguments": {
+      "code": "return bridge.state.big;",
+      "max_output_bytes": 1200
+    }
+  },
+  "sent_to_plugin": [
+    {
+      "code": [
+        "return bridge.state.big;"
+      ],
+      "description": "Execute JS Code",
+      "capture": false,
+      "capture_node_ids": null,
+      "diff": false,
+      "scale": 1,
+      "max_px": 1024
+    },
+    {
+      "code": [
+        "const a = {\"ids\":[\"2:0\",\"2:1\",\"2:2\",\"2:3\",\"2:4\",\"2:5\",\"2:6\",\"2:7\",\"2:8\",\"2:9\",\"2:10\",\"2:11\"],\"depth\":0,\"props\":null,\"view\":null,\"context\":false,\"find\":null,\"findText\":null,\"type\":null,\"limit\":30,\"check\":null,\"compare\":null,\"like\":null,\"autoBytes\":3200,\"screens\":false,\"notes\":true,\"findTreeMax\":8,\"notesMax\":30,\"findTreeBytes\":3200};",
+        "const out = {};",
+        "let targets = a.ids;",
+        "const query = a.findText || a.find;",
+        "let hits = [];",
+        "if (query) {",
+        "  let more = [];",
+        "  for (const root of (a.ids.length ? a.ids : [null])) {",
+        "    const opts = { limit: a.limit };",
+        "    if (root) opts.root = root;",
+        "    if (a.type) opts.type = a.type;",
+        "    if (a.findText) opts.text = true;",
+        "    for (const f of bridge.find(query, opts)) (typeof f === 'string' ? more : hits).push(f);",
+        "  }",
+        "  targets = hits.map(f => f.id);",
+        "  if (!targets.length) {",
+        "    out.found = 'no matches';",
+        "    if (!a.ids.length) {",
+        "      const cur = figma.currentPage;",
+        "      out.found = 'no matches on page ' + JSON.stringify(cur.name);",
+        "      const others = (figma.root && figma.root.children || []).filter(p => p.id !== cur.id);",
+        "      if (others.length) {",
+        "        const parts = [];",
+        "        let loaded = 0;",
+        "        for (const p of others) {",
+        "          if (loaded >= 8) { parts.push(JSON.stringify(p.name) + ': not scanned'); continue; }",
+        "          loaded++;",
+        "          try {",
+        "            if (typeof p.loadAsync === 'function') await p.loadAsync();",
+        "            const opts = { limit: 1, root: p.id };",
+        "            if (a.type) opts.type = a.type;",
+        "            if (a.findText) opts.text = true;",
+        "            const r = bridge.find(query, opts);",
+        "            const more = r.find(x => typeof x === 'string');",
+        "            const m = more && /\\((\\d+) total\\)/.exec(more);",
+        "            parts.push(JSON.stringify(p.name) + ': ' + (m ? m[1] : r.filter(x => typeof x !== 'string').length));",
+        "          } catch (e) { parts.push(JSON.stringify(p.name) + ': ?'); }",
+        "        }",
+        "        out.other_pages = parts.join(', ') + ' (matches; switch page to use them)';",
+        "      }",
+        "    }",
+        "  }",
+        "  if (more.length) out.found_more = more;",
+        "}",
+        "if (a.view === 'flow' && !targets.length && !query) {",
+        "  const sel = (figma.currentPage.selection || []).map(n => n.id);",
+        "  targets = sel.concat(figma.currentPage.children.map(n => n.id).filter(id => sel.indexOf(id) === -1));",
+        "  if (!targets.length) out.flow = 'the page is empty';",
+        "}",
+        "if (a.view === 'flow' && a.screens && targets.length) {",
+        "  const tops = [];",
+        "  for (const id of targets) {",
+        "    let n = figma.getNodeById(id);",
+        "    if (!n) continue;",
+        "    while (n.parent && n.parent.type !== 'PAGE' && n.parent.type !== 'SECTION' && n.parent.type !== 'DOCUMENT') n = n.parent;",
+        "    if (tops.indexOf(n.id) === -1) tops.push(n.id);",
+        "  }",
+        "  if (tops.length) targets = tops;",
+        "}",
+        "if (a.like) out.like = bridge.like(a.like, a.ids);",
+        "const wantsRead = !a.like && (a.props || query || a.ids.length || a.view || a.context || !a.check);",
+        "if (a.compare && targets.length) out.compare = bridge.compare(a.compare, targets);",
+        "if (wantsRead && !out.flow && (targets.length || !query)) {",
+        "  const refs = targets.length ? targets : [figma.currentPage];",
+        "  if (a.compare) {}",
+        "  else if (a.props) {",
+        "    out.props = bridge.inspect(refs, a.props);",
+        "    if (a.props.indexOf('texts') !== -1) {",
+        "      const lines = [];",
+        "      const multi = Object.keys(out.props).length > 1;",
+        "      for (const id of Object.keys(out.props)) {",
+        "        const row = out.props[id];",
+        "        if (!row || typeof row !== 'object' || !Array.isArray(row.texts)) continue;",
+        "        if (multi) lines.push('@' + id);",
+        "        for (const l of row.texts) lines.push(l);",
+        "        delete row.texts;",
+        "        if (!Object.keys(row).length) delete out.props[id];",
+        "      }",
+        "      out.texts = lines.length ? lines.join('\\n') : 'no TEXT nodes';",
+        "      if (!Object.keys(out.props).length) delete out.props;",
+        "    }",
+        "  }",
+        "  else if (a.findText && !a.view) out.found = hits.map(f => '#' + f.id + ' ' + JSON.stringify(f.name) + ' «' + f.text + '» in ' + (f.parent ? f.parent + ', screen ' + JSON.stringify(String(f.frame).replace(/ #\\S+$/, '')) : f.frame)).join('\\n');",
+        "  else {",
+        "    const so = { maxChildren: 200 };",
+        "    const findTree = query && !a.view && a.depth === null && hits.length > 0 && hits.length <= a.findTreeMax;",
+        "    if (a.depth !== null) so.depth = a.depth; else if (findTree) so.autoBytes = a.findTreeBytes; else if (query || a.view === 'map') so.depth = query ? 0 : 1; else so.autoBytes = a.autoBytes;",
+        "    if (a.view === 'map') so.view = 'map';",
+        "    if (a.view === 'table') so.view = 'table';",
+        "    if (a.view === 'flow') so.view = 'flow';",
+        "    let s;",
+        "    if (findTree) {",
+        "      const jb = t => { let b = 2; for (let i = 0; i < t.length; i++) { const c = t.charCodeAt(i); b += c === 34 || c === 92 || c === 10 ? 2 : c < 0x80 ? 1 : c < 0x800 ? 2 : c >= 0xD800 && c <= 0xDBFF ? (i++, 4) : 3; } return b; };",
+        "      const hitSet = new Set(targets);",
+        "      const inHit = id => { let p = figma.getNodeById(id); p = p && p.parent; while (p) { if (hitSet.has(p.id)) return true; p = p.parent; } return false; };",
+        "      const tops = targets.filter(id => !inHit(id));",
+        "      const withLost = tree => { const lost = targets.filter(id => tops.indexOf(id) === -1 && tree.indexOf('#' + id + ' ') === -1); return lost.length ? tree + '\\n' + bridge.summarize(lost, { depth: 0 }) : tree; };",
+        "      s = withLost(bridge.summarize(tops, so));",
+        "      if (jb(s) > a.findTreeBytes) { const room = so.autoBytes - (jb(s) - jb(bridge.summarize(tops, so))); if (room > 200) s = withLost(bridge.summarize(tops, Object.assign({}, so, { autoBytes: room }))); }",
+        "      if (jb(s) > a.findTreeBytes) s = bridge.summarize(refs, { maxChildren: 200, depth: 0 });",
+        "    } else s = bridge.summarize(refs, so);",
+        "    out[query ? 'found' : a.view === 'flow' ? 'flow' : 'outline'] = s;",
+        "  }",
+        "  if (a.context) {",
+        "    out.context = {};",
+        "    const ws = l => (l || []).map(x => x.w + '×' + x.n).join(', ');",
+        "    for (const r of refs) {",
+        "      const id = typeof r === 'string' ? r : r.id;",
+        "      const c = bridge.context(id);",
+        "      out.context[id] = { node: c.node.type + ' ' + JSON.stringify(c.node.name) + ' #' + c.node.id + ' ' + c.node.w + 'x' + c.node.h, ancestors: c.ancestors.join(' › '), siblings: ws(c.siblings), pageWidths: ws(c.pageWidths),",
+        "        components: c.components.map(x => x.set + ' ×' + x.used + (x.props ? ' ' + Object.keys(x.props).map(k => k + '=' + (Array.isArray(x.props[k]) ? x.props[k].join('|') : x.props[k])).join('; ') : '')), conventions: c.conventions };",
+        "    }",
+        "  }",
+        "}",
+        "if (a.notes) {",
+        "  const notes = [];",
+        "  const instancesOf = new Map();",
+        "  for (const id of a.ids) {",
+        "    if (id.charAt(0) !== 'I' || id.indexOf(';') === -1) continue;",
+        "    const parts = id.slice(1).split(';');",
+        "    const inst = figma.getNodeById(parts[0]);",
+        "    const layer = figma.getNodeById(parts[parts.length - 1]);",
+        "    if (!inst || inst.type !== 'INSTANCE' || !layer || !figma.getNodeById(id)) continue;",
+        "    const main = inst.mainComponent;",
+        "    if (!main) continue;",
+        "    if (!instancesOf.has(main.id)) instancesOf.set(main.id, typeof main.getInstancesAsync === 'function' ? await main.getInstancesAsync() : (main.instances || []));",
+        "    const others = instancesOf.get(main.id).filter(i => i.id !== inst.id);",
+        "    const checked = others.slice(0, a.notesMax);",
+        "    const differ = [];",
+        "    for (const o of checked) {",
+        "      const cid = 'I' + o.id + ';' + parts.slice(1).join(';');",
+        "      if (!figma.getNodeById(cid)) continue;",
+        "      if (!/: identical$/.test(bridge.compare(layer.id, [cid]).split('\\n')[0])) differ.push(o.id);",
+        "    }",
+        "    const same = checked.length - differ.length;",
+        "    const scope = others.length > checked.length ? ', of ' + checked.length + ' checked (' + others.length + ' other instances in all)' : '';",
+        "    notes.push('NOTE ' + id + ': an override inside instance #' + inst.id + '; main COMPONENT ' + JSON.stringify(main.name) + ' #' + main.id + ' and ' + same + ' other instance' + (same === 1 ? '' : 's') + ' untouched' + scope + (differ.length ? ' (' + differ.length + ' differ from the master: ' + differ.slice(0, 4).map(x => '#' + x).join(' ') + ')' : ''));",
+        "  }",
+        "  if (notes.length) out.notes = notes;",
+        "}",
+        "if (a.check) out.check = bridge.check(a.check);",
+        "return out;"
+      ],
+      "description": "Inspect (after write)"
+    }
+  ],
+  "reply": {
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": true,
+          "after": "Already re-read for you, as they are now (no verify call needed):\nFRAME \"Card\" #1:2 320x200 @0,0 [V gap8 pad16] fill:#FFFFFF r8",
+          "result": {
+            "rows": [
+              {
+                "id": "2:0",
+                "name": "Строка таблицы 0"
+              },
+              {
+                "id": "2:1",
+                "name": "Строка таблицы 1"
+              },
+              {
+                "id": "2:2",
+                "name": "Строка таблицы 2"
+              },
+              {
+                "id": "2:3",
+                "name": "Строка таблицы 3"
+              },
+              {
+                "id": "2:4",
+                "name": "Строка таблицы 4"
+              },
+              {
+                "id": "2:5",
+                "name": "Строка таблицы 5"
+              },
+              {
+                "id": "2:6",
+                "name": "Строка таблицы 6"
+              },
+              {
+                "id": "2:7",
+                "name": "Строка таблицы 7"
+              },
+              {
+                "id": "2:8",
+                "name": "Строка таблицы 8"
+              },
+              {
+                "id": "2:9",
+                "name": "Строка таблицы 9"
+              },
+              "…+110 more (120 total)"
+            ]
+          },
+          "truncated": "result shrunk 6510→557 bytes (cuts marked with …). Full value is in bridge.state.lastResult — next call return just the part you need, e.g. `return bridge.state.lastResult.slice(40, 80)` for an array, or only the keys you need; don't re-run. Return less.",
+          "created": [
+            "3:0",
+            "3:1",
+            "3:2",
+            "3:3",
+            "3:4",
+            "3:5",
+            "3:6",
+            "3:7",
+            "3:8",
+            "3:9",
+            "3:10",
+            "3:11",
+            "3:12",
+            "3:13",
+            "3:14",
+            "3:15",
+            "3:16",
+            "3:17",
+            "3:18",
+            "3:19",
+            "3:20",
+            "3:21",
+            "3:22",
+            "3:23",
+            "3:24",
+            "3:25",
+            "3:26",
+            "3:27",
+            "3:28",
+            "3:29",
+            "…+50 more (80 total)"
+          ],
+          "checkpoint_id": "cp_3"
+        }
+      }
+    ]
+  }
+}

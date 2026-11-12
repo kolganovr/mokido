@@ -1,0 +1,42 @@
+{
+  "call": {
+    "tool": "figma_find_components",
+    "arguments": {
+      "query": "Button",
+      "page_name": "Components",
+      "include_variants": false,
+      "limit": 5,
+      "refresh_index": true
+    }
+  },
+  "sent_to_plugin": [
+    {
+      "type": "FIND_COMPONENTS",
+      "query": "Button",
+      "page_name": "Components",
+      "include_variants": false,
+      "limit": 5,
+      "refresh_index": true
+    }
+  ],
+  "reply": {
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": true,
+          "result": {
+            "components": [
+              {
+                "id": "5:5",
+                "name": "Button",
+                "variants": 4
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

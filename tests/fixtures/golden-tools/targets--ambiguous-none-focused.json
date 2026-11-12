@@ -1,0 +1,21 @@
+{
+  "call": {
+    "tool": "figma_get_variables",
+    "arguments": {}
+  },
+  "sent_to_plugin": {},
+  "reply": {
+    "isError": true,
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": false,
+          "code": "AMBIGUOUS_TARGET",
+          "error": "2 Figma documents are connected and none is focused (Alpha, Beta). Click into the intended Figma window, or pass target: \"<fileName>\" — see figma_list_targets."
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,110 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "EXECUTE",
+    "id": "ex1",
+    "code": "progress(1, 3, 'working'); progress(2, 3); progress(3, 3, 42);\nlog('hello'); log({ a: 1 }); log(undefined);\nnotify('custom toast', { timeout: 100 });\nreturn 'ok';"
+   },
+   "posted": [
+    {
+     "type": "PROGRESS",
+     "id": "ex1",
+     "step": 1,
+     "of": 3,
+     "note": "working",
+     "ts": 1700000000000
+    },
+    {
+     "type": "PROGRESS",
+     "id": "ex1",
+     "step": 2,
+     "of": 3,
+     "ts": 1700000000000
+    },
+    {
+     "type": "PROGRESS",
+     "id": "ex1",
+     "step": 3,
+     "of": 3,
+     "note": "42",
+     "ts": 1700000000000
+    },
+    {
+     "type": "LOG",
+     "text": "hello"
+    },
+    {
+     "type": "LOG",
+     "text": "[object Object]"
+    },
+    {
+     "type": "LOG",
+     "text": "undefined"
+    },
+    {
+     "type": "RESULT",
+     "id": "ex1",
+     "success": true,
+     "description": "AI Command Execution",
+     "result": "ok",
+     "resultStashed": true,
+     "screenshot": null,
+     "screenshots": null,
+     "beforeScreenshot": null,
+     "captureNote": null,
+     "targetName": null,
+     "targetId": null,
+     "checkpointId": null,
+     "created": [],
+     "modified": [],
+     "warnings": [],
+     "durationMs": 0
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "selection": []
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [],
+  "notifies": [
+   {
+    "text": "AI Command Execution...",
+    "opts": {
+     "timeout": 30000
+    }
+   },
+   {
+    "text": "custom toast",
+    "opts": {
+     "timeout": 100
+    }
+   },
+   {
+    "text": "AI Command Execution — done!",
+    "opts": {
+     "timeout": 2500
+    }
+   }
+  ],
+  "cancels": 1,
+  "uiResizes": [],
+  "fontLoads": [
+   "Inter/Regular",
+   "Inter/Medium",
+   "Inter/Bold"
+  ],
+  "exports": [],
+  "modeSets": [],
+  "storage": {}
+ }
+}

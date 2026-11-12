@@ -1,0 +1,35 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "RESIZE_WINDOW"
+   },
+   "posted": []
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "selection": []
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [],
+  "notifies": [],
+  "cancels": 0,
+  "uiResizes": [
+   [
+    null,
+    null
+   ]
+  ],
+  "fontLoads": [],
+  "exports": [],
+  "modeSets": [],
+  "storage": {}
+ }
+}

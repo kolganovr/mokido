@@ -1,0 +1,21 @@
+{
+  "call": {
+    "tool": "figma_get_variables",
+    "arguments": {}
+  },
+  "sent_to_plugin": {},
+  "reply": {
+    "isError": true,
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": false,
+          "code": "NO_CONNECTED_CLIENTS",
+          "error": "No Figma plugin is connected to the bridge. Ask the user to open Figma DESKTOP (not the browser) and launch the Mokido plugin (Ctrl+Alt+P / Cmd+Option+P) until the status shows CONNECTED, then retry.\n\nHINT: The Figma plugin did not answer. Ask the user to open Figma DESKTOP (not the browser) and launch the Mokido plugin (Ctrl+Alt+P / Cmd+Option+P) until the status shows CONNECTED, then retry."
+        }
+      }
+    ]
+  }
+}

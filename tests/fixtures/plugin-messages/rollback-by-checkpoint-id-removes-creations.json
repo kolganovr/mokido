@@ -1,0 +1,133 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "EXECUTE",
+    "id": "e1",
+    "code": "const a = figma.createFrame(); const b = figma.createText(); a.appendChild(b); return [a.id, b.id];"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "e1",
+     "success": true,
+     "description": "AI Command Execution",
+     "result": [
+      "1:13",
+      "1:14"
+     ],
+     "resultStashed": true,
+     "screenshot": null,
+     "screenshots": null,
+     "beforeScreenshot": null,
+     "captureNote": null,
+     "targetName": null,
+     "targetId": null,
+     "checkpointId": "cp_loyw3v28_1",
+     "created": [
+      "1:13",
+      "1:14"
+     ],
+     "modified": [],
+     "warnings": [],
+     "durationMs": 0
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "ROLLBACK",
+    "id": "b1",
+    "startTime": 9,
+    "checkpoint_id": "cp_loyw3v28_1"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "b1",
+     "success": true,
+     "description": "Rollback cp_loyw3v28_1",
+     "result": {
+      "checkpoint_id": "cp_loyw3v28_1",
+      "label": "AI Command Execution",
+      "removed": [
+       "1:14",
+       "1:13"
+      ],
+      "restored": [],
+      "missing": []
+     },
+     "startTime": 9
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "LIST_CHECKPOINTS",
+    "id": "l1"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "l1",
+     "success": true,
+     "description": "List Checkpoints",
+     "result": [
+      {
+       "id": "cp_loyw3v28_1",
+       "label": "AI Command Execution",
+       "createdAt": 1700000000000,
+       "created": 2,
+       "modified": 0,
+       "committed": true,
+       "rolledBack": true
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "selection": []
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [],
+  "notifies": [
+   {
+    "text": "AI Command Execution...",
+    "opts": {
+     "timeout": 30000
+    }
+   },
+   {
+    "text": "AI Command Execution — done!",
+    "opts": {
+     "timeout": 2500
+    }
+   },
+   {
+    "text": "Rolled back \"AI Command Execution\" (2 removed, 0 restored)",
+    "opts": {
+     "timeout": 3500
+    }
+   }
+  ],
+  "cancels": 1,
+  "uiResizes": [],
+  "fontLoads": [
+   "Inter/Regular",
+   "Inter/Medium",
+   "Inter/Bold"
+  ],
+  "exports": [],
+  "modeSets": [],
+  "storage": {}
+ }
+}

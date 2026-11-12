@@ -1,0 +1,30 @@
+{
+  "call": {
+    "tool": "figma_get_variables",
+    "arguments": {
+      "target": "bEtA",
+      "collection_name": "X"
+    }
+  },
+  "sent_to_plugin": {
+    "Beta": [
+      {
+        "type": "GET_VARIABLES",
+        "collection_name": "X",
+        "limit": 300
+      }
+    ]
+  },
+  "reply": {
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": true,
+          "result": "ok"
+        }
+      }
+    ]
+  }
+}

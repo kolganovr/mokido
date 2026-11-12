@@ -1,0 +1,21 @@
+{
+  "request": {
+    "method": "OPTIONS",
+    "path": "/execute",
+    "headers": {
+      "Origin": "https://www.figma.com"
+    },
+    "body": null
+  },
+  "status": 204,
+  "headers": {
+    "access-control-allow-origin": "https://www.figma.com",
+    "access-control-allow-methods": "GET, POST, OPTIONS",
+    "access-control-allow-headers": "Content-Type, X-Bridge-Token",
+    "vary": "Origin"
+  },
+  "body": {
+    "type": "text",
+    "text": ""
+  }
+}

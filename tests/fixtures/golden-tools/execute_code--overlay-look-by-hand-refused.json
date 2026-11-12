@@ -1,0 +1,24 @@
+{
+  "call": {
+    "tool": "figma_execute_code",
+    "arguments": {
+      "code": "const n = figma.getNodeById('21:2086'); n.overlayPositionType = 'BOTTOM_CENTER'; n.overlayBackground = { type: 'SOLID_COLOR', color: { r: 0, g: 0, b: 0, a: 0.4 } };"
+    }
+  },
+  "sent_to_plugin": [],
+  "reply": {
+    "isError": true,
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": false,
+          "code": "USE_OPEN_OVERLAY",
+          "error": "Not run. overlayPositionType / overlayBackground / overlayBackgroundInteraction are READ-ONLY in the Plugin API (no setter), there is no other way to set them. If bridge.openOverlay already ran and said MANUAL STEP, the task is done: tell the user that step and stop. Otherwise one call makes the link and tries the look; its reply names what the user must set by hand (MANUAL STEP). Swap the ids if the order is wrong. A script that is not this: add /* run-anyway */.",
+          "use_instead": "await bridge.openOverlay(triggerId, \"21:2086\", { position: 'BOTTOM_CENTER', dim: 0.4, closeOnOutside: true })"
+        }
+      }
+    ]
+  }
+}

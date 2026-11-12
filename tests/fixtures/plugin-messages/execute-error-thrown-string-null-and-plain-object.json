@@ -1,0 +1,122 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "EXECUTE",
+    "id": "e1",
+    "code": "throw 'just a string';"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "e1",
+     "success": false,
+     "description": "AI Command Execution",
+     "error": "just a string",
+     "code": null,
+     "durationMs": 0
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "EXECUTE",
+    "id": "e2",
+    "code": "throw null;"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "e2",
+     "success": false,
+     "description": "AI Command Execution",
+     "error": "null",
+     "code": null,
+     "durationMs": 0
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "EXECUTE",
+    "id": "e3",
+    "code": "throw { message: 'object with message' };"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "e3",
+     "success": false,
+     "description": "AI Command Execution",
+     "error": "object with message",
+     "code": null,
+     "durationMs": 0
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "selection": []
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [],
+  "notifies": [
+   {
+    "text": "AI Command Execution...",
+    "opts": {
+     "timeout": 30000
+    }
+   },
+   {
+    "text": "Error: just a string",
+    "opts": {
+     "error": true,
+     "timeout": 6000
+    }
+   },
+   {
+    "text": "AI Command Execution...",
+    "opts": {
+     "timeout": 30000
+    }
+   },
+   {
+    "text": "Error: null",
+    "opts": {
+     "error": true,
+     "timeout": 6000
+    }
+   },
+   {
+    "text": "AI Command Execution...",
+    "opts": {
+     "timeout": 30000
+    }
+   },
+   {
+    "text": "Error: object with message",
+    "opts": {
+     "error": true,
+     "timeout": 6000
+    }
+   }
+  ],
+  "cancels": 3,
+  "uiResizes": [],
+  "fontLoads": [
+   "Inter/Regular",
+   "Inter/Medium",
+   "Inter/Bold"
+  ],
+  "exports": [],
+  "modeSets": [],
+  "storage": {}
+ }
+}

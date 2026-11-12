@@ -1,0 +1,24 @@
+{
+  "call": {
+    "tool": "figma_execute_code",
+    "arguments": {
+      "code": "return figma.currentPage.findAll(n => n.type === 'TEXT').length;"
+    }
+  },
+  "sent_to_plugin": [],
+  "reply": {
+    "isError": true,
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": false,
+          "code": "PAGE_SCAN_BLOCKED",
+          "error": "Not run. figma.currentPage.findAll / a walk of the whole page freezes the plugin for minutes on a big file (747 s seen). Scope it to a section: figma_inspect with node_ids, find / find_type (name search), or view:\"flow\" for prototype links; or findAll on a section node in a write script.",
+          "use_instead": "figma_inspect {\"node_ids\":[\"1:2\"],\"depth\":3}"
+        }
+      }
+    ]
+  }
+}

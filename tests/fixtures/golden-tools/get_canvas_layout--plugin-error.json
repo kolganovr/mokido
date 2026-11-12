@@ -1,0 +1,28 @@
+{
+  "call": {
+    "tool": "figma_get_canvas_layout",
+    "arguments": {}
+  },
+  "sent_to_plugin": [
+    {
+      "type": "GET_CANVAS_LAYOUT",
+      "direction": "RIGHT",
+      "gap": 80,
+      "limit": 200
+    }
+  ],
+  "reply": {
+    "isError": true,
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": false,
+          "code": "EMPTY_PAGE",
+          "error": "Page is empty"
+        }
+      }
+    ]
+  }
+}

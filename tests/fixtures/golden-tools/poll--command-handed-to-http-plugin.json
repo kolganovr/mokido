@@ -1,0 +1,12 @@
+{
+  "command": {
+    "id": "<cmd_id>",
+    "code": "return 41 + 1;",
+    "description": "polled",
+    "capture": false,
+    "capture_node_ids": null,
+    "diff": false,
+    "scale": 1,
+    "max_px": 1024
+  }
+}

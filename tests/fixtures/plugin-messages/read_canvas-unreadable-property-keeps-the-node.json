@@ -1,0 +1,129 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "READ_CANVAS",
+    "id": "R1",
+    "startTime": 8
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "R1",
+     "success": true,
+     "description": "Read Canvas",
+     "result": {
+      "document": {
+       "id": "0:1",
+       "name": "Page 1",
+       "type": "CANVAS",
+       "children": [
+        {
+         "id": "1:1",
+         "name": "Grumpy",
+         "type": "FRAME",
+         "visible": true,
+         "absoluteBoundingBox": {
+          "x": 0,
+          "y": 0,
+          "width": 10,
+          "height": 10
+         },
+         "fills": [],
+         "children": [
+          {
+           "id": "1:2",
+           "name": "Kid",
+           "type": "TEXT",
+           "visible": true,
+           "absoluteBoundingBox": {
+            "x": 0,
+            "y": 0,
+            "width": 100,
+            "height": 20
+           },
+           "fills": [],
+           "characters": "still here",
+           "style": {
+            "fontFamily": "Inter",
+            "fontWeight": 400,
+            "fontSize": 14
+           }
+          }
+         ]
+        }
+       ]
+      },
+      "name": "Test File",
+      "truncatedTop": false
+     },
+     "startTime": 8
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "children": [
+     {
+      "id": "1:1",
+      "type": "FRAME",
+      "name": "Grumpy",
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "width": 10,
+      "height": 10,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [],
+      "layoutMode": "NONE",
+      "clipsContent": false,
+      "children": [
+       {
+        "id": "1:2",
+        "type": "TEXT",
+        "name": "Kid",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 100,
+        "height": 20,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [],
+        "strokes": [],
+        "characters": "still here",
+        "fontName": {
+         "family": "Inter",
+         "style": "Regular"
+        },
+        "fontSize": 14,
+        "textAutoResize": "WIDTH_AND_HEIGHT"
+       }
+      ]
+     }
+    ],
+    "selection": []
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [],
+  "notifies": [],
+  "cancels": 0,
+  "uiResizes": [],
+  "fontLoads": [],
+  "exports": [],
+  "modeSets": [],
+  "storage": {}
+ }
+}

@@ -1,0 +1,132 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "EXECUTE",
+    "id": "e1",
+    "code": "const copy = figma.getNodeById('1:2').clone();\nconst inst = figma.getNodeById('1:1').createInstance();\nreturn [copy.id, inst.id];"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "e1",
+     "success": true,
+     "description": "AI Command Execution",
+     "result": [
+      "1:15",
+      "1:16"
+     ],
+     "resultStashed": true,
+     "screenshot": null,
+     "screenshots": null,
+     "beforeScreenshot": null,
+     "captureNote": null,
+     "targetName": null,
+     "targetId": null,
+     "checkpointId": "cp_loyw3v28_1",
+     "created": [
+      "1:15",
+      "1:16"
+     ],
+     "modified": [],
+     "warnings": [],
+     "durationMs": 0
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "children": [
+     {
+      "id": "1:1",
+      "type": "COMPONENT",
+      "name": "Comp",
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "width": 100,
+      "height": 100,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [],
+      "strokes": [],
+      "layoutMode": "NONE",
+      "clipsContent": false,
+      "componentProperties": {}
+     },
+     {
+      "id": "1:2",
+      "type": "FRAME",
+      "name": "Source",
+      "visible": true,
+      "x": 500,
+      "y": 500,
+      "width": 100,
+      "height": 100,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [],
+      "strokes": [],
+      "layoutMode": "NONE",
+      "clipsContent": false
+     },
+     {
+      "id": "1:15",
+      "type": "FRAME",
+      "name": "Source",
+      "visible": true,
+      "x": 500,
+      "y": 500,
+      "width": 100,
+      "height": 100,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [],
+      "strokes": [],
+      "layoutMode": "NONE",
+      "clipsContent": false
+     }
+    ],
+    "selection": []
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [],
+  "notifies": [
+   {
+    "text": "AI Command Execution...",
+    "opts": {
+     "timeout": 30000
+    }
+   },
+   {
+    "text": "AI Command Execution — done!",
+    "opts": {
+     "timeout": 2500
+    }
+   }
+  ],
+  "cancels": 1,
+  "uiResizes": [],
+  "fontLoads": [
+   "Inter/Regular",
+   "Inter/Medium",
+   "Inter/Bold"
+  ],
+  "exports": [],
+  "modeSets": [],
+  "storage": {}
+ }
+}

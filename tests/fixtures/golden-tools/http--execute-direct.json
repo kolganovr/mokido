@@ -1,0 +1,30 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/execute?token=golden-test-token",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": "{\"type\":\"GET_VARIABLES\",\"limit\":1,\"timeoutMs\":3000}"
+  },
+  "status": 200,
+  "headers": {
+    "content-type": "application/json",
+    "access-control-allow-methods": "GET, POST, OPTIONS",
+    "access-control-allow-headers": "Content-Type, X-Bridge-Token"
+  },
+  "body": {
+    "type": "text",
+    "compact_json": true,
+    "json": {
+      "type": "RESULT",
+      "success": true,
+      "id": "<cmd_id>",
+      "result": {
+        "direct": true
+      },
+      "durationMs": 1,
+      "__file": "Golden File"
+    }
+  }
+}

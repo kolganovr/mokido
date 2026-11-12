@@ -1,0 +1,648 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "SET_PAUSED",
+    "value": true
+   },
+   "posted": [
+    {
+     "type": "PAUSED_STATE",
+     "paused": true
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "INSERT_SVG",
+    "id": "p1",
+    "svg_code": "<svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M0 0h24v24H0z\"/></svg>",
+    "startTime": 1
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "p1",
+     "success": false,
+     "description": "AI Command",
+     "error": "Paused by the user in the Mokido plugin. Ask them to press Resume there.",
+     "code": "EXECUTION_PAUSED",
+     "startTime": 1
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "INSERT_COMPONENT_INSTANCE",
+    "id": "p2",
+    "component_name": "Card",
+    "startTime": 2
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "p2",
+     "success": false,
+     "description": "AI Command",
+     "error": "Paused by the user in the Mokido plugin. Ask them to press Resume there.",
+     "code": "EXECUTION_PAUSED",
+     "startTime": 2
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "SET_VARIABLES_MODE",
+    "id": "p3",
+    "collection_name": "c",
+    "mode_name": "m",
+    "startTime": 3
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "p3",
+     "success": false,
+     "description": "AI Command",
+     "error": "Paused by the user in the Mokido plugin. Ask them to press Resume there.",
+     "code": "EXECUTION_PAUSED",
+     "startTime": 3
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "GET_VARIABLES",
+    "id": "p4"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "p4",
+     "success": true,
+     "description": "Get Variables",
+     "result": {
+      "collections": [],
+      "tokens": []
+     }
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "LIST_CHECKPOINTS",
+    "id": "p5"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "p5",
+     "success": true,
+     "description": "List Checkpoints",
+     "result": []
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "GET_CANVAS_LAYOUT",
+    "id": "p6"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "p6",
+     "success": true,
+     "description": "Get Canvas Layout",
+     "result": {
+      "pageName": "Buttons",
+      "totalArtboards": 3,
+      "artboards": [
+       {
+        "id": "1:1",
+        "name": "Button",
+        "type": "COMPONENT_SET",
+        "x": 0,
+        "y": 0,
+        "width": 100,
+        "height": 100
+       },
+       {
+        "id": "1:10",
+        "name": "Icon / Arrow",
+        "type": "COMPONENT",
+        "x": 0,
+        "y": 0,
+        "width": 24,
+        "height": 24
+       },
+       {
+        "id": "1:11",
+        "name": "Button Group",
+        "type": "COMPONENT",
+        "x": 0,
+        "y": 0,
+        "width": 200,
+        "height": 40
+       }
+      ],
+      "canvasBounds": {
+       "minX": 0,
+       "maxX": 200,
+       "minY": 0,
+       "maxY": 100
+      },
+      "suggestedNextPosition": {
+       "x": 280,
+       "y": 0
+      }
+     }
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "FIND_COMPONENTS",
+    "id": "p7",
+    "query": "card"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "p7",
+     "success": true,
+     "description": "Find Components (\"card\")",
+     "result": [
+      {
+       "id": "1:12",
+       "name": "Card",
+       "type": "COMPONENT",
+       "key": "key-card",
+       "page": "Cards"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "SCREENSHOT",
+    "id": "p8"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "p8",
+     "success": true,
+     "description": "Screenshot capture",
+     "result": "Captured 1 node(s)",
+     "screenshots": [
+      {
+       "id": "0:1",
+       "name": "Buttons",
+       "base64": "iVBORw0KGgo="
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "GET_DOC_INFO"
+   },
+   "posted": [
+    {
+     "type": "DOC_INFO",
+     "fileKey": null,
+     "fileName": "Test File",
+     "pageName": "Buttons",
+     "pageId": "0:1"
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Buttons",
+    "visible": true,
+    "children": [
+     {
+      "id": "1:1",
+      "type": "COMPONENT_SET",
+      "name": "Button",
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "width": 100,
+      "height": 100,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [],
+      "strokes": [],
+      "layoutMode": "NONE",
+      "clipsContent": false,
+      "description": "Primary action",
+      "key": "key-button",
+      "componentPropertyDefinitions": {
+       "Size": {
+        "type": "VARIANT",
+        "variantOptions": [
+         "S",
+         "L"
+        ],
+        "defaultValue": "S"
+       },
+       "State": {
+        "type": "VARIANT",
+        "variantOptions": [
+         "Default",
+         "Hover"
+        ],
+        "defaultValue": "Default"
+       },
+       "Label#1:0": {
+        "type": "TEXT",
+        "defaultValue": "Click"
+       }
+      },
+      "children": [
+       {
+        "id": "1:2",
+        "type": "COMPONENT",
+        "name": "Size=S, State=Default",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 80,
+        "height": 32,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [],
+        "strokes": [],
+        "layoutMode": "NONE",
+        "clipsContent": false,
+        "variantProperties": {
+         "Size": "S",
+         "State": "Default"
+        },
+        "componentProperties": {},
+        "children": [
+         {
+          "id": "1:3",
+          "type": "TEXT",
+          "name": "Label",
+          "visible": true,
+          "x": 0,
+          "y": 0,
+          "width": 100,
+          "height": 20,
+          "constraints": {
+           "horizontal": "MIN",
+           "vertical": "MIN"
+          },
+          "fills": [],
+          "strokes": [],
+          "characters": "Click",
+          "fontName": {
+           "family": "Inter",
+           "style": "Regular"
+          },
+          "fontSize": 14,
+          "textAutoResize": "WIDTH_AND_HEIGHT"
+         }
+        ]
+       },
+       {
+        "id": "1:4",
+        "type": "COMPONENT",
+        "name": "Size=S, State=Hover",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 80,
+        "height": 32,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [],
+        "strokes": [],
+        "layoutMode": "NONE",
+        "clipsContent": false,
+        "variantProperties": {
+         "Size": "S",
+         "State": "Hover"
+        },
+        "componentProperties": {},
+        "children": [
+         {
+          "id": "1:5",
+          "type": "TEXT",
+          "name": "Label",
+          "visible": true,
+          "x": 0,
+          "y": 0,
+          "width": 100,
+          "height": 20,
+          "constraints": {
+           "horizontal": "MIN",
+           "vertical": "MIN"
+          },
+          "fills": [],
+          "strokes": [],
+          "characters": "Click",
+          "fontName": {
+           "family": "Inter",
+           "style": "Regular"
+          },
+          "fontSize": 14,
+          "textAutoResize": "WIDTH_AND_HEIGHT"
+         }
+        ]
+       },
+       {
+        "id": "1:6",
+        "type": "COMPONENT",
+        "name": "Size=L, State=Default",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 120,
+        "height": 32,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [],
+        "strokes": [],
+        "layoutMode": "NONE",
+        "clipsContent": false,
+        "variantProperties": {
+         "Size": "L",
+         "State": "Default"
+        },
+        "componentProperties": {},
+        "children": [
+         {
+          "id": "1:7",
+          "type": "TEXT",
+          "name": "Label",
+          "visible": true,
+          "x": 0,
+          "y": 0,
+          "width": 100,
+          "height": 20,
+          "constraints": {
+           "horizontal": "MIN",
+           "vertical": "MIN"
+          },
+          "fills": [],
+          "strokes": [],
+          "characters": "Click",
+          "fontName": {
+           "family": "Inter",
+           "style": "Regular"
+          },
+          "fontSize": 14,
+          "textAutoResize": "WIDTH_AND_HEIGHT"
+         }
+        ]
+       },
+       {
+        "id": "1:8",
+        "type": "COMPONENT",
+        "name": "Size=L, State=Hover",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 120,
+        "height": 32,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [],
+        "strokes": [],
+        "layoutMode": "NONE",
+        "clipsContent": false,
+        "variantProperties": {
+         "Size": "L",
+         "State": "Hover"
+        },
+        "componentProperties": {},
+        "children": [
+         {
+          "id": "1:9",
+          "type": "TEXT",
+          "name": "Label",
+          "visible": true,
+          "x": 0,
+          "y": 0,
+          "width": 100,
+          "height": 20,
+          "constraints": {
+           "horizontal": "MIN",
+           "vertical": "MIN"
+          },
+          "fills": [],
+          "strokes": [],
+          "characters": "Click",
+          "fontName": {
+           "family": "Inter",
+           "style": "Regular"
+          },
+          "fontSize": 14,
+          "textAutoResize": "WIDTH_AND_HEIGHT"
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "id": "1:10",
+      "type": "COMPONENT",
+      "name": "Icon / Arrow",
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "width": 24,
+      "height": 24,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [],
+      "strokes": [],
+      "layoutMode": "NONE",
+      "clipsContent": false,
+      "description": "arrow glyph",
+      "key": "key-arrow",
+      "componentPropertyDefinitions": {
+       "Show": {
+        "type": "BOOLEAN",
+        "defaultValue": true
+       }
+      },
+      "componentProperties": {}
+     },
+     {
+      "id": "1:11",
+      "type": "COMPONENT",
+      "name": "Button Group",
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "width": 200,
+      "height": 40,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [],
+      "strokes": [],
+      "layoutMode": "NONE",
+      "clipsContent": false,
+      "key": "key-group",
+      "componentProperties": {}
+     }
+    ],
+    "selection": []
+   },
+   {
+    "id": "0:2",
+    "type": "PAGE",
+    "name": "Cards",
+    "visible": true,
+    "children": [
+     {
+      "id": "1:12",
+      "type": "COMPONENT",
+      "name": "Card",
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "width": 300,
+      "height": 180,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [],
+      "strokes": [],
+      "layoutMode": "NONE",
+      "clipsContent": false,
+      "key": "key-card",
+      "componentProperties": {},
+      "children": [
+       {
+        "id": "1:13",
+        "type": "TEXT",
+        "name": "Title",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 100,
+        "height": 20,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [],
+        "strokes": [],
+        "characters": "Card title",
+        "fontName": {
+         "family": "Inter",
+         "style": "Regular"
+        },
+        "fontSize": 14,
+        "textAutoResize": "WIDTH_AND_HEIGHT"
+       },
+       {
+        "id": "1:14",
+        "type": "TEXT",
+        "name": "Body",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 100,
+        "height": 20,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [],
+        "strokes": [],
+        "characters": "Card body",
+        "fontName": {
+         "family": "Inter",
+         "style": "Regular"
+        },
+        "fontSize": 14,
+        "textAutoResize": "WIDTH_AND_HEIGHT"
+       }
+      ]
+     },
+     {
+      "id": "1:15",
+      "type": "COMPONENT",
+      "name": "button icon",
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "width": 100,
+      "height": 100,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [],
+      "strokes": [],
+      "layoutMode": "NONE",
+      "clipsContent": false,
+      "key": "key-bicon",
+      "componentProperties": {}
+     }
+    ],
+    "selection": []
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [
+   [
+    "0:1"
+   ]
+  ],
+  "notifies": [
+   {
+    "text": "Capturing screenshot (Buttons)...",
+    "opts": {
+     "timeout": 2500
+    }
+   }
+  ],
+  "cancels": 0,
+  "uiResizes": [],
+  "fontLoads": [],
+  "exports": [
+   {
+    "id": "0:1",
+    "settings": {
+     "format": "PNG",
+     "constraint": {
+      "type": "SCALE",
+      "value": 1
+     }
+    }
+   }
+  ],
+  "modeSets": [],
+  "storage": {}
+ }
+}

@@ -1,0 +1,139 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "EXECUTE",
+    "id": "e1",
+    "code": "return 1;",
+    "capture": true,
+    "capture_node_ids": [
+     "1:2",
+     "1:3"
+    ]
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "e1",
+     "success": true,
+     "description": "AI Command Execution",
+     "result": 1,
+     "resultStashed": true,
+     "screenshot": "iVBORw0KGgo=",
+     "screenshots": null,
+     "beforeScreenshot": null,
+     "captureNote": null,
+     "targetName": "Wrap",
+     "targetId": "1:1",
+     "checkpointId": null,
+     "created": [],
+     "modified": [],
+     "warnings": [],
+     "durationMs": 0
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "children": [
+     {
+      "id": "1:1",
+      "type": "FRAME",
+      "name": "Wrap",
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "width": 300,
+      "height": 200,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [],
+      "strokes": [],
+      "layoutMode": "NONE",
+      "clipsContent": false,
+      "children": [
+       {
+        "id": "1:2",
+        "type": "RECTANGLE",
+        "name": "A",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 140,
+        "height": 200,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [],
+        "strokes": []
+       },
+       {
+        "id": "1:3",
+        "type": "RECTANGLE",
+        "name": "B",
+        "visible": true,
+        "x": 150,
+        "y": 0,
+        "width": 140,
+        "height": 200,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [],
+        "strokes": []
+       }
+      ]
+     }
+    ],
+    "selection": []
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [],
+  "notifies": [
+   {
+    "text": "AI Command Execution...",
+    "opts": {
+     "timeout": 30000
+    }
+   },
+   {
+    "text": "AI Command Execution + capture sent to AI",
+    "opts": {
+     "timeout": 3000
+    }
+   }
+  ],
+  "cancels": 1,
+  "uiResizes": [],
+  "fontLoads": [
+   "Inter/Regular",
+   "Inter/Medium",
+   "Inter/Bold"
+  ],
+  "exports": [
+   {
+    "id": "1:1",
+    "settings": {
+     "format": "PNG",
+     "constraint": {
+      "type": "SCALE",
+      "value": 1
+     }
+    }
+   }
+  ],
+  "modeSets": [],
+  "storage": {}
+ }
+}

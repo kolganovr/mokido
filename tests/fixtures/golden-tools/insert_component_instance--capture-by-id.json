@@ -1,0 +1,45 @@
+{
+  "call": {
+    "tool": "figma_insert_component_instance",
+    "arguments": {
+      "component_id": "5:5",
+      "capture": true,
+      "scale": 2,
+      "max_px": 300
+    }
+  },
+  "sent_to_plugin": [
+    {
+      "type": "INSERT_COMPONENT_INSTANCE",
+      "component_id": "5:5",
+      "properties": {},
+      "text_overrides": {},
+      "capture": true,
+      "scale": 2,
+      "max_px": 300
+    }
+  ],
+  "reply": {
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": true,
+          "result": "Inserted 6:7",
+          "created": [
+            "6:7"
+          ],
+          "images": [
+            "800x600 ~640tok"
+          ]
+        }
+      },
+      {
+        "type": "image",
+        "mimeType": "image/png",
+        "data": "iVBORw0KGgoAAAANSUhEUgAAAyAAAAJYAAAAAAAAAAAA"
+      }
+    ]
+  }
+}

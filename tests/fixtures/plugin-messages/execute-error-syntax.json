@@ -1,0 +1,60 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "EXECUTE",
+    "id": "e1",
+    "code": "const = ;"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "e1",
+     "success": false,
+     "description": "AI Command Execution",
+     "error": "Unexpected token '='\n\nHINT: Your code is compiled as an async function body: top-level await and return are allowed, import/export are not. Check for unbalanced braces or quotes in the code string.",
+     "code": "SCRIPT_SYNTAX_ERROR",
+     "durationMs": 0
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "selection": []
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [],
+  "notifies": [
+   {
+    "text": "AI Command Execution...",
+    "opts": {
+     "timeout": 30000
+    }
+   },
+   {
+    "text": "Error: Unexpected token '='",
+    "opts": {
+     "error": true,
+     "timeout": 6000
+    }
+   }
+  ],
+  "cancels": 1,
+  "uiResizes": [],
+  "fontLoads": [
+   "Inter/Regular",
+   "Inter/Medium",
+   "Inter/Bold"
+  ],
+  "exports": [],
+  "modeSets": [],
+  "storage": {}
+ }
+}

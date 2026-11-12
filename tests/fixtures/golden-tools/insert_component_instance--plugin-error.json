@@ -1,0 +1,33 @@
+{
+  "call": {
+    "tool": "figma_insert_component_instance",
+    "arguments": {
+      "component_name": "Nope"
+    }
+  },
+  "sent_to_plugin": [
+    {
+      "type": "INSERT_COMPONENT_INSTANCE",
+      "component_name": "Nope",
+      "properties": {},
+      "text_overrides": {},
+      "capture": false,
+      "scale": 1,
+      "max_px": 1024
+    }
+  ],
+  "reply": {
+    "isError": true,
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": false,
+          "code": "COMPONENT_NOT_FOUND",
+          "error": "No component named Nope"
+        }
+      }
+    ]
+  }
+}

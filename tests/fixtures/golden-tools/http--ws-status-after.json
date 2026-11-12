@@ -1,0 +1,23 @@
+{
+  "status": {
+    "connected": true,
+    "wsClients": 1,
+    "lastPing": "<n>",
+    "serverVersion": "<version>",
+    "pid": "<n>",
+    "targets": [
+      {
+        "id": "<ws_id>",
+        "fileName": "Golden File",
+        "pageName": "Page 2",
+        "pluginVersion": "9.9.9",
+        "focused": true,
+        "lastSeenMsAgo": "<n>"
+      }
+    ],
+    "limits": {
+      "escalateMs": 400,
+      "stalledAfterMs": 120000
+    }
+  }
+}

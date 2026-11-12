@@ -1,0 +1,78 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "EXECUTE",
+    "id": "e1",
+    "code": "return [getFreeCanvasPosition(), getFreeCanvasPosition(10, 10, { layout: 'grid' })];"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "e1",
+     "success": true,
+     "description": "AI Command Execution",
+     "result": [
+      {
+       "x": 0,
+       "y": 0
+      },
+      {
+       "x": 0,
+       "y": 0
+      }
+     ],
+     "resultStashed": true,
+     "screenshot": null,
+     "screenshots": null,
+     "beforeScreenshot": null,
+     "captureNote": null,
+     "targetName": null,
+     "targetId": null,
+     "checkpointId": null,
+     "created": [],
+     "modified": [],
+     "warnings": [],
+     "durationMs": 0
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "selection": []
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [],
+  "notifies": [
+   {
+    "text": "AI Command Execution...",
+    "opts": {
+     "timeout": 30000
+    }
+   },
+   {
+    "text": "AI Command Execution — done!",
+    "opts": {
+     "timeout": 2500
+    }
+   }
+  ],
+  "cancels": 1,
+  "uiResizes": [],
+  "fontLoads": [
+   "Inter/Regular",
+   "Inter/Medium",
+   "Inter/Bold"
+  ],
+  "exports": [],
+  "modeSets": [],
+  "storage": {}
+ }
+}

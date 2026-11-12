@@ -1,0 +1,33 @@
+{
+  "call": {
+    "tool": "figma_insert_svg",
+    "arguments": {
+      "svg_code": "<svg/>"
+    }
+  },
+  "sent_to_plugin": [
+    {
+      "type": "INSERT_SVG",
+      "svg_code": "<svg/>",
+      "as_component": false,
+      "capture": false,
+      "scale": 2,
+      "max_px": 1024
+    }
+  ],
+  "reply": {
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": true,
+          "result": "Inserted 6:9",
+          "created": [
+            "6:9"
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "call": {
+    "tool": "figma_rollback",
+    "arguments": {
+      "checkpoint_id": "cp_gone"
+    }
+  },
+  "sent_to_plugin": [
+    {
+      "type": "ROLLBACK",
+      "checkpoint_id": "cp_gone"
+    }
+  ],
+  "reply": {
+    "isError": true,
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": false,
+          "code": "CHECKPOINT_NOT_FOUND",
+          "error": "Checkpoint cp_gone not found"
+        }
+      }
+    ]
+  }
+}

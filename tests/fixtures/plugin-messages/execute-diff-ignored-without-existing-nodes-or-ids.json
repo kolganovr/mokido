@@ -1,0 +1,170 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "EXECUTE",
+    "id": "e1",
+    "code": "return 1;",
+    "diff": true,
+    "capture_node_ids": [
+     "9:99"
+    ]
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "e1",
+     "success": true,
+     "description": "AI Command Execution",
+     "result": 1,
+     "resultStashed": true,
+     "screenshot": null,
+     "screenshots": null,
+     "beforeScreenshot": null,
+     "captureNote": null,
+     "targetName": null,
+     "targetId": null,
+     "checkpointId": null,
+     "created": [],
+     "modified": [],
+     "warnings": [],
+     "durationMs": 0
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "EXECUTE",
+    "id": "e2",
+    "code": "return 2;",
+    "diff": true,
+    "capture_node_ids": []
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "e2",
+     "success": true,
+     "description": "AI Command Execution",
+     "result": 2,
+     "resultStashed": true,
+     "screenshot": null,
+     "screenshots": null,
+     "beforeScreenshot": null,
+     "captureNote": null,
+     "targetName": null,
+     "targetId": null,
+     "checkpointId": null,
+     "created": [],
+     "modified": [],
+     "warnings": [],
+     "durationMs": 0
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "EXECUTE",
+    "id": "e3",
+    "code": "return 3;",
+    "diff": true
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "e3",
+     "success": true,
+     "description": "AI Command Execution",
+     "result": 3,
+     "resultStashed": true,
+     "screenshot": null,
+     "screenshots": null,
+     "beforeScreenshot": null,
+     "captureNote": null,
+     "targetName": null,
+     "targetId": null,
+     "checkpointId": null,
+     "created": [],
+     "modified": [],
+     "warnings": [],
+     "durationMs": 0
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "EXECUTE",
+    "id": "e4",
+    "code": "return 4;",
+    "diff": "yes",
+    "capture_node_ids": [
+     "9:99"
+    ]
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "e4",
+     "success": true,
+     "description": "AI Command Execution",
+     "result": 4,
+     "resultStashed": true,
+     "screenshot": null,
+     "screenshots": null,
+     "beforeScreenshot": null,
+     "captureNote": null,
+     "targetName": null,
+     "targetId": null,
+     "checkpointId": null,
+     "created": [],
+     "modified": [],
+     "warnings": [],
+     "durationMs": 0
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "selection": []
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [],
+  "notifies": [
+   {
+    "text": "AI Command Execution...",
+    "opts": {
+     "timeout": 30000
+    }
+   },
+   {
+    "text": "AI Command Execution — done!",
+    "opts": {
+     "timeout": 2500
+    }
+   },
+   {
+    "text": "AI Command Execution...",
+    "opts": {
+     "timeout": 30000
+    }
+   }
+  ],
+  "cancels": 2,
+  "uiResizes": [],
+  "fontLoads": [
+   "Inter/Regular",
+   "Inter/Medium",
+   "Inter/Bold"
+  ],
+  "exports": [],
+  "modeSets": [],
+  "storage": {}
+ }
+}

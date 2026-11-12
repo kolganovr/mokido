@@ -1,0 +1,35 @@
+{
+  "call": {
+    "tool": "figma_execute_code",
+    "arguments": {
+      "code": "return 1;"
+    }
+  },
+  "sent_to_plugin": [
+    {
+      "code": [
+        "return 1;"
+      ],
+      "description": "Execute JS Code",
+      "capture": false,
+      "capture_node_ids": null,
+      "diff": false,
+      "scale": 1,
+      "max_px": 1024
+    }
+  ],
+  "reply": {
+    "isError": true,
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": false,
+          "code": null,
+          "error": "reactions[0].actions[0] matches no variant. Closest (no type matched): Invalid enum value, expected 'BACK' | 'CLOSE' at reactions[0].actions[0].type. 4 other variants skipped. Valid shapes: bridge.info().reactions, or bridge.setReaction / openOverlay / closeOverlay.\n  at line 3\nHINT: see the docs"
+        }
+      }
+    ]
+  }
+}

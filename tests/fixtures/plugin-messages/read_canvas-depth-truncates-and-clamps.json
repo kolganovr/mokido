@@ -1,0 +1,565 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "READ_CANVAS",
+    "id": "R1",
+    "startTime": 8,
+    "depth": 1
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "R1",
+     "success": true,
+     "description": "Read Canvas",
+     "result": {
+      "depthReached": 2,
+      "lastName": "L2",
+      "lastTruncated": true
+     },
+     "startTime": 8
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "READ_CANVAS",
+    "id": "R1",
+    "startTime": 8,
+    "depth": 3
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "R1",
+     "success": true,
+     "description": "Read Canvas",
+     "result": {
+      "depthReached": 4,
+      "lastName": "L4",
+      "lastTruncated": true
+     },
+     "startTime": 8
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "READ_CANVAS",
+    "id": "R1",
+    "startTime": 8,
+    "depth": 99
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "R1",
+     "success": true,
+     "description": "Read Canvas",
+     "result": {
+      "depthReached": 13,
+      "lastName": "L13",
+      "lastTruncated": true
+     },
+     "startTime": 8
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "READ_CANVAS",
+    "id": "R1",
+    "startTime": 8,
+    "depth": 0
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "R1",
+     "success": true,
+     "description": "Read Canvas",
+     "result": {
+      "depthReached": 7,
+      "lastName": "L7",
+      "lastTruncated": true
+     },
+     "startTime": 8
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "READ_CANVAS",
+    "id": "R1",
+    "startTime": 8,
+    "depth": -1
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "R1",
+     "success": true,
+     "description": "Read Canvas",
+     "result": {
+      "depthReached": 7,
+      "lastName": "L7",
+      "lastTruncated": true
+     },
+     "startTime": 8
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "READ_CANVAS",
+    "id": "R1",
+    "startTime": 8,
+    "depth": "3"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "R1",
+     "success": true,
+     "description": "Read Canvas",
+     "result": {
+      "depthReached": 7,
+      "lastName": "L7",
+      "lastTruncated": true
+     },
+     "startTime": 8
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "READ_CANVAS",
+    "id": "R1",
+    "startTime": 8,
+    "depth": null
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "R1",
+     "success": true,
+     "description": "Read Canvas",
+     "result": {
+      "depthReached": 7,
+      "lastName": "L7",
+      "lastTruncated": true
+     },
+     "startTime": 8
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "READ_CANVAS",
+    "id": "R1",
+    "startTime": 8
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "R1",
+     "success": true,
+     "description": "Read Canvas",
+     "result": {
+      "depthReached": 7,
+      "lastName": "L7",
+      "lastTruncated": true
+     },
+     "startTime": 8
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "READ_CANVAS",
+    "id": "R1",
+    "startTime": 8,
+    "depth": 12
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "R1",
+     "success": true,
+     "description": "Read Canvas",
+     "result": {
+      "depthReached": 13,
+      "lastName": "L13",
+      "lastTruncated": true
+     },
+     "startTime": 8
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "READ_CANVAS",
+    "id": "R1",
+    "startTime": 8,
+    "depth": 13
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "R1",
+     "success": true,
+     "description": "Read Canvas",
+     "result": {
+      "depthReached": 13,
+      "lastName": "L13",
+      "lastTruncated": true
+     },
+     "startTime": 8
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "READ_CANVAS",
+    "id": "R1",
+    "startTime": 8,
+    "depth": 2.5
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "R1",
+     "success": true,
+     "description": "Read Canvas",
+     "result": {
+      "depthReached": 3,
+      "lastName": "L3",
+      "lastTruncated": true
+     },
+     "startTime": 8
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "children": [
+     {
+      "id": "1:1",
+      "type": "FRAME",
+      "name": "L0",
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "width": 100,
+      "height": 100,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [],
+      "strokes": [],
+      "layoutMode": "NONE",
+      "clipsContent": false,
+      "children": [
+       {
+        "id": "1:2",
+        "type": "FRAME",
+        "name": "L1",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 100,
+        "height": 100,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [],
+        "strokes": [],
+        "layoutMode": "NONE",
+        "clipsContent": false,
+        "children": [
+         {
+          "id": "1:3",
+          "type": "FRAME",
+          "name": "L2",
+          "visible": true,
+          "x": 0,
+          "y": 0,
+          "width": 100,
+          "height": 100,
+          "constraints": {
+           "horizontal": "MIN",
+           "vertical": "MIN"
+          },
+          "fills": [],
+          "strokes": [],
+          "layoutMode": "NONE",
+          "clipsContent": false,
+          "children": [
+           {
+            "id": "1:4",
+            "type": "FRAME",
+            "name": "L3",
+            "visible": true,
+            "x": 0,
+            "y": 0,
+            "width": 100,
+            "height": 100,
+            "constraints": {
+             "horizontal": "MIN",
+             "vertical": "MIN"
+            },
+            "fills": [],
+            "strokes": [],
+            "layoutMode": "NONE",
+            "clipsContent": false,
+            "children": [
+             {
+              "id": "1:5",
+              "type": "FRAME",
+              "name": "L4",
+              "visible": true,
+              "x": 0,
+              "y": 0,
+              "width": 100,
+              "height": 100,
+              "constraints": {
+               "horizontal": "MIN",
+               "vertical": "MIN"
+              },
+              "fills": [],
+              "strokes": [],
+              "layoutMode": "NONE",
+              "clipsContent": false,
+              "children": [
+               {
+                "id": "1:6",
+                "type": "FRAME",
+                "name": "L5",
+                "visible": true,
+                "x": 0,
+                "y": 0,
+                "width": 100,
+                "height": 100,
+                "constraints": {
+                 "horizontal": "MIN",
+                 "vertical": "MIN"
+                },
+                "fills": [],
+                "strokes": [],
+                "layoutMode": "NONE",
+                "clipsContent": false,
+                "children": [
+                 {
+                  "id": "1:7",
+                  "type": "FRAME",
+                  "name": "L6",
+                  "visible": true,
+                  "x": 0,
+                  "y": 0,
+                  "width": 100,
+                  "height": 100,
+                  "constraints": {
+                   "horizontal": "MIN",
+                   "vertical": "MIN"
+                  },
+                  "fills": [],
+                  "strokes": [],
+                  "layoutMode": "NONE",
+                  "clipsContent": false,
+                  "children": [
+                   {
+                    "id": "1:8",
+                    "type": "FRAME",
+                    "name": "L7",
+                    "visible": true,
+                    "x": 0,
+                    "y": 0,
+                    "width": 100,
+                    "height": 100,
+                    "constraints": {
+                     "horizontal": "MIN",
+                     "vertical": "MIN"
+                    },
+                    "fills": [],
+                    "strokes": [],
+                    "layoutMode": "NONE",
+                    "clipsContent": false,
+                    "children": [
+                     {
+                      "id": "1:9",
+                      "type": "FRAME",
+                      "name": "L8",
+                      "visible": true,
+                      "x": 0,
+                      "y": 0,
+                      "width": 100,
+                      "height": 100,
+                      "constraints": {
+                       "horizontal": "MIN",
+                       "vertical": "MIN"
+                      },
+                      "fills": [],
+                      "strokes": [],
+                      "layoutMode": "NONE",
+                      "clipsContent": false,
+                      "children": [
+                       {
+                        "id": "1:10",
+                        "type": "FRAME",
+                        "name": "L9",
+                        "visible": true,
+                        "x": 0,
+                        "y": 0,
+                        "width": 100,
+                        "height": 100,
+                        "constraints": {
+                         "horizontal": "MIN",
+                         "vertical": "MIN"
+                        },
+                        "fills": [],
+                        "strokes": [],
+                        "layoutMode": "NONE",
+                        "clipsContent": false,
+                        "children": [
+                         {
+                          "id": "1:11",
+                          "type": "FRAME",
+                          "name": "L10",
+                          "visible": true,
+                          "x": 0,
+                          "y": 0,
+                          "width": 100,
+                          "height": 100,
+                          "constraints": {
+                           "horizontal": "MIN",
+                           "vertical": "MIN"
+                          },
+                          "fills": [],
+                          "strokes": [],
+                          "layoutMode": "NONE",
+                          "clipsContent": false,
+                          "children": [
+                           {
+                            "id": "1:12",
+                            "type": "FRAME",
+                            "name": "L11",
+                            "visible": true,
+                            "x": 0,
+                            "y": 0,
+                            "width": 100,
+                            "height": 100,
+                            "constraints": {
+                             "horizontal": "MIN",
+                             "vertical": "MIN"
+                            },
+                            "fills": [],
+                            "strokes": [],
+                            "layoutMode": "NONE",
+                            "clipsContent": false,
+                            "children": [
+                             {
+                              "id": "1:13",
+                              "type": "FRAME",
+                              "name": "L12",
+                              "visible": true,
+                              "x": 0,
+                              "y": 0,
+                              "width": 100,
+                              "height": 100,
+                              "constraints": {
+                               "horizontal": "MIN",
+                               "vertical": "MIN"
+                              },
+                              "fills": [],
+                              "strokes": [],
+                              "layoutMode": "NONE",
+                              "clipsContent": false,
+                              "children": [
+                               {
+                                "id": "1:14",
+                                "type": "FRAME",
+                                "name": "L13",
+                                "visible": true,
+                                "x": 0,
+                                "y": 0,
+                                "width": 100,
+                                "height": 100,
+                                "constraints": {
+                                 "horizontal": "MIN",
+                                 "vertical": "MIN"
+                                },
+                                "fills": [],
+                                "strokes": [],
+                                "layoutMode": "NONE",
+                                "clipsContent": false,
+                                "children": [
+                                 {
+                                  "id": "1:15",
+                                  "type": "FRAME",
+                                  "name": "L14",
+                                  "visible": true,
+                                  "x": 0,
+                                  "y": 0,
+                                  "width": 100,
+                                  "height": 100,
+                                  "constraints": {
+                                   "horizontal": "MIN",
+                                   "vertical": "MIN"
+                                  },
+                                  "fills": [],
+                                  "strokes": [],
+                                  "layoutMode": "NONE",
+                                  "clipsContent": false
+                                 }
+                                ]
+                               }
+                              ]
+                             }
+                            ]
+                           }
+                          ]
+                         }
+                        ]
+                       }
+                      ]
+                     }
+                    ]
+                   }
+                  ]
+                 }
+                ]
+               }
+              ]
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ],
+    "selection": []
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [],
+  "notifies": [],
+  "cancels": 0,
+  "uiResizes": [],
+  "fontLoads": [],
+  "exports": [],
+  "modeSets": [],
+  "storage": {}
+ }
+}

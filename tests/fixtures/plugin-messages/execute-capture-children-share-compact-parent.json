@@ -1,0 +1,139 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "EXECUTE",
+    "id": "e1",
+    "code": "const p = figma.createFrame(); p.name = 'Row'; p.resize(300, 200);\nconst a = figma.createRectangle(); a.resize(150, 200); const b = figma.createRectangle(); b.resize(150, 200);\np.appendChild(a); p.appendChild(b); return p.id;",
+    "capture": true
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "e1",
+     "success": true,
+     "description": "AI Command Execution",
+     "result": "1:13",
+     "resultStashed": true,
+     "screenshot": "iVBORw0KGgo=",
+     "screenshots": null,
+     "beforeScreenshot": null,
+     "captureNote": null,
+     "targetName": "Row",
+     "targetId": "1:13",
+     "checkpointId": "cp_loyw3v28_1",
+     "created": [
+      "1:13",
+      "1:14",
+      "1:15"
+     ],
+     "modified": [],
+     "warnings": [],
+     "durationMs": 0
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "children": [
+     {
+      "id": "1:13",
+      "type": "FRAME",
+      "name": "Row",
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "width": 300,
+      "height": 200,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [],
+      "strokes": [],
+      "layoutMode": "NONE",
+      "clipsContent": false,
+      "children": [
+       {
+        "id": "1:14",
+        "type": "RECTANGLE",
+        "name": "Rectangle",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 150,
+        "height": 200,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [],
+        "strokes": []
+       },
+       {
+        "id": "1:15",
+        "type": "RECTANGLE",
+        "name": "Rectangle",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 150,
+        "height": 200,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [],
+        "strokes": []
+       }
+      ]
+     }
+    ],
+    "selection": []
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [],
+  "notifies": [
+   {
+    "text": "AI Command Execution...",
+    "opts": {
+     "timeout": 30000
+    }
+   },
+   {
+    "text": "AI Command Execution + capture sent to AI",
+    "opts": {
+     "timeout": 3000
+    }
+   }
+  ],
+  "cancels": 1,
+  "uiResizes": [],
+  "fontLoads": [
+   "Inter/Regular",
+   "Inter/Medium",
+   "Inter/Bold"
+  ],
+  "exports": [
+   {
+    "id": "1:13",
+    "settings": {
+     "format": "PNG",
+     "constraint": {
+      "type": "SCALE",
+      "value": 1
+     }
+    }
+   }
+  ],
+  "modeSets": [],
+  "storage": {}
+ }
+}

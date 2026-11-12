@@ -1,0 +1,45 @@
+{
+  "call": {
+    "tool": "figma_set_variables_mode",
+    "arguments": {
+      "collection_name": "Brand",
+      "mode_name": "Dark",
+      "target_id": "1:1",
+      "capture": true
+    }
+  },
+  "sent_to_plugin": [
+    {
+      "type": "SET_VARIABLES_MODE",
+      "collection_name": "Brand",
+      "mode_name": "Dark",
+      "target_id": "1:1",
+      "capture": true,
+      "scale": 1,
+      "max_px": 1024
+    }
+  ],
+  "reply": {
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": true,
+          "result": "Mode Dark set on 1:1",
+          "modified": [
+            "1:1"
+          ],
+          "images": [
+            "800x600 ~640tok"
+          ]
+        }
+      },
+      {
+        "type": "image",
+        "mimeType": "image/png",
+        "data": "iVBORw0KGgoAAAANSUhEUgAAAyAAAAJYAAAAAAAAAAAA"
+      }
+    ]
+  }
+}

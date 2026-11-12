@@ -1,0 +1,21 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/result?token=golden-test-token",
+    "headers": {},
+    "body": "{\"id\":\"cmd_unknown\",\"success\":true}"
+  },
+  "status": 200,
+  "headers": {
+    "content-type": "application/json",
+    "access-control-allow-methods": "GET, POST, OPTIONS",
+    "access-control-allow-headers": "Content-Type, X-Bridge-Token"
+  },
+  "body": {
+    "type": "text",
+    "compact_json": true,
+    "json": {
+      "received": true
+    }
+  }
+}

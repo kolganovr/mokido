@@ -1,0 +1,46 @@
+{
+  "call": {
+    "tool": "get_node",
+    "arguments": {
+      "file_key": "AbC123",
+      "node_ids": [
+        "1:1",
+        "1-2"
+      ],
+      "depth": 1,
+      "format": "json",
+      "budget_tokens": 100
+    }
+  },
+  "sent_to_plugin": [],
+  "rest_requests": [
+    {
+      "method": "GET",
+      "path": "/files/AbC123/nodes?ids=1%3A1%2C1%3A2&depth=1",
+      "headers": {
+        "X-Figma-Token": "test",
+        "Content-Type": "application/json"
+      },
+      "body": null
+    }
+  ],
+  "reply": {
+    "content": [
+      {
+        "type": "text",
+        "text": [
+          "<!-- file=\"Golden file\" -->",
+          "<!-- Optimized Figma Layout (67.4% smaller than the raw API response | 1 KB -> 0.4 KB) -->",
+          "{",
+          "  \"id\": \"1:1\",",
+          "  \"name\": \"Card\",",
+          "  \"type\": \"FRAME\",",
+          "  \"width\": 320,",
+          "  \"height\":",
+          "",
+          "<!-- cut at depth=0 to fit 400 bytes. Read a specific node_id for more depth, or raise budget_tokens. -->"
+        ]
+      }
+    ]
+  }
+}

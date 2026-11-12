@@ -1,0 +1,63 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "EXECUTE",
+    "id": "e1",
+    "code": "throw new Error('x cannot be overridden in an instance');"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "e1",
+     "success": false,
+     "description": "AI Command Execution",
+     "error": "x cannot be overridden in an instance\n  at line 1: throw new Error('x cannot be overridden in an instance');\n\nHINT: Children of an INSTANCE cannot have x/y (and other override-forbidden props) set directly. Position via AutoLayout on the parent (itemSpacing, primaryAxisAlignItems, counterAxisAlignItems), or edit the master COMPONENT instead of the instance. bridge.setPosition(node, x, y) checks this for you.",
+     "code": "INSTANCE_TRANSFORM_LOCKED",
+     "durationMs": 0,
+     "line": 1,
+     "column": 7,
+     "at": "throw new Error('x cannot be overridden in an instance');"
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "selection": []
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [],
+  "notifies": [
+   {
+    "text": "AI Command Execution...",
+    "opts": {
+     "timeout": 30000
+    }
+   },
+   {
+    "text": "Error: x cannot be overridden in an instance",
+    "opts": {
+     "error": true,
+     "timeout": 6000
+    }
+   }
+  ],
+  "cancels": 1,
+  "uiResizes": [],
+  "fontLoads": [
+   "Inter/Regular",
+   "Inter/Medium",
+   "Inter/Bold"
+  ],
+  "exports": [],
+  "modeSets": [],
+  "storage": {}
+ }
+}

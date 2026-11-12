@@ -1,0 +1,36 @@
+{
+  "call": {
+    "tool": "figma_execute_code",
+    "arguments": {
+      "code": "await ensureFont('Inter', 'Bold'); const t = figma.createText(); t.fontName = { family: 'Inter', style: 'Bold' }; t.characters = 'Hi'; return t.id;"
+    }
+  },
+  "sent_to_plugin": [
+    {
+      "code": [
+        "(function (st) { const ms = st.__fontTimeoutMs || 5000; const done = st.__fontsLoaded || (st.__fontsLoaded = {}); const memo = (load, key) => { const m = new Map(); return function () { const k = key.apply(null, arguments); if (k === null) return load.apply(null, arguments); if (done[k]) return Promise.resolve(); if (!m.has(k)) { let tm; const late = typeof setTimeout === 'function' ? new Promise(r => { tm = setTimeout(r, ms); }) : new Promise(() => {}); m.set(k, Promise.race([Promise.resolve(load.apply(null, arguments)), late]).then(() => { if (tm) clearTimeout(tm); done[k] = 1; }, e => { if (tm) clearTimeout(tm); m.delete(k); throw e; })); } return m.get(k); }; }; ensureFont = memo(ensureFont, (f, s) => 'e|' + (f || 'Inter') + '|' + (s || 'Regular')); const lf = memo(figma.loadFontAsync.bind(figma), f => f && f.family ? f.family + '|' + f.style : null); figma = (function (real) { return new Proxy({}, { get(t, k) { if (k === 'loadFontAsync') return lf; const v = real[k]; return typeof v === 'function' ? v.bind(real) : v; }, set(t, k, v) { real[k] = v; return true; }, has(t, k) { return k in real; } }); })(figma); })(typeof bridge !== 'undefined' && bridge && bridge.state || {}); await ensureFont('Inter', 'Bold'); const t = figma.createText(); t.fontName = { family: 'Inter', style: 'Bold' }; t.characters = 'Hi'; return t.id;"
+      ],
+      "description": "Execute JS Code",
+      "capture": false,
+      "capture_node_ids": null,
+      "diff": false,
+      "scale": 1,
+      "max_px": 1024
+    }
+  ],
+  "reply": {
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": true,
+          "result": "7:1",
+          "created": [
+            "7:1"
+          ]
+        }
+      }
+    ]
+  }
+}

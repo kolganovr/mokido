@@ -1,0 +1,38 @@
+{
+  "call": {
+    "tool": "figma_execute_code",
+    "arguments": {
+      "code": "foo(1);"
+    }
+  },
+  "sent_to_plugin": [
+    {
+      "code": [
+        "foo(1);"
+      ],
+      "description": "Execute JS Code",
+      "capture": false,
+      "capture_node_ids": null,
+      "diff": false,
+      "scale": 1,
+      "max_px": 1024
+    }
+  ],
+  "reply": {
+    "isError": true,
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": false,
+          "code": "SCRIPT_RUNTIME_ERROR",
+          "error": "ReferenceError: foo is not defined",
+          "line": 7,
+          "column": 3,
+          "at": "foo(1);"
+        }
+      }
+    ]
+  }
+}

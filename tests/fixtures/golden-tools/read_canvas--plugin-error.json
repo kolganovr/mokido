@@ -1,0 +1,32 @@
+{
+  "call": {
+    "tool": "figma_read_canvas",
+    "arguments": {
+      "node_ids": [
+        "9:9"
+      ]
+    }
+  },
+  "sent_to_plugin": [
+    {
+      "type": "READ_CANVAS",
+      "node_ids": "9:9",
+      "depth": 6,
+      "include_hidden": false
+    }
+  ],
+  "reply": {
+    "isError": true,
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": false,
+          "code": "NODE_NOT_FOUND",
+          "error": "No such node"
+        }
+      }
+    ]
+  }
+}

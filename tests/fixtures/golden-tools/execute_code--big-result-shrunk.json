@@ -1,0 +1,389 @@
+{
+  "call": {
+    "tool": "figma_execute_code",
+    "arguments": {
+      "code": "return bridge.state.big;"
+    }
+  },
+  "sent_to_plugin": [
+    {
+      "code": [
+        "return bridge.state.big;"
+      ],
+      "description": "Execute JS Code",
+      "capture": false,
+      "capture_node_ids": null,
+      "diff": false,
+      "scale": 1,
+      "max_px": 1024
+    }
+  ],
+  "reply": {
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": true,
+          "result": {
+            "rows": [
+              {
+                "id": "1:0",
+                "name": "Row 0",
+                "fills": [
+                  "{object with 2 keys}"
+                ]
+              },
+              {
+                "id": "1:1",
+                "name": "Row 1",
+                "fills": [
+                  "{object with 2 keys}"
+                ]
+              },
+              {
+                "id": "1:2",
+                "name": "Row 2",
+                "fills": [
+                  "{object with 2 keys}"
+                ]
+              },
+              {
+                "id": "1:3",
+                "name": "Row 3",
+                "fills": [
+                  "{object with 2 keys}"
+                ]
+              },
+              {
+                "id": "1:4",
+                "name": "Row 4",
+                "fills": [
+                  "{object with 2 keys}"
+                ]
+              },
+              {
+                "id": "1:5",
+                "name": "Row 5",
+                "fills": [
+                  "{object with 2 keys}"
+                ]
+              },
+              {
+                "id": "1:6",
+                "name": "Row 6",
+                "fills": [
+                  "{object with 2 keys}"
+                ]
+              },
+              {
+                "id": "1:7",
+                "name": "Row 7",
+                "fills": [
+                  "{object with 2 keys}"
+                ]
+              },
+              {
+                "id": "1:8",
+                "name": "Row 8",
+                "fills": [
+                  "{object with 2 keys}"
+                ]
+              },
+              {
+                "id": "1:9",
+                "name": "Row 9",
+                "fills": [
+                  "{object with 2 keys}"
+                ]
+              },
+              {
+                "id": "1:10",
+                "name": "Row 10",
+                "fills": [
+                  "{object with 2 keys}"
+                ]
+              },
+              {
+                "id": "1:11",
+                "name": "Row 11",
+                "fills": [
+                  "{object with 2 keys}"
+                ]
+              },
+              {
+                "id": "1:12",
+                "name": "Row 12",
+                "fills": [
+                  "{object with 2 keys}"
+                ]
+              },
+              {
+                "id": "1:13",
+                "name": "Row 13",
+                "fills": [
+                  "{object with 2 keys}"
+                ]
+              },
+              {
+                "id": "1:14",
+                "name": "Row 14",
+                "fills": [
+                  "{object with 2 keys}"
+                ]
+              },
+              {
+                "id": "1:15",
+                "name": "Row 15",
+                "fills": [
+                  "{object with 2 keys}"
+                ]
+              },
+              {
+                "id": "1:16",
+                "name": "Row 16",
+                "fills": [
+                  "{object with 2 keys}"
+                ]
+              },
+              {
+                "id": "1:17",
+                "name": "Row 17",
+                "fills": [
+                  "{object with 2 keys}"
+                ]
+              },
+              {
+                "id": "1:18",
+                "name": "Row 18",
+                "fills": [
+                  "{object with 2 keys}"
+                ]
+              },
+              {
+                "id": "1:19",
+                "name": "Row 19",
+                "fills": [
+                  "{object with 2 keys}"
+                ]
+              },
+              {
+                "id": "1:20",
+                "name": "Row 20",
+                "fills": [
+                  "{object with 2 keys}"
+                ]
+              },
+              {
+                "id": "1:21",
+                "name": "Row 21",
+                "fills": [
+                  "{object with 2 keys}"
+                ]
+              },
+              {
+                "id": "1:22",
+                "name": "Row 22",
+                "fills": [
+                  "{object with 2 keys}"
+                ]
+              },
+              {
+                "id": "1:23",
+                "name": "Row 23",
+                "fills": [
+                  "{object with 2 keys}"
+                ]
+              },
+              {
+                "id": "1:24",
+                "name": "Row 24",
+                "fills": [
+                  "{object with 2 keys}"
+                ]
+              },
+              {
+                "id": "1:25",
+                "name": "Row 25",
+                "fills": [
+                  "{object with 2 keys}"
+                ]
+              },
+              {
+                "id": "1:26",
+                "name": "Row 26",
+                "fills": [
+                  "{object with 2 keys}"
+                ]
+              },
+              {
+                "id": "1:27",
+                "name": "Row 27",
+                "fills": [
+                  "{object with 2 keys}"
+                ]
+              },
+              {
+                "id": "1:28",
+                "name": "Row 28",
+                "fills": [
+                  "{object with 2 keys}"
+                ]
+              },
+              {
+                "id": "1:29",
+                "name": "Row 29",
+                "fills": [
+                  "{object with 2 keys}"
+                ]
+              },
+              {
+                "id": "1:30",
+                "name": "Row 30",
+                "fills": [
+                  "{object with 2 keys}"
+                ]
+              },
+              {
+                "id": "1:31",
+                "name": "Row 31",
+                "fills": [
+                  "{object with 2 keys}"
+                ]
+              },
+              {
+                "id": "1:32",
+                "name": "Row 32",
+                "fills": [
+                  "{object with 2 keys}"
+                ]
+              },
+              {
+                "id": "1:33",
+                "name": "Row 33",
+                "fills": [
+                  "{object with 2 keys}"
+                ]
+              },
+              {
+                "id": "1:34",
+                "name": "Row 34",
+                "fills": [
+                  "{object with 2 keys}"
+                ]
+              },
+              {
+                "id": "1:35",
+                "name": "Row 35",
+                "fills": [
+                  "{object with 2 keys}"
+                ]
+              },
+              {
+                "id": "1:36",
+                "name": "Row 36",
+                "fills": [
+                  "{object with 2 keys}"
+                ]
+              },
+              {
+                "id": "1:37",
+                "name": "Row 37",
+                "fills": [
+                  "{object with 2 keys}"
+                ]
+              },
+              {
+                "id": "1:38",
+                "name": "Row 38",
+                "fills": [
+                  "{object with 2 keys}"
+                ]
+              },
+              {
+                "id": "1:39",
+                "name": "Row 39",
+                "fills": [
+                  "{object with 2 keys}"
+                ]
+              },
+              {
+                "id": "1:40",
+                "name": "Row 40",
+                "fills": [
+                  "{object with 2 keys}"
+                ]
+              },
+              {
+                "id": "1:41",
+                "name": "Row 41",
+                "fills": [
+                  "{object with 2 keys}"
+                ]
+              },
+              {
+                "id": "1:42",
+                "name": "Row 42",
+                "fills": [
+                  "{object with 2 keys}"
+                ]
+              },
+              {
+                "id": "1:43",
+                "name": "Row 43",
+                "fills": [
+                  "{object with 2 keys}"
+                ]
+              },
+              {
+                "id": "1:44",
+                "name": "Row 44",
+                "fills": [
+                  "{object with 2 keys}"
+                ]
+              },
+              {
+                "id": "1:45",
+                "name": "Row 45",
+                "fills": [
+                  "{object with 2 keys}"
+                ]
+              },
+              {
+                "id": "1:46",
+                "name": "Row 46",
+                "fills": [
+                  "{object with 2 keys}"
+                ]
+              },
+              {
+                "id": "1:47",
+                "name": "Row 47",
+                "fills": [
+                  "{object with 2 keys}"
+                ]
+              },
+              {
+                "id": "1:48",
+                "name": "Row 48",
+                "fills": [
+                  "{object with 2 keys}"
+                ]
+              },
+              {
+                "id": "1:49",
+                "name": "Row 49",
+                "fills": [
+                  "{object with 2 keys}"
+                ]
+              },
+              "…+350 more (400 total)"
+            ]
+          },
+          "truncated": "result shrunk 34590→3167 bytes (cuts marked with …). Full value is in bridge.state.lastResult — next call return just the part you need, e.g. `return bridge.state.lastResult.slice(40, 80)` for an array, or only the keys you need; don't re-run. Return less.",
+          "duration_ms": 9
+        }
+      }
+    ]
+  }
+}

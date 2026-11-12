@@ -1,0 +1,32 @@
+{
+  "call": {
+    "tool": "figma_screenshot",
+    "arguments": {
+      "ids": [
+        "9:3"
+      ]
+    }
+  },
+  "sent_to_plugin": [
+    {
+      "type": "SCREENSHOT",
+      "nodeIds": "9:3",
+      "scale": 1,
+      "max_px": 1024,
+      "description": "Figma Screenshot"
+    }
+  ],
+  "reply": {
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": true,
+          "result": "Captured",
+          "images": []
+        }
+      }
+    ]
+  }
+}

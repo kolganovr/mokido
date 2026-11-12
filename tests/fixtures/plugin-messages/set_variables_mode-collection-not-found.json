@@ -1,0 +1,51 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "SET_VARIABLES_MODE",
+    "id": "m1",
+    "startTime": 3,
+    "collection_name": "Nope",
+    "mode_name": "Dark"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "m1",
+     "success": false,
+     "description": "Set Variable Mode \"Dark\" on \"Nope\"",
+     "error": "Variable collection \"Nope\" not found.",
+     "startTime": 3
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "selection": []
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [],
+  "notifies": [
+   {
+    "text": "Error: Variable collection \"Nope\" not found.",
+    "opts": {
+     "error": true,
+     "timeout": 6000
+    }
+   }
+  ],
+  "cancels": 0,
+  "uiResizes": [],
+  "fontLoads": [],
+  "exports": [],
+  "modeSets": [],
+  "storage": {}
+ }
+}

@@ -1,0 +1,35 @@
+{
+  "call": {
+    "tool": "figma_execute_code",
+    "arguments": {
+      "code": "/* run-anyway */ return figma.currentPage.findAll(n => n.type === 'TEXT').length;"
+    }
+  },
+  "sent_to_plugin": [
+    {
+      "code": [
+        "/* run-anyway */ return figma.currentPage.findAll(n => n.type === 'TEXT').length;"
+      ],
+      "description": "Execute JS Code",
+      "capture": false,
+      "capture_node_ids": null,
+      "diff": false,
+      "scale": 1,
+      "max_px": 1024
+    }
+  ],
+  "reply": {
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": true,
+          "use_instead": "figma_inspect {\"node_ids\":[\"1:2\"],\"depth\":3} — reads the same nodes in ONE call (one line per node: TYPE \"name\" #id WxH @x,y [layout] fill font \"text\" →component variant), every id at once; a long reply pages with offset=K. Hand-written read #4 in a row: each is a full model turn that re-sends the whole conversation. Next: one figma_inspect for everything still unknown, then ONE figma_execute_code that makes the whole change and returns only ids/flags.",
+          "lint": "Whole-page scan: figma.currentPage.findAll / a walk of the whole page freezes the plugin for minutes on a big file (747 s seen). Scope it to a section: figma_inspect with node_ids, find / find_type (name search), or view:\"flow\" for prototype links; or findAll on a section node in a write script.",
+          "result": 3
+        }
+      }
+    ]
+  }
+}

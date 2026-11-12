@@ -1,0 +1,186 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "INSERT_COMPONENT_INSTANCE",
+    "id": "i1",
+    "startTime": 1,
+    "component_name": "Locked",
+    "text_overrides": {
+     "Label": "y"
+    }
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "i1",
+     "success": true,
+     "description": "Insert Component \"Locked\"",
+     "result": {
+      "instanceId": "1:15",
+      "name": "Locked",
+      "masterComponentId": "1:1",
+      "masterName": "Locked",
+      "parentContainer": "Page 1",
+      "width": 100,
+      "height": 100,
+      "warnings": [
+       "text_overrides not applied (no matching text layer or property): Label"
+      ]
+     },
+     "screenshot": null,
+     "captureNote": null,
+     "targetName": "Locked",
+     "targetId": "1:15",
+     "checkpointId": "cp_loyw3v28_1",
+     "created": [
+      "1:15"
+     ],
+     "modified": [],
+     "warnings": [
+      "text_overrides not applied (no matching text layer or property): Label"
+     ],
+     "startTime": 1
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "children": [
+     {
+      "id": "1:1",
+      "type": "COMPONENT",
+      "name": "Locked",
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "width": 100,
+      "height": 100,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [],
+      "strokes": [],
+      "layoutMode": "NONE",
+      "clipsContent": false,
+      "componentProperties": {},
+      "children": [
+       {
+        "id": "1:2",
+        "type": "TEXT",
+        "name": "Label",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 100,
+        "height": 20,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [],
+        "strokes": [],
+        "characters": "x",
+        "fontName": {
+         "family": "Inter",
+         "style": "Regular"
+        },
+        "fontSize": 14,
+        "textAutoResize": "WIDTH_AND_HEIGHT"
+       }
+      ]
+     },
+     {
+      "id": "1:15",
+      "type": "INSTANCE",
+      "name": "Locked",
+      "visible": true,
+      "x": 180,
+      "y": 0,
+      "width": 100,
+      "height": 100,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [],
+      "strokes": [],
+      "layoutMode": "NONE",
+      "clipsContent": false,
+      "componentProperties": {},
+      "variantProperties": null,
+      "layoutSizingHorizontal": "FIXED",
+      "layoutSizingVertical": "FIXED",
+      "layoutPositioning": "AUTO",
+      "mainComponent": "1:1",
+      "children": [
+       {
+        "id": "1:16",
+        "type": "TEXT",
+        "name": "Label",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 100,
+        "height": 20,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [],
+        "strokes": [],
+        "characters": "x",
+        "fontName": {
+         "family": "Inter",
+         "style": "Regular"
+        },
+        "fontSize": 14,
+        "textAutoResize": "WIDTH_AND_HEIGHT"
+       }
+      ]
+     }
+    ],
+    "selection": [
+     "1:15"
+    ]
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [
+   [
+    "1:15"
+   ]
+  ],
+  "notifies": [
+   {
+    "text": "Inserting component...",
+    "opts": {
+     "timeout": 15000
+    }
+   },
+   {
+    "text": "Inserted Locked",
+    "opts": {
+     "timeout": 3000
+    }
+   }
+  ],
+  "cancels": 1,
+  "uiResizes": [],
+  "fontLoads": [
+   "Inter/Regular",
+   "Inter/Medium",
+   "Inter/Bold"
+  ],
+  "exports": [],
+  "modeSets": [],
+  "storage": {}
+ }
+}

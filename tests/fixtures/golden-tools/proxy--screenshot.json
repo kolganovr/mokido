@@ -1,0 +1,39 @@
+{
+  "call": {
+    "tool": "figma_screenshot",
+    "arguments": {
+      "node_ids": [
+        "1:1"
+      ]
+    }
+  },
+  "sent_to_plugin": [
+    {
+      "type": "SCREENSHOT",
+      "nodeIds": "1:1",
+      "scale": 1,
+      "max_px": 1024,
+      "description": "Figma Screenshot"
+    }
+  ],
+  "reply": {
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": true,
+          "result": "Captured 1",
+          "images": [
+            "A 5x5 ~1tok"
+          ]
+        }
+      },
+      {
+        "type": "image",
+        "mimeType": "image/png",
+        "data": "iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFAAAAAAAAAAAA"
+      }
+    ]
+  }
+}

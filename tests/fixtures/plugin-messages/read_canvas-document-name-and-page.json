@@ -1,0 +1,91 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "READ_CANVAS",
+    "id": "R1",
+    "startTime": 8
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "R1",
+     "success": true,
+     "description": "Read Canvas",
+     "result": {
+      "document": {
+       "id": "0:2",
+       "name": "Second page",
+       "type": "CANVAS",
+       "children": [
+        {
+         "id": "1:1",
+         "name": "Only here",
+         "type": "FRAME",
+         "visible": true,
+         "absoluteBoundingBox": {
+          "x": 0,
+          "y": 0,
+          "width": 100,
+          "height": 100
+         },
+         "fills": []
+        }
+       ]
+      },
+      "name": "Test File",
+      "truncatedTop": false
+     },
+     "startTime": 8
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "selection": []
+   },
+   {
+    "id": "0:2",
+    "type": "PAGE",
+    "name": "Second page",
+    "visible": true,
+    "children": [
+     {
+      "id": "1:1",
+      "type": "FRAME",
+      "name": "Only here",
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "width": 100,
+      "height": 100,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [],
+      "strokes": [],
+      "layoutMode": "NONE",
+      "clipsContent": false
+     }
+    ],
+    "selection": []
+   }
+  ],
+  "currentPage": "0:2",
+  "viewport": [],
+  "notifies": [],
+  "cancels": 0,
+  "uiResizes": [],
+  "fontLoads": [],
+  "exports": [],
+  "modeSets": [],
+  "storage": {}
+ }
+}

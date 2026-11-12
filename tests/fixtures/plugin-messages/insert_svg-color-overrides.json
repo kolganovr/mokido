@@ -1,0 +1,559 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "INSERT_SVG",
+    "id": "v1",
+    "startTime": 4,
+    "svg_code": "<svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M0 0h24v24H0z\"/></svg>",
+    "name": "Fill",
+    "fill_override": "#FF0000"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "v1",
+     "success": true,
+     "description": "Insert SVG \"Fill\"",
+     "result": {
+      "nodeId": "1:13",
+      "name": "Fill",
+      "type": "FRAME",
+      "width": 24,
+      "height": 24,
+      "parentContainer": "Page 1"
+     },
+     "screenshot": null,
+     "captureNote": null,
+     "targetName": "Fill",
+     "targetId": "1:13",
+     "checkpointId": "cp_loyw3v28_1",
+     "created": [
+      "1:13"
+     ],
+     "modified": [],
+     "warnings": [],
+     "startTime": 4
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "INSERT_SVG",
+    "id": "v1",
+    "startTime": 4,
+    "svg_code": "<svg width=\"48\" height=\"24\"><path d=\"M0 0L10 10\" stroke=\"#000\"/></svg>",
+    "name": "Stroke",
+    "stroke_override": "#00ff00"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "v1",
+     "success": true,
+     "description": "Insert SVG \"Stroke\"",
+     "result": {
+      "nodeId": "1:15",
+      "name": "Stroke",
+      "type": "FRAME",
+      "width": 48,
+      "height": 24,
+      "parentContainer": "Fill"
+     },
+     "screenshot": null,
+     "captureNote": null,
+     "targetName": "Stroke",
+     "targetId": "1:15",
+     "checkpointId": "cp_loyw3v28_2",
+     "created": [
+      "1:15"
+     ],
+     "modified": [],
+     "warnings": [],
+     "startTime": 4
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "INSERT_SVG",
+    "id": "v1",
+    "startTime": 4,
+    "svg_code": "<svg width=\"48\" height=\"24\"><path d=\"M0 0L10 10\" stroke=\"#000\"/></svg>",
+    "name": "Universal",
+    "color_override": "rgb(10, 20, 30)",
+    "fill_override": "white"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "v1",
+     "success": true,
+     "description": "Insert SVG \"Universal\"",
+     "result": {
+      "nodeId": "1:17",
+      "name": "Universal",
+      "type": "FRAME",
+      "width": 48,
+      "height": 24,
+      "parentContainer": "Stroke"
+     },
+     "screenshot": null,
+     "captureNote": null,
+     "targetName": "Universal",
+     "targetId": "1:17",
+     "checkpointId": "cp_loyw3v28_3",
+     "created": [
+      "1:17"
+     ],
+     "modified": [],
+     "warnings": [],
+     "startTime": 4
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "INSERT_SVG",
+    "id": "v1",
+    "startTime": 4,
+    "svg_code": "<svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M0 0h24v24H0z\"/></svg>",
+    "name": "Short hex",
+    "color_override": "#f00"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "v1",
+     "success": true,
+     "description": "Insert SVG \"Short hex\"",
+     "result": {
+      "nodeId": "1:19",
+      "name": "Short hex",
+      "type": "FRAME",
+      "width": 24,
+      "height": 24,
+      "parentContainer": "Universal"
+     },
+     "screenshot": null,
+     "captureNote": null,
+     "targetName": "Short hex",
+     "targetId": "1:19",
+     "checkpointId": "cp_loyw3v28_4",
+     "created": [
+      "1:19"
+     ],
+     "modified": [],
+     "warnings": [],
+     "startTime": 4
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "INSERT_SVG",
+    "id": "v1",
+    "startTime": 4,
+    "svg_code": "<svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M0 0h24v24H0z\"/></svg>",
+    "name": "Black",
+    "fill_override": "black"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "v1",
+     "success": true,
+     "description": "Insert SVG \"Black\"",
+     "result": {
+      "nodeId": "1:21",
+      "name": "Black",
+      "type": "FRAME",
+      "width": 24,
+      "height": 24,
+      "parentContainer": "Short hex"
+     },
+     "screenshot": null,
+     "captureNote": null,
+     "targetName": "Black",
+     "targetId": "1:21",
+     "checkpointId": "cp_loyw3v28_5",
+     "created": [
+      "1:21"
+     ],
+     "modified": [],
+     "warnings": [],
+     "startTime": 4
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "INSERT_SVG",
+    "id": "v1",
+    "startTime": 4,
+    "svg_code": "<svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M0 0h24v24H0z\"/></svg>",
+    "name": "Clamped",
+    "fill_override": "rgba(300, 0, 0, 0.5)"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "v1",
+     "success": true,
+     "description": "Insert SVG \"Clamped\"",
+     "result": {
+      "nodeId": "1:23",
+      "name": "Clamped",
+      "type": "FRAME",
+      "width": 24,
+      "height": 24,
+      "parentContainer": "Black"
+     },
+     "screenshot": null,
+     "captureNote": null,
+     "targetName": "Clamped",
+     "targetId": "1:23",
+     "checkpointId": "cp_loyw3v28_6",
+     "created": [
+      "1:23"
+     ],
+     "modified": [],
+     "warnings": [],
+     "startTime": 4
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "children": [
+     {
+      "id": "1:13",
+      "type": "FRAME",
+      "name": "Fill",
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "width": 24,
+      "height": 24,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [],
+      "strokes": [],
+      "layoutMode": "NONE",
+      "clipsContent": false,
+      "children": [
+       {
+        "id": "1:14",
+        "type": "VECTOR",
+        "name": "Vector",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 24,
+        "height": 24,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [
+         {
+          "type": "SOLID",
+          "color": {
+           "r": 1,
+           "g": 0,
+           "b": 0
+          }
+         }
+        ],
+        "strokes": []
+       },
+       {
+        "id": "1:15",
+        "type": "FRAME",
+        "name": "Stroke",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 48,
+        "height": 24,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [],
+        "strokes": [],
+        "layoutMode": "NONE",
+        "clipsContent": false,
+        "children": [
+         {
+          "id": "1:16",
+          "type": "VECTOR",
+          "name": "Vector",
+          "visible": true,
+          "x": 0,
+          "y": 0,
+          "width": 48,
+          "height": 24,
+          "constraints": {
+           "horizontal": "MIN",
+           "vertical": "MIN"
+          },
+          "fills": [],
+          "strokes": [
+           {
+            "type": "SOLID",
+            "color": {
+             "r": 0,
+             "g": 1,
+             "b": 0
+            }
+           }
+          ]
+         },
+         {
+          "id": "1:17",
+          "type": "FRAME",
+          "name": "Universal",
+          "visible": true,
+          "x": 0,
+          "y": 0,
+          "width": 48,
+          "height": 24,
+          "constraints": {
+           "horizontal": "MIN",
+           "vertical": "MIN"
+          },
+          "fills": [],
+          "strokes": [],
+          "layoutMode": "NONE",
+          "clipsContent": false,
+          "children": [
+           {
+            "id": "1:18",
+            "type": "VECTOR",
+            "name": "Vector",
+            "visible": true,
+            "x": 0,
+            "y": 0,
+            "width": 48,
+            "height": 24,
+            "constraints": {
+             "horizontal": "MIN",
+             "vertical": "MIN"
+            },
+            "fills": [],
+            "strokes": [
+             {
+              "type": "SOLID",
+              "color": {
+               "r": 0.0392156862745098,
+               "g": 0.0784313725490196,
+               "b": 0.11764705882352941
+              }
+             }
+            ]
+           },
+           {
+            "id": "1:19",
+            "type": "FRAME",
+            "name": "Short hex",
+            "visible": true,
+            "x": 0,
+            "y": 0,
+            "width": 24,
+            "height": 24,
+            "constraints": {
+             "horizontal": "MIN",
+             "vertical": "MIN"
+            },
+            "fills": [],
+            "strokes": [],
+            "layoutMode": "NONE",
+            "clipsContent": false,
+            "children": [
+             {
+              "id": "1:20",
+              "type": "VECTOR",
+              "name": "Vector",
+              "visible": true,
+              "x": 0,
+              "y": 0,
+              "width": 24,
+              "height": 24,
+              "constraints": {
+               "horizontal": "MIN",
+               "vertical": "MIN"
+              },
+              "fills": [
+               {
+                "type": "SOLID",
+                "color": {
+                 "r": 1,
+                 "g": 0,
+                 "b": 0
+                }
+               }
+              ],
+              "strokes": []
+             },
+             {
+              "id": "1:21",
+              "type": "FRAME",
+              "name": "Black",
+              "visible": true,
+              "x": 0,
+              "y": 0,
+              "width": 24,
+              "height": 24,
+              "constraints": {
+               "horizontal": "MIN",
+               "vertical": "MIN"
+              },
+              "fills": [],
+              "strokes": [],
+              "layoutMode": "NONE",
+              "clipsContent": false,
+              "children": [
+               {
+                "id": "1:22",
+                "type": "VECTOR",
+                "name": "Vector",
+                "visible": true,
+                "x": 0,
+                "y": 0,
+                "width": 24,
+                "height": 24,
+                "constraints": {
+                 "horizontal": "MIN",
+                 "vertical": "MIN"
+                },
+                "fills": [
+                 {
+                  "type": "SOLID",
+                  "color": {
+                   "r": 0,
+                   "g": 0,
+                   "b": 0
+                  }
+                 }
+                ],
+                "strokes": []
+               },
+               {
+                "id": "1:23",
+                "type": "FRAME",
+                "name": "Clamped",
+                "visible": true,
+                "x": 0,
+                "y": 0,
+                "width": 24,
+                "height": 24,
+                "constraints": {
+                 "horizontal": "MIN",
+                 "vertical": "MIN"
+                },
+                "fills": [],
+                "strokes": [],
+                "layoutMode": "NONE",
+                "clipsContent": false,
+                "children": [
+                 {
+                  "id": "1:24",
+                  "type": "VECTOR",
+                  "name": "Vector",
+                  "visible": true,
+                  "x": 0,
+                  "y": 0,
+                  "width": 24,
+                  "height": 24,
+                  "constraints": {
+                   "horizontal": "MIN",
+                   "vertical": "MIN"
+                  },
+                  "fills": [
+                   {
+                    "type": "SOLID",
+                    "color": {
+                     "r": 1,
+                     "g": 0,
+                     "b": 0
+                    }
+                   }
+                  ],
+                  "strokes": []
+                 }
+                ]
+               }
+              ]
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ],
+    "selection": [
+     "1:23"
+    ]
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [
+   [
+    "1:13"
+   ],
+   [
+    "1:15"
+   ],
+   [
+    "1:17"
+   ],
+   [
+    "1:19"
+   ],
+   [
+    "1:21"
+   ],
+   [
+    "1:23"
+   ]
+  ],
+  "notifies": [
+   {
+    "text": "Inserting vector SVG...",
+    "opts": {
+     "timeout": 15000
+    }
+   },
+   {
+    "text": "Vector inserted: Fill",
+    "opts": {
+     "timeout": 3000
+    }
+   },
+   {
+    "text": "Inserting vector SVG...",
+    "opts": {
+     "timeout": 15000
+    }
+   }
+  ],
+  "cancels": 2,
+  "uiResizes": [],
+  "fontLoads": [],
+  "exports": [],
+  "modeSets": [],
+  "storage": {}
+ }
+}

@@ -1,0 +1,204 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "EXECUTE",
+    "id": "e1",
+    "code": "const f = figma.createFrame(); f.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];\nconst t = figma.createText(); t.characters = 'Faint caption'; t.fills = [{ type: 'SOLID', color: { r: 0.8, g: 0.8, b: 0.8 } }]; f.appendChild(t);\nconst ok = figma.createText(); ok.characters = 'Readable'; ok.fills = [{ type: 'SOLID', color: { r: 0, g: 0, b: 0 } }]; f.appendChild(ok);\nconst hidden = figma.createText(); hidden.characters = 'hidden fill'; hidden.fills = [{ type: 'SOLID', visible: false, color: { r: 1, g: 1, b: 1 } }]; f.appendChild(hidden); return f.id;"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "e1",
+     "success": true,
+     "description": "AI Command Execution",
+     "result": "1:13",
+     "resultStashed": true,
+     "screenshot": null,
+     "screenshots": null,
+     "beforeScreenshot": null,
+     "captureNote": null,
+     "targetName": null,
+     "targetId": null,
+     "checkpointId": "cp_loyw3v28_1",
+     "created": [
+      "1:13",
+      "1:14",
+      "1:15",
+      "1:16"
+     ],
+     "modified": [],
+     "warnings": [
+      "Text \"Faint caption\" has ~1.6:1 contrast against its parent fill (WCAG AA wants 4.5:1)."
+     ],
+     "durationMs": 0
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "children": [
+     {
+      "id": "1:13",
+      "type": "FRAME",
+      "name": "Frame",
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "width": 100,
+      "height": 100,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [
+       {
+        "type": "SOLID",
+        "color": {
+         "r": 1,
+         "g": 1,
+         "b": 1
+        }
+       }
+      ],
+      "strokes": [],
+      "layoutMode": "NONE",
+      "clipsContent": false,
+      "children": [
+       {
+        "id": "1:14",
+        "type": "TEXT",
+        "name": "Text",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 100,
+        "height": 20,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [
+         {
+          "type": "SOLID",
+          "color": {
+           "r": 0.8,
+           "g": 0.8,
+           "b": 0.8
+          }
+         }
+        ],
+        "strokes": [],
+        "characters": "Faint caption",
+        "fontName": {
+         "family": "Inter",
+         "style": "Regular"
+        },
+        "fontSize": 14,
+        "textAutoResize": "WIDTH_AND_HEIGHT"
+       },
+       {
+        "id": "1:15",
+        "type": "TEXT",
+        "name": "Text",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 100,
+        "height": 20,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [
+         {
+          "type": "SOLID",
+          "color": {
+           "r": 0,
+           "g": 0,
+           "b": 0
+          }
+         }
+        ],
+        "strokes": [],
+        "characters": "Readable",
+        "fontName": {
+         "family": "Inter",
+         "style": "Regular"
+        },
+        "fontSize": 14,
+        "textAutoResize": "WIDTH_AND_HEIGHT"
+       },
+       {
+        "id": "1:16",
+        "type": "TEXT",
+        "name": "Text",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 100,
+        "height": 20,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [
+         {
+          "type": "SOLID",
+          "visible": false,
+          "color": {
+           "r": 1,
+           "g": 1,
+           "b": 1
+          }
+         }
+        ],
+        "strokes": [],
+        "characters": "hidden fill",
+        "fontName": {
+         "family": "Inter",
+         "style": "Regular"
+        },
+        "fontSize": 14,
+        "textAutoResize": "WIDTH_AND_HEIGHT"
+       }
+      ]
+     }
+    ],
+    "selection": []
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [],
+  "notifies": [
+   {
+    "text": "AI Command Execution...",
+    "opts": {
+     "timeout": 30000
+    }
+   },
+   {
+    "text": "AI Command Execution — done!",
+    "opts": {
+     "timeout": 2500
+    }
+   }
+  ],
+  "cancels": 1,
+  "uiResizes": [],
+  "fontLoads": [
+   "Inter/Regular",
+   "Inter/Medium",
+   "Inter/Bold"
+  ],
+  "exports": [],
+  "modeSets": [],
+  "storage": {}
+ }
+}

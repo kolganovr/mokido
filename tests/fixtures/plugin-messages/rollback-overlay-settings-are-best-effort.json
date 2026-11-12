@@ -1,0 +1,135 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "EXECUTE",
+    "id": "e1",
+    "code": "const n = figma.getNodeById('1:1'); bridge.snapshot(n); n.overlayPositionType = 'MANUAL'; n.overlayBackground = { type: 'SOLID_COLOR' }; return 1;"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "e1",
+     "success": true,
+     "description": "AI Command Execution",
+     "result": 1,
+     "resultStashed": true,
+     "screenshot": null,
+     "screenshots": null,
+     "beforeScreenshot": null,
+     "captureNote": null,
+     "targetName": null,
+     "targetId": null,
+     "checkpointId": "cp_loyw3v28_1",
+     "created": [],
+     "modified": [
+      "1:1"
+     ],
+     "warnings": [],
+     "durationMs": 0
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "ROLLBACK",
+    "id": "b1",
+    "startTime": 9,
+    "checkpoint_id": "cp_loyw3v28_1"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "b1",
+     "success": true,
+     "description": "Rollback cp_loyw3v28_1",
+     "result": {
+      "checkpoint_id": "cp_loyw3v28_1",
+      "label": "AI Command Execution",
+      "removed": [],
+      "restored": [
+       "1:1"
+      ],
+      "missing": []
+     },
+     "startTime": 9
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "children": [
+     {
+      "id": "1:1",
+      "type": "FRAME",
+      "name": "Overlay",
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "width": 100,
+      "height": 100,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [],
+      "strokes": [],
+      "layoutMode": "NONE",
+      "clipsContent": false,
+      "overlayPositionType": "CENTER",
+      "overlayBackground": {
+       "type": "NONE"
+      },
+      "overlayBackgroundInteraction": "CLICK_OUTSIDE"
+     }
+    ],
+    "selection": []
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [
+   [
+    "1:1"
+   ]
+  ],
+  "notifies": [
+   {
+    "text": "AI Command Execution...",
+    "opts": {
+     "timeout": 30000
+    }
+   },
+   {
+    "text": "AI Command Execution — done!",
+    "opts": {
+     "timeout": 2500
+    }
+   },
+   {
+    "text": "Rolled back \"AI Command Execution\" (0 removed, 1 restored)",
+    "opts": {
+     "timeout": 3500
+    }
+   }
+  ],
+  "cancels": 1,
+  "uiResizes": [],
+  "fontLoads": [
+   "Inter/Regular",
+   "Inter/Medium",
+   "Inter/Bold"
+  ],
+  "exports": [],
+  "modeSets": [],
+  "storage": {}
+ },
+ "extra": {
+  "attemptedReadOnlyWrites": 1
+ }
+}

@@ -1,0 +1,25 @@
+{
+  "call": {
+    "tool": "figma_execute_code",
+    "arguments": {
+      "code": "return bridge.setText.toString();"
+    }
+  },
+  "sent_to_plugin": [],
+  "reply": {
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": true,
+          "not_run": true,
+          "note": "Answered by the server without running the script: how to call bridge.setText. Call it directly in the write; don't read its source.",
+          "signatures": {
+            "setText": "await bridge.setText(root, { layerNameOrId: 'text' }) or bridge.setText(textNodeOrId, 'text') - loads all fonts and sets TEXT layers found by id or exact name under root, KEEPING font styles by words - font, size, colour, decoration, letter spacing (first word keeps its style, the tail from the first space keeps its own; more styles: word by word, extra words take the last). Replace text with it, never with `characters =` (that flattens mixed fonts) or a per-character getRangeFontName loop. Returns { set: [ids] }."
+          }
+        }
+      }
+    ]
+  }
+}

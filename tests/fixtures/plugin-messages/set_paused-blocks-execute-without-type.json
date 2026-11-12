@@ -1,0 +1,52 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "SET_PAUSED",
+    "value": true
+   },
+   "posted": [
+    {
+     "type": "PAUSED_STATE",
+     "paused": true
+    }
+   ]
+  },
+  {
+   "send": {
+    "id": "x1",
+    "code": "return 1"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "x1",
+     "success": false,
+     "description": "AI Command",
+     "error": "Paused by the user in the Mokido plugin. Ask them to press Resume there.",
+     "code": "EXECUTION_PAUSED"
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "selection": []
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [],
+  "notifies": [],
+  "cancels": 0,
+  "uiResizes": [],
+  "fontLoads": [],
+  "exports": [],
+  "modeSets": [],
+  "storage": {}
+ }
+}

@@ -1,0 +1,21 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/result?token=golden-test-token",
+    "headers": {},
+    "body": "{not json"
+  },
+  "status": 400,
+  "headers": {
+    "content-type": "application/json",
+    "access-control-allow-methods": "GET, POST, OPTIONS",
+    "access-control-allow-headers": "Content-Type, X-Bridge-Token"
+  },
+  "body": {
+    "type": "text",
+    "compact_json": true,
+    "json": {
+      "error": "Expected property name or '}' in JSON at position 1 (line 1 column 2)"
+    }
+  }
+}

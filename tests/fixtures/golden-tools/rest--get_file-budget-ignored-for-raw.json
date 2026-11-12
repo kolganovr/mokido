@@ -1,0 +1,152 @@
+{
+  "call": {
+    "tool": "get_file",
+    "arguments": {
+      "file_key": "AbC123",
+      "budget_tokens": 40,
+      "format": "raw"
+    }
+  },
+  "sent_to_plugin": [],
+  "rest_requests": [
+    {
+      "method": "GET",
+      "path": "/files/AbC123?depth=2",
+      "headers": {
+        "X-Figma-Token": "test",
+        "Content-Type": "application/json"
+      },
+      "body": null
+    }
+  ],
+  "reply": {
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "name": "Golden file",
+          "lastModified": "2026-01-01T00:00:00Z",
+          "document": {
+            "id": "0:0",
+            "name": "Document",
+            "type": "DOCUMENT",
+            "children": [
+              {
+                "id": "0:1",
+                "name": "Page 1",
+                "type": "CANVAS",
+                "children": [
+                  {
+                    "id": "1:1",
+                    "name": "Card",
+                    "type": "FRAME",
+                    "absoluteBoundingBox": {
+                      "x": 0,
+                      "y": 0,
+                      "width": 320,
+                      "height": 120
+                    },
+                    "layoutMode": "VERTICAL",
+                    "itemSpacing": 12,
+                    "paddingTop": 16,
+                    "paddingRight": 16,
+                    "paddingBottom": 16,
+                    "paddingLeft": 16,
+                    "cornerRadius": 12,
+                    "fills": [
+                      {
+                        "type": "SOLID",
+                        "visible": true,
+                        "color": {
+                          "r": 1,
+                          "g": 1,
+                          "b": 1
+                        }
+                      }
+                    ],
+                    "children": [
+                      {
+                        "id": "1:2",
+                        "name": "Title",
+                        "type": "TEXT",
+                        "absoluteBoundingBox": {
+                          "x": 16,
+                          "y": 16,
+                          "width": 288,
+                          "height": 24
+                        },
+                        "characters": "Hello",
+                        "style": {
+                          "fontFamily": "Inter",
+                          "fontWeight": 700,
+                          "fontSize": 16,
+                          "textAlignHorizontal": "LEFT"
+                        },
+                        "fills": [
+                          {
+                            "type": "SOLID",
+                            "visible": true,
+                            "color": {
+                              "r": 0.1,
+                              "g": 0.1,
+                              "b": 0.1
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "id": "1:3",
+                        "name": "Hidden Layer",
+                        "type": "TEXT",
+                        "visible": false,
+                        "absoluteBoundingBox": {
+                          "x": 0,
+                          "y": 0,
+                          "width": 10,
+                          "height": 10
+                        },
+                        "characters": "secret"
+                      },
+                      {
+                        "id": "1:5",
+                        "name": "Footer",
+                        "type": "FRAME",
+                        "absoluteBoundingBox": {
+                          "x": 16,
+                          "y": 80,
+                          "width": 288,
+                          "height": 24
+                        },
+                        "children": [
+                          {
+                            "id": "1:6",
+                            "name": "Description",
+                            "type": "TEXT",
+                            "absoluteBoundingBox": {
+                              "x": 16,
+                              "y": 80,
+                              "width": 288,
+                              "height": 24
+                            },
+                            "characters": "A longer paragraph of body copy nested two levels deep, which a shallow depth cuts away.",
+                            "style": {
+                              "fontFamily": "Inter",
+                              "fontWeight": 400,
+                              "fontSize": 13,
+                              "textAlignHorizontal": "LEFT"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

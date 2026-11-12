@@ -1,0 +1,101 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "INSERT_COMPONENT_INSTANCE",
+    "id": "i1",
+    "startTime": 1,
+    "component_name": "Odd"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "i1",
+     "success": false,
+     "description": "Insert Component \"Odd\"",
+     "error": "Failed to resolve valid variant in ComponentSet \"Odd\"",
+     "code": null,
+     "startTime": 1
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "children": [
+     {
+      "id": "1:1",
+      "type": "COMPONENT_SET",
+      "name": "Odd",
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "width": 100,
+      "height": 100,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [],
+      "strokes": [],
+      "layoutMode": "NONE",
+      "clipsContent": false,
+      "children": [
+       {
+        "id": "1:2",
+        "type": "FRAME",
+        "name": "not a variant",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 100,
+        "height": 100,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [],
+        "strokes": [],
+        "layoutMode": "NONE",
+        "clipsContent": false
+       }
+      ]
+     }
+    ],
+    "selection": []
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [],
+  "notifies": [
+   {
+    "text": "Inserting component...",
+    "opts": {
+     "timeout": 15000
+    }
+   },
+   {
+    "text": "Error: Failed to resolve valid variant in ComponentSet \"Odd\"",
+    "opts": {
+     "error": true,
+     "timeout": 6000
+    }
+   }
+  ],
+  "cancels": 1,
+  "uiResizes": [],
+  "fontLoads": [
+   "Inter/Regular",
+   "Inter/Medium",
+   "Inter/Bold"
+  ],
+  "exports": [],
+  "modeSets": [],
+  "storage": {}
+ }
+}

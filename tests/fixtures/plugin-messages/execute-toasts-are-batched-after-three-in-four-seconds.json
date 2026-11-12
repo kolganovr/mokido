@@ -1,0 +1,233 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "EXECUTE",
+    "id": "e1",
+    "code": "return 0;",
+    "description": "Call 0"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "e1",
+     "success": true,
+     "description": "Call 0",
+     "result": 0,
+     "resultStashed": true,
+     "screenshot": null,
+     "screenshots": null,
+     "beforeScreenshot": null,
+     "captureNote": null,
+     "targetName": null,
+     "targetId": null,
+     "checkpointId": null,
+     "created": [],
+     "modified": [],
+     "warnings": [],
+     "durationMs": 0
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "EXECUTE",
+    "id": "e2",
+    "code": "return 1;",
+    "description": "Call 1"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "e2",
+     "success": true,
+     "description": "Call 1",
+     "result": 1,
+     "resultStashed": true,
+     "screenshot": null,
+     "screenshots": null,
+     "beforeScreenshot": null,
+     "captureNote": null,
+     "targetName": null,
+     "targetId": null,
+     "checkpointId": null,
+     "created": [],
+     "modified": [],
+     "warnings": [],
+     "durationMs": 0
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "EXECUTE",
+    "id": "e3",
+    "code": "return 2;",
+    "description": "Call 2"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "e3",
+     "success": true,
+     "description": "Call 2",
+     "result": 2,
+     "resultStashed": true,
+     "screenshot": null,
+     "screenshots": null,
+     "beforeScreenshot": null,
+     "captureNote": null,
+     "targetName": null,
+     "targetId": null,
+     "checkpointId": null,
+     "created": [],
+     "modified": [],
+     "warnings": [],
+     "durationMs": 0
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "EXECUTE",
+    "id": "e4",
+    "code": "return 3;",
+    "description": "Call 3"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "e4",
+     "success": true,
+     "description": "Call 3",
+     "result": 3,
+     "resultStashed": true,
+     "screenshot": null,
+     "screenshots": null,
+     "beforeScreenshot": null,
+     "captureNote": null,
+     "targetName": null,
+     "targetId": null,
+     "checkpointId": null,
+     "created": [],
+     "modified": [],
+     "warnings": [],
+     "durationMs": 0
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "EXECUTE",
+    "id": "e5",
+    "code": "return 4;",
+    "description": "Call 4"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "e5",
+     "success": true,
+     "description": "Call 4",
+     "result": 4,
+     "resultStashed": true,
+     "screenshot": null,
+     "screenshots": null,
+     "beforeScreenshot": null,
+     "captureNote": null,
+     "targetName": null,
+     "targetId": null,
+     "checkpointId": null,
+     "created": [],
+     "modified": [],
+     "warnings": [],
+     "durationMs": 0
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "EXECUTE",
+    "id": "e6",
+    "code": "return 'later';",
+    "description": "Later"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "e6",
+     "success": true,
+     "description": "Later",
+     "result": "later",
+     "resultStashed": true,
+     "screenshot": null,
+     "screenshots": null,
+     "beforeScreenshot": null,
+     "captureNote": null,
+     "targetName": null,
+     "targetId": null,
+     "checkpointId": null,
+     "created": [],
+     "modified": [],
+     "warnings": [],
+     "durationMs": 0
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "selection": []
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [],
+  "notifies": [
+   {
+    "text": "Call 0...",
+    "opts": {
+     "timeout": 30000
+    }
+   },
+   {
+    "text": "Call 0 — done!",
+    "opts": {
+     "timeout": 2500
+    }
+   },
+   {
+    "text": "Call 1...",
+    "opts": {
+     "timeout": 30000
+    }
+   },
+   {
+    "text": "Later...",
+    "opts": {
+     "timeout": 30000
+    }
+   },
+   {
+    "text": "Later — done!",
+    "opts": {
+     "timeout": 2500
+    }
+   }
+  ],
+  "cancels": 3,
+  "uiResizes": [],
+  "fontLoads": [
+   "Inter/Regular",
+   "Inter/Medium",
+   "Inter/Bold"
+  ],
+  "exports": [],
+  "modeSets": [],
+  "storage": {}
+ }
+}

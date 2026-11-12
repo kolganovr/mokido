@@ -1,0 +1,34 @@
+{
+  "call": {
+    "tool": "get_image",
+    "arguments": {
+      "file_key": "https://www.figma.com/design/AbC123/x?node-id=1-1"
+    }
+  },
+  "sent_to_plugin": [],
+  "rest_requests": [
+    {
+      "method": "GET",
+      "path": "/images/AbC123?ids=1%3A1&format=png&scale=2",
+      "headers": {
+        "X-Figma-Token": "test",
+        "Content-Type": "application/json"
+      },
+      "body": null
+    }
+  ],
+  "reply": {
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "err": null,
+          "images": {
+            "1:1": "https://example.test/1.png"
+          }
+        }
+      }
+    ]
+  }
+}

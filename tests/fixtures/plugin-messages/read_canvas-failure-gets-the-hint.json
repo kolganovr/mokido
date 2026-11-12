@@ -1,0 +1,42 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "READ_CANVAS",
+    "id": "R1",
+    "startTime": 8
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "R1",
+     "success": false,
+     "description": "Read Canvas",
+     "error": "Cannot read properties of undefined (reading 'filter')\n\nHINT: Every call runs in a fresh scope, so helpers from a previous figma_execute_code call are gone, and anything declared through eval() never existed at all. Persist reusable code with bridge.define(\"kit\", \"...; module.exports = { helper }\") and reload it via bridge.require(\"kit\").",
+     "code": "SCOPE_LOST",
+     "startTime": 8
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "selection": []
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [],
+  "notifies": [],
+  "cancels": 0,
+  "uiResizes": [],
+  "fontLoads": [],
+  "exports": [],
+  "modeSets": [],
+  "storage": {}
+ }
+}

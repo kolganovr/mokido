@@ -1,0 +1,34 @@
+{
+  "call": {
+    "tool": "figma_read_canvas",
+    "arguments": {
+      "node_ids": [
+        "1:1"
+      ]
+    }
+  },
+  "sent_to_plugin": [
+    {
+      "type": "READ_CANVAS",
+      "node_ids": "1:1",
+      "depth": 6,
+      "include_hidden": false
+    }
+  ],
+  "reply": {
+    "content": [
+      {
+        "type": "text",
+        "text": [
+          "<!-- Optimized Figma Layout (62.1% smaller than the raw API response | 1 KB -> 0.4 KB) -->",
+          "<Frame id=\"1:1\" name=\"Card\" w=\"320\" h=\"120\" col gap=\"12\" pad=\"16\" bg=\"#FFFFFF\" radius=\"12\">",
+          "  <Text id=\"1:2\" name=\"Title\" w=\"288\" h=\"24\" x=\"16\" y=\"16\" color=\"#1A1A1A\" font=\"Inter Bold 16px\">Hello</Text>",
+          "  <Frame id=\"1:5\" name=\"Footer\" w=\"288\" h=\"24\" x=\"16\" y=\"80\">",
+          "    <Text id=\"1:6\" name=\"Description\" w=\"288\" h=\"24\" font=\"Inter 13px\">A longer paragraph of body copy nested two levels deep, which a shallow depth cuts away.</Text>",
+          "  </Frame>",
+          "</Frame>"
+        ]
+      }
+    ]
+  }
+}

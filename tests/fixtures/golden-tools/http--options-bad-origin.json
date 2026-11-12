@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "OPTIONS",
+    "path": "/execute",
+    "headers": {
+      "Origin": "https://evil.example"
+    },
+    "body": null
+  },
+  "status": 403,
+  "headers": {
+    "access-control-allow-methods": "GET, POST, OPTIONS",
+    "access-control-allow-headers": "Content-Type, X-Bridge-Token"
+  },
+  "body": {
+    "type": "text",
+    "text": ""
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "call": {
+    "tool": "figma_screenshot",
+    "arguments": {
+      "node_id": "9:1",
+      "scale": 2,
+      "max_px": 256,
+      "description": "Look"
+    }
+  },
+  "sent_to_plugin": [
+    {
+      "type": "SCREENSHOT",
+      "nodeIds": "9:1",
+      "scale": 2,
+      "max_px": 256,
+      "description": "Look"
+    }
+  ],
+  "reply": {
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": true,
+          "result": "Captured 6 node(s)",
+          "images": [
+            "Frame 1 800x600 ~640tok",
+            "Frame 2 801x600 ~641tok",
+            "Frame 3 802x600 ~642tok",
+            "Frame 4 803x600 ~643tok"
+          ],
+          "images_skipped": "2 more image(s) not sent (max 4 per call)."
+        }
+      },
+      {
+        "type": "image",
+        "mimeType": "image/png",
+        "data": "iVBORw0KGgoAAAANSUhEUgAAAyAAAAJYAAAAAAAAAAAA"
+      },
+      {
+        "type": "image",
+        "mimeType": "image/png",
+        "data": "iVBORw0KGgoAAAANSUhEUgAAAyEAAAJYAAAAAAAAAAAA"
+      },
+      {
+        "type": "image",
+        "mimeType": "image/png",
+        "data": "iVBORw0KGgoAAAANSUhEUgAAAyIAAAJYAAAAAAAAAAAA"
+      },
+      {
+        "type": "image",
+        "mimeType": "image/png",
+        "data": "iVBORw0KGgoAAAANSUhEUgAAAyMAAAJYAAAAAAAAAAAA"
+      }
+    ]
+  }
+}

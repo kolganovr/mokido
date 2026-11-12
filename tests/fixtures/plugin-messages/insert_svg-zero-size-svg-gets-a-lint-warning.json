@@ -1,0 +1,128 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "INSERT_SVG",
+    "id": "v1",
+    "startTime": 4,
+    "svg_code": "<svg width=\"0\" height=\"10\"></svg>",
+    "name": "Flat"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "v1",
+     "success": true,
+     "description": "Insert SVG \"Flat\"",
+     "result": {
+      "nodeId": "1:13",
+      "name": "Flat",
+      "type": "FRAME",
+      "width": 0,
+      "height": 10,
+      "parentContainer": "Page 1"
+     },
+     "screenshot": null,
+     "captureNote": null,
+     "targetName": "Flat",
+     "targetId": "1:13",
+     "checkpointId": "cp_loyw3v28_1",
+     "created": [
+      "1:13"
+     ],
+     "modified": [],
+     "warnings": [
+      "\"Flat\" has a zero dimension (0x10) — likely unintended."
+     ],
+     "startTime": 4
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "children": [
+     {
+      "id": "1:13",
+      "type": "FRAME",
+      "name": "Flat",
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 10,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [],
+      "strokes": [],
+      "layoutMode": "NONE",
+      "clipsContent": false,
+      "children": [
+       {
+        "id": "1:14",
+        "type": "VECTOR",
+        "name": "Vector",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 10,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [
+         {
+          "type": "SOLID",
+          "color": {
+           "r": 0,
+           "g": 0,
+           "b": 0
+          }
+         }
+        ],
+        "strokes": []
+       }
+      ]
+     }
+    ],
+    "selection": [
+     "1:13"
+    ]
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [
+   [
+    "1:13"
+   ]
+  ],
+  "notifies": [
+   {
+    "text": "Inserting vector SVG...",
+    "opts": {
+     "timeout": 15000
+    }
+   },
+   {
+    "text": "Vector inserted: Flat",
+    "opts": {
+     "timeout": 3000
+    }
+   }
+  ],
+  "cancels": 1,
+  "uiResizes": [],
+  "fontLoads": [],
+  "exports": [],
+  "modeSets": [],
+  "storage": {}
+ }
+}

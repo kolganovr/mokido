@@ -1,0 +1,90 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "FIND_COMPONENTS",
+    "id": "f1",
+    "startTime": 1,
+    "query": "deep"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "f1",
+     "success": true,
+     "description": "Find Components (\"deep\")",
+     "result": [
+      {
+       "id": "1:2",
+       "name": "Deep Item",
+       "type": "COMPONENT",
+       "page": "Page 1"
+      }
+     ],
+     "startTime": 1
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "children": [
+     {
+      "id": "1:1",
+      "type": "FRAME",
+      "name": "Wrapper",
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "width": 100,
+      "height": 100,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [],
+      "strokes": [],
+      "layoutMode": "NONE",
+      "clipsContent": false,
+      "children": [
+       {
+        "id": "1:2",
+        "type": "COMPONENT",
+        "name": "Deep Item",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 100,
+        "height": 100,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [],
+        "strokes": [],
+        "layoutMode": "NONE",
+        "clipsContent": false,
+        "componentProperties": {}
+       }
+      ]
+     }
+    ],
+    "selection": []
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [],
+  "notifies": [],
+  "cancels": 0,
+  "uiResizes": [],
+  "fontLoads": [],
+  "exports": [],
+  "modeSets": [],
+  "storage": {}
+ }
+}

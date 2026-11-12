@@ -1,0 +1,66 @@
+{
+  "call": {
+    "tool": "figma_insert_svg",
+    "arguments": {
+      "svg_code": "<svg viewBox=\"0 0 24 24\"><path d=\"M0 0h24v24H0z\"/></svg>",
+      "name": "ic_box",
+      "width": 32,
+      "height": 32,
+      "fill_override": "#111111",
+      "stroke_override": "#222222",
+      "color_override": "#333333",
+      "target_parent_id": "1:1",
+      "position": {
+        "x": 1,
+        "y": 2
+      },
+      "as_component": true,
+      "capture": true,
+      "scale": 3
+    }
+  },
+  "sent_to_plugin": [
+    {
+      "type": "INSERT_SVG",
+      "svg_code": "<svg viewBox=\"0 0 24 24\"><path d=\"M0 0h24v24H0z\"/></svg>",
+      "name": "ic_box",
+      "width": 32,
+      "height": 32,
+      "fill_override": "#111111",
+      "stroke_override": "#222222",
+      "color_override": "#333333",
+      "target_parent_id": "1:1",
+      "position": {
+        "x": 1,
+        "y": 2
+      },
+      "as_component": true,
+      "capture": true,
+      "scale": 3,
+      "max_px": 1024
+    }
+  ],
+  "reply": {
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": true,
+          "result": "Inserted icon 6:8",
+          "created": [
+            "6:8"
+          ],
+          "images": [
+            "800x600 ~640tok"
+          ]
+        }
+      },
+      {
+        "type": "image",
+        "mimeType": "image/png",
+        "data": "iVBORw0KGgoAAAANSUhEUgAAAyAAAAJYAAAAAAAAAAAA"
+      }
+    ]
+  }
+}

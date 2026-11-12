@@ -1,0 +1,35 @@
+{
+  "call": {
+    "tool": "figma_execute_code",
+    "arguments": {
+      "code": "const n = figma.getNodeById('1:2'); return n.name;"
+    }
+  },
+  "sent_to_plugin": [
+    {
+      "code": [
+        "const n = figma.getNodeById('1:2'); return n.name;"
+      ],
+      "description": "Execute JS Code",
+      "capture": false,
+      "capture_node_ids": null,
+      "diff": false,
+      "scale": 1,
+      "max_px": 1024
+    }
+  ],
+  "reply": {
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": true,
+          "use_instead": "figma_inspect {\"node_ids\":[\"1:2\"],\"depth\":0} — reads the same nodes in ONE call (one line per node: TYPE \"name\" #id WxH @x,y [layout] fill font \"text\" →component variant), every id at once; a long reply pages with offset=K. Hand-written read #1 in a row: each is a full model turn that re-sends the whole conversation. figma_inspect also does: find / find_text (search names / text under node_ids), props:[...] (exact values: \"font\", \"text\", \"layout\", \"padding\", \"props\" = componentProperties, \"variant\", \"main\", \"reactions\", or any raw property), context:true (parent sections, breakpoints, component variants), view:\"map\" (canvas map), view:\"table\" (per table: headers, widths, cell contents and variant counts per column, row/cell ids), check (pass/fail), like:'<ref id>' finds the copies of a correct node under node_ids and lists how each differs, then REF lines with the reference's exact values, compare:'<ref id>' lists how each node_id differs from the reference, then REF lines with its exact values to copy into the write.",
+          "result": "Title",
+          "duration_ms": 4
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,90 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "SCREENSHOT",
+    "id": "s1",
+    "nodeIds": "1:1"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "s1",
+     "success": true,
+     "description": "Screenshot capture",
+     "result": "Captured 1 node(s)",
+     "screenshots": [
+      {
+       "id": "1:1",
+       "name": "Heavy",
+       "base64": null,
+       "error": "Screenshot failed for \"Heavy\": Screenshot is 8 MB after encoding, over the 8 MB limit. Select a specific frame (or pass node_ids) instead of capturing the whole page, or lower \"scale\"."
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "children": [
+     {
+      "id": "1:1",
+      "type": "FRAME",
+      "name": "Heavy",
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "width": 100,
+      "height": 100,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [],
+      "strokes": [],
+      "layoutMode": "NONE",
+      "clipsContent": false
+     }
+    ],
+    "selection": []
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [
+   [
+    "1:1"
+   ]
+  ],
+  "notifies": [
+   {
+    "text": "Capturing screenshot (Heavy)...",
+    "opts": {
+     "timeout": 2500
+    }
+   }
+  ],
+  "cancels": 0,
+  "uiResizes": [],
+  "fontLoads": [],
+  "exports": [
+   {
+    "id": "1:1",
+    "settings": {
+     "format": "PNG",
+     "constraint": {
+      "type": "SCALE",
+      "value": 1
+     }
+    }
+   }
+  ],
+  "modeSets": [],
+  "storage": {}
+ }
+}

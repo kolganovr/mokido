@@ -1,0 +1,49 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "SCREENSHOT",
+    "id": "s2",
+    "autoZoom": false
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "s2",
+     "success": false,
+     "description": "Screenshot capture",
+     "error": "Error"
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "selection": [
+     "[unreadable id]"
+    ]
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [],
+  "notifies": [
+   {
+    "text": "Capturing screenshot (Weird)...",
+    "opts": {
+     "timeout": 2500
+    }
+   }
+  ],
+  "cancels": 0,
+  "uiResizes": [],
+  "fontLoads": [],
+  "exports": [],
+  "modeSets": [],
+  "storage": {}
+ }
+}

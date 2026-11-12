@@ -1,0 +1,24 @@
+{
+  "call": {
+    "tool": "figma_job_status",
+    "arguments": {
+      "job_id": "<cmd_id>"
+    }
+  },
+  "sent_to_plugin": [],
+  "reply": {
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": true,
+          "result": "late",
+          "duration_ms": 300,
+          "status": "done",
+          "job_id": "<cmd_id>"
+        }
+      }
+    ]
+  }
+}

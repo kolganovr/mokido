@@ -1,0 +1,221 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "SCREENSHOT",
+    "id": "s1",
+    "nodeIds": "1:1",
+    "scale": 3,
+    "max_px": 600
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "s1",
+     "success": true,
+     "description": "Screenshot capture",
+     "result": "Captured 1 node(s)",
+     "screenshots": [
+      {
+       "id": "1:1",
+       "name": "Big",
+       "base64": "iVBORw0KGgo="
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "SCREENSHOT",
+    "id": "s2",
+    "nodeIds": "1:1"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "s2",
+     "success": true,
+     "description": "Screenshot capture",
+     "result": "Captured 1 node(s)",
+     "screenshots": [
+      {
+       "id": "1:1",
+       "name": "Big",
+       "base64": "iVBORw0KGgo="
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "SCREENSHOT",
+    "id": "s3",
+    "nodeIds": "1:1",
+    "scale": -1,
+    "max_px": -5
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "s3",
+     "success": true,
+     "description": "Screenshot capture",
+     "result": "Captured 1 node(s)",
+     "screenshots": [
+      {
+       "id": "1:1",
+       "name": "Big",
+       "base64": "iVBORw0KGgo="
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "SCREENSHOT",
+    "id": "s4",
+    "nodeIds": "1:1",
+    "scale": 0.25,
+    "max_px": 99999
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "s4",
+     "success": true,
+     "description": "Screenshot capture",
+     "result": "Captured 1 node(s)",
+     "screenshots": [
+      {
+       "id": "1:1",
+       "name": "Big",
+       "base64": "iVBORw0KGgo="
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "children": [
+     {
+      "id": "1:1",
+      "type": "FRAME",
+      "name": "Big",
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "width": 4000,
+      "height": 1000,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [],
+      "strokes": [],
+      "layoutMode": "NONE",
+      "clipsContent": false
+     }
+    ],
+    "selection": []
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [
+   [
+    "1:1"
+   ],
+   [
+    "1:1"
+   ],
+   [
+    "1:1"
+   ],
+   [
+    "1:1"
+   ]
+  ],
+  "notifies": [
+   {
+    "text": "Capturing screenshot (Big)...",
+    "opts": {
+     "timeout": 2500
+    }
+   },
+   {
+    "text": "Capturing screenshot (Big)...",
+    "opts": {
+     "timeout": 2500
+    }
+   },
+   {
+    "text": "Capturing screenshot (Big)...",
+    "opts": {
+     "timeout": 2500
+    }
+   },
+   {
+    "text": "Capturing screenshot (Big)...",
+    "opts": {
+     "timeout": 2500
+    }
+   }
+  ],
+  "cancels": 0,
+  "uiResizes": [],
+  "fontLoads": [],
+  "exports": [
+   {
+    "id": "1:1",
+    "settings": {
+     "format": "PNG",
+     "constraint": {
+      "type": "SCALE",
+      "value": 0.15
+     }
+    }
+   },
+   {
+    "id": "1:1",
+    "settings": {
+     "format": "PNG",
+     "constraint": {
+      "type": "SCALE",
+      "value": 0.256
+     }
+    }
+   },
+   {
+    "id": "1:1",
+    "settings": {
+     "format": "PNG",
+     "constraint": {
+      "type": "SCALE",
+      "value": 0.256
+     }
+    }
+   },
+   {
+    "id": "1:1",
+    "settings": {
+     "format": "PNG",
+     "constraint": {
+      "type": "SCALE",
+      "value": 0.25
+     }
+    }
+   }
+  ],
+  "modeSets": [],
+  "storage": {}
+ }
+}

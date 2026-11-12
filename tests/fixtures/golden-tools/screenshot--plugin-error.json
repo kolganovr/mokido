@@ -1,0 +1,33 @@
+{
+  "call": {
+    "tool": "figma_screenshot",
+    "arguments": {
+      "node_ids": [
+        "9:9"
+      ]
+    }
+  },
+  "sent_to_plugin": [
+    {
+      "type": "SCREENSHOT",
+      "nodeIds": "9:9",
+      "scale": 1,
+      "max_px": 1024,
+      "description": "Figma Screenshot"
+    }
+  ],
+  "reply": {
+    "isError": true,
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": false,
+          "code": "EMPTY_SELECTION",
+          "error": "Selection is empty"
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,146 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "INSERT_SVG",
+    "id": "v1",
+    "startTime": 4
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "v1",
+     "success": false,
+     "description": "Insert SVG \"Vector\"",
+     "error": "Invalid or empty svg_code. Must be a valid <svg ...>...</svg> XML string.",
+     "code": null,
+     "startTime": 4
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "INSERT_SVG",
+    "id": "v1",
+    "startTime": 4,
+    "svg_code": ""
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "v1",
+     "success": false,
+     "description": "Insert SVG \"Vector\"",
+     "error": "Invalid or empty svg_code. Must be a valid <svg ...>...</svg> XML string.",
+     "code": null,
+     "startTime": 4
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "INSERT_SVG",
+    "id": "v1",
+    "startTime": 4,
+    "svg_code": 42
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "v1",
+     "success": false,
+     "description": "Insert SVG \"Vector\"",
+     "error": "Invalid or empty svg_code. Must be a valid <svg ...>...</svg> XML string.",
+     "code": null,
+     "startTime": 4
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "INSERT_SVG",
+    "id": "v1",
+    "startTime": 4,
+    "svg_code": "<div>not svg</div>"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "v1",
+     "success": false,
+     "description": "Insert SVG \"Vector\"",
+     "error": "Invalid or empty svg_code. Must be a valid <svg ...>...</svg> XML string.",
+     "code": null,
+     "startTime": 4
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "selection": []
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [],
+  "notifies": [
+   {
+    "text": "Inserting vector SVG...",
+    "opts": {
+     "timeout": 15000
+    }
+   },
+   {
+    "text": "Error: Invalid or empty svg_code. Must be a valid <svg ...>...</svg> XML string.",
+    "opts": {
+     "error": true,
+     "timeout": 6000
+    }
+   },
+   {
+    "text": "Inserting vector SVG...",
+    "opts": {
+     "timeout": 15000
+    }
+   },
+   {
+    "text": "Error: Invalid or empty svg_code. Must be a valid <svg ...>...</svg> XML string.",
+    "opts": {
+     "error": true,
+     "timeout": 6000
+    }
+   },
+   {
+    "text": "Inserting vector SVG...",
+    "opts": {
+     "timeout": 15000
+    }
+   },
+   {
+    "text": "Error: Invalid or empty svg_code. Must be a valid <svg ...>...</svg> XML string.",
+    "opts": {
+     "error": true,
+     "timeout": 6000
+    }
+   },
+   {
+    "text": "Error: Invalid or empty svg_code. Must be a valid <svg ...>...</svg> XML string.",
+    "opts": {
+     "error": true,
+     "timeout": 6000
+    }
+   }
+  ],
+  "cancels": 3,
+  "uiResizes": [],
+  "fontLoads": [],
+  "exports": [],
+  "modeSets": [],
+  "storage": {}
+ }
+}

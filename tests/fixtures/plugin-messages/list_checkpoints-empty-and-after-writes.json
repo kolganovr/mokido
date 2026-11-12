@@ -1,0 +1,254 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "LIST_CHECKPOINTS",
+    "id": "l0"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "l0",
+     "success": true,
+     "description": "List Checkpoints",
+     "result": []
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "EXECUTE",
+    "id": "e1",
+    "code": "figma.createFrame(); return 1;",
+    "description": "First write"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "e1",
+     "success": true,
+     "description": "First write",
+     "result": 1,
+     "resultStashed": true,
+     "screenshot": null,
+     "screenshots": null,
+     "beforeScreenshot": null,
+     "captureNote": null,
+     "targetName": null,
+     "targetId": null,
+     "checkpointId": "cp_loyw3v28_1",
+     "created": [
+      "1:13"
+     ],
+     "modified": [],
+     "warnings": [],
+     "durationMs": 0
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "EXECUTE",
+    "id": "e2",
+    "code": "return 2;",
+    "description": "A read"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "e2",
+     "success": true,
+     "description": "A read",
+     "result": 2,
+     "resultStashed": true,
+     "screenshot": null,
+     "screenshots": null,
+     "beforeScreenshot": null,
+     "captureNote": null,
+     "targetName": null,
+     "targetId": null,
+     "checkpointId": null,
+     "created": [],
+     "modified": [],
+     "warnings": [],
+     "durationMs": 0
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "EXECUTE",
+    "id": "e3",
+    "code": "figma.createRectangle(); figma.createEllipse(); return 3;",
+    "description": "Second write"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "e3",
+     "success": true,
+     "description": "Second write",
+     "result": 3,
+     "resultStashed": true,
+     "screenshot": null,
+     "screenshots": null,
+     "beforeScreenshot": null,
+     "captureNote": null,
+     "targetName": null,
+     "targetId": null,
+     "checkpointId": "cp_loyw3yx4_3",
+     "created": [
+      "1:14",
+      "1:15"
+     ],
+     "modified": [],
+     "warnings": [],
+     "durationMs": 0
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "LIST_CHECKPOINTS",
+    "id": "l1",
+    "startTime": 77
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "l1",
+     "success": true,
+     "description": "List Checkpoints",
+     "result": [
+      {
+       "id": "cp_loyw3v28_1",
+       "label": "First write",
+       "createdAt": 1700000000000,
+       "created": 1,
+       "modified": 0,
+       "committed": true,
+       "rolledBack": false
+      },
+      {
+       "id": "cp_loyw3yx4_3",
+       "label": "Second write",
+       "createdAt": 1700000005000,
+       "created": 2,
+       "modified": 0,
+       "committed": true,
+       "rolledBack": false
+      }
+     ],
+     "startTime": 77
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "children": [
+     {
+      "id": "1:13",
+      "type": "FRAME",
+      "name": "Frame",
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "width": 100,
+      "height": 100,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [],
+      "strokes": [],
+      "layoutMode": "NONE",
+      "clipsContent": false
+     },
+     {
+      "id": "1:14",
+      "type": "RECTANGLE",
+      "name": "Rectangle",
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "width": 100,
+      "height": 100,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [],
+      "strokes": []
+     },
+     {
+      "id": "1:15",
+      "type": "ELLIPSE",
+      "name": "Ellipse",
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "width": 100,
+      "height": 100,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [],
+      "strokes": []
+     }
+    ],
+    "selection": []
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [],
+  "notifies": [
+   {
+    "text": "First write...",
+    "opts": {
+     "timeout": 30000
+    }
+   },
+   {
+    "text": "First write — done!",
+    "opts": {
+     "timeout": 2500
+    }
+   },
+   {
+    "text": "A read...",
+    "opts": {
+     "timeout": 30000
+    }
+   },
+   {
+    "text": "A read — done!",
+    "opts": {
+     "timeout": 2500
+    }
+   },
+   {
+    "text": "Second write...",
+    "opts": {
+     "timeout": 30000
+    }
+   }
+  ],
+  "cancels": 3,
+  "uiResizes": [],
+  "fontLoads": [
+   "Inter/Regular",
+   "Inter/Medium",
+   "Inter/Bold"
+  ],
+  "exports": [],
+  "modeSets": [],
+  "storage": {}
+ }
+}

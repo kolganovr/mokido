@@ -1,0 +1,42 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "GET_VARIABLES",
+    "id": "g1",
+    "startTime": 2,
+    "collection_name": "colors"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "g1",
+     "success": false,
+     "description": "Get Variables (\"colors\")",
+     "error": "stub: variables unavailable",
+     "startTime": 2
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "selection": []
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [],
+  "notifies": [],
+  "cancels": 0,
+  "uiResizes": [],
+  "fontLoads": [],
+  "exports": [],
+  "modeSets": [],
+  "storage": {}
+ }
+}

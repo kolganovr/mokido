@@ -1,0 +1,23 @@
+{
+  "call": {
+    "tool": "figma_job_status",
+    "arguments": {
+      "job_id": "<cmd_id>"
+    }
+  },
+  "sent_to_plugin": [],
+  "reply": {
+    "isError": true,
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": false,
+          "code": "JOB_NOT_FOUND",
+          "error": "No job \"<cmd_id>\". A job is forgotten once read after finishing, or after ~200 newer jobs have been created."
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "call": {
+    "tool": "figma_does_not_exist",
+    "arguments": {
+      "a": 1
+    }
+  },
+  "sent_to_plugin": [],
+  "reply": {
+    "isError": true,
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": false,
+          "code": "UNKNOWN_TOOL",
+          "error": "Unknown tool: figma_does_not_exist\n\nHINT: Call tools/list to see the tools this bridge actually exposes."
+        }
+      }
+    ]
+  }
+}

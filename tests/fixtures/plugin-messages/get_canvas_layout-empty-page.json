@@ -1,0 +1,50 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "GET_CANVAS_LAYOUT",
+    "id": "L1",
+    "startTime": 6
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "L1",
+     "success": true,
+     "description": "Get Canvas Layout",
+     "result": {
+      "pageName": "Page 1",
+      "totalArtboards": 0,
+      "artboards": [],
+      "canvasBounds": null,
+      "suggestedNextPosition": {
+       "x": 0,
+       "y": 0
+      }
+     },
+     "startTime": 6
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "selection": []
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [],
+  "notifies": [],
+  "cancels": 0,
+  "uiResizes": [],
+  "fontLoads": [],
+  "exports": [],
+  "modeSets": [],
+  "storage": {}
+ }
+}

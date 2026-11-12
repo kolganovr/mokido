@@ -1,0 +1,41 @@
+{
+  "call": {
+    "tool": "get_file",
+    "arguments": {
+      "file_key": "AbC123"
+    }
+  },
+  "sent_to_plugin": [],
+  "rest_requests": [
+    {
+      "method": "GET",
+      "path": "/files/AbC123?depth=2",
+      "headers": {
+        "X-Figma-Token": "test",
+        "Content-Type": "application/json"
+      },
+      "body": null
+    }
+  ],
+  "reply": {
+    "content": [
+      {
+        "type": "text",
+        "text": [
+          "<!-- file=\"Golden file\" lastModified=2026-01-01T00:00:00Z -->",
+          "<!-- Optimized Figma Layout (59% smaller than the raw API response | 1 KB -> 0.5 KB) -->",
+          "<Document id=\"0:0\" name=\"Document\" x=\"0\" y=\"0\">",
+          "  <Page id=\"0:1\" name=\"Page 1\" x=\"0\" y=\"0\">",
+          "    <Frame id=\"1:1\" name=\"Card\" w=\"320\" h=\"120\" col gap=\"12\" pad=\"16\" bg=\"#FFFFFF\" radius=\"12\">",
+          "      <Text id=\"1:2\" name=\"Title\" w=\"288\" h=\"24\" color=\"#1A1A1A\" font=\"Inter Bold 16px\">Hello</Text>",
+          "      <Frame id=\"1:5\" name=\"Footer\" w=\"288\" h=\"24\">",
+          "        <Text id=\"1:6\" name=\"Description\" w=\"288\" h=\"24\" font=\"Inter 13px\">A longer paragraph of body copy nested two levels deep, which a shallow depth cuts away.</Text>",
+          "      </Frame>",
+          "    </Frame>",
+          "  </Page>",
+          "</Document>"
+        ]
+      }
+    ]
+  }
+}

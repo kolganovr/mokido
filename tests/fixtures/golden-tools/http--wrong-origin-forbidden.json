@@ -1,0 +1,23 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/status?token=golden-test-token",
+    "headers": {
+      "Origin": "https://evil.example"
+    },
+    "body": null
+  },
+  "status": 403,
+  "headers": {
+    "content-type": "application/json",
+    "access-control-allow-methods": "GET, POST, OPTIONS",
+    "access-control-allow-headers": "Content-Type, X-Bridge-Token"
+  },
+  "body": {
+    "type": "text",
+    "compact_json": true,
+    "json": {
+      "error": "Forbidden: the Figma bridge only accepts requests from the Mokido plugin. If you are the plugin, make sure install.mjs baked the matching bridge token into it."
+    }
+  }
+}

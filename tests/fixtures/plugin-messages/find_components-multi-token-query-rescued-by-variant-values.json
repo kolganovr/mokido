@@ -1,0 +1,108 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "FIND_COMPONENTS",
+    "id": "f1",
+    "startTime": 1,
+    "query": "nav item"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "f1",
+     "success": true,
+     "description": "Find Components (\"nav item\")",
+     "result": [
+      {
+       "id": "1:1",
+       "name": "Nav / Item",
+       "type": "COMPONENT_SET",
+       "page": "Page 1",
+       "variants": {
+        "Kind": [
+         "nav item",
+         "other"
+        ]
+       }
+      }
+     ],
+     "startTime": 1
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "children": [
+     {
+      "id": "1:1",
+      "type": "COMPONENT_SET",
+      "name": "Nav / Item",
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "width": 100,
+      "height": 100,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [],
+      "strokes": [],
+      "layoutMode": "NONE",
+      "clipsContent": false,
+      "componentPropertyDefinitions": {
+       "Kind": {
+        "type": "VARIANT",
+        "variantOptions": [
+         "nav item",
+         "other"
+        ]
+       }
+      },
+      "children": [
+       {
+        "id": "1:2",
+        "type": "COMPONENT",
+        "name": "Kind=nav item",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 100,
+        "height": 100,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [],
+        "strokes": [],
+        "layoutMode": "NONE",
+        "clipsContent": false,
+        "variantProperties": {
+         "Kind": "nav item"
+        },
+        "componentProperties": {}
+       }
+      ]
+     }
+    ],
+    "selection": []
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [],
+  "notifies": [],
+  "cancels": 0,
+  "uiResizes": [],
+  "fontLoads": [],
+  "exports": [],
+  "modeSets": [],
+  "storage": {}
+ }
+}

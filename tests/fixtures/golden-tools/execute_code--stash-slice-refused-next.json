@@ -1,0 +1,24 @@
+{
+  "call": {
+    "tool": "figma_execute_code",
+    "arguments": {
+      "code": "return bridge.state.lastResult.rows.slice(5, 10);"
+    }
+  },
+  "sent_to_plugin": [],
+  "reply": {
+    "isError": true,
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": false,
+          "code": "READ_REFUSED",
+          "error": "Not run: hand-written read #3 in a row, and no result comes back for those. Call figma_inspect {\"node_ids\":[\"1:3\"],\"depth\":0} (long replies page with offset=K), or make the whole change in ONE figma_execute_code. A script that is not a read: add the comment /* run-anyway */.",
+          "use_instead": "figma_inspect {\"node_ids\":[\"1:3\"],\"depth\":0}"
+        }
+      }
+    ]
+  }
+}

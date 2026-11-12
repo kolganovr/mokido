@@ -1,0 +1,47 @@
+{
+  "call": {
+    "tool": "figma_get_variables",
+    "arguments": {
+      "collection_name": "Brand",
+      "limit": 10
+    }
+  },
+  "sent_to_plugin": [
+    {
+      "type": "GET_VARIABLES",
+      "collection_name": "Brand",
+      "limit": 10
+    }
+  ],
+  "reply": {
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": true,
+          "result": {
+            "collections": [
+              {
+                "name": "Brand",
+                "modes": [
+                  "Light",
+                  "Dark"
+                ],
+                "variables": [
+                  {
+                    "name": "primary",
+                    "values": {
+                      "Light": "#8C66F2",
+                      "Dark": "#B49CFF"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

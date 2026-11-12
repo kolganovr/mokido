@@ -1,0 +1,99 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "EXECUTE",
+    "id": "e1",
+    "code": "const t = figma.createText(); t.characters = 'A very long headline that does not fit into its box at all'; t.textAutoResize = 'NONE'; t.textTruncation = 'ENDING'; return t.id;"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "e1",
+     "success": true,
+     "description": "AI Command Execution",
+     "result": "1:13",
+     "resultStashed": true,
+     "screenshot": null,
+     "screenshots": null,
+     "beforeScreenshot": null,
+     "captureNote": null,
+     "targetName": null,
+     "targetId": null,
+     "checkpointId": "cp_loyw3v28_1",
+     "created": [
+      "1:13"
+     ],
+     "modified": [],
+     "warnings": [
+      "Text \"A very long headline that does not fit i\" is truncated (ends with an ellipsis) — widen the node or its container."
+     ],
+     "durationMs": 0
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "children": [
+     {
+      "id": "1:13",
+      "type": "TEXT",
+      "name": "Text",
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "width": 100,
+      "height": 20,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [],
+      "strokes": [],
+      "characters": "A very long headline that does not fit into its box at all",
+      "fontName": {
+       "family": "Inter",
+       "style": "Regular"
+      },
+      "fontSize": 14,
+      "textAutoResize": "NONE",
+      "textTruncation": "ENDING"
+     }
+    ],
+    "selection": []
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [],
+  "notifies": [
+   {
+    "text": "AI Command Execution...",
+    "opts": {
+     "timeout": 30000
+    }
+   },
+   {
+    "text": "AI Command Execution — done!",
+    "opts": {
+     "timeout": 2500
+    }
+   }
+  ],
+  "cancels": 1,
+  "uiResizes": [],
+  "fontLoads": [
+   "Inter/Regular",
+   "Inter/Medium",
+   "Inter/Bold"
+  ],
+  "exports": [],
+  "modeSets": [],
+  "storage": {}
+ }
+}

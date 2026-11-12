@@ -1,0 +1,110 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "INSERT_SVG",
+    "id": "v1",
+    "startTime": 4,
+    "svg_code": "<svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M0 0h24v24H0z\"/></svg>",
+    "as_component": true,
+    "name": "Icon / Check"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "v1",
+     "success": true,
+     "description": "Insert SVG \"Icon / Check\"",
+     "result": {
+      "nodeId": "1:15",
+      "name": "Icon / Check",
+      "type": "COMPONENT",
+      "width": 24,
+      "height": 24,
+      "parentContainer": "Page 1"
+     },
+     "screenshot": null,
+     "captureNote": null,
+     "targetName": "Icon / Check",
+     "targetId": "1:15",
+     "checkpointId": "cp_loyw3v28_1",
+     "created": [
+      "1:13",
+      "1:15"
+     ],
+     "modified": [],
+     "warnings": [],
+     "startTime": 4
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "ROLLBACK",
+    "id": "r1"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "r1",
+     "success": true,
+     "description": "Rollback last",
+     "result": {
+      "checkpoint_id": "cp_loyw3v28_1",
+      "label": "Insert SVG \"Icon / Check\"",
+      "removed": [
+       "1:15"
+      ],
+      "restored": [],
+      "missing": []
+     }
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "selection": [
+     "1:15"
+    ]
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [
+   [
+    "1:15"
+   ]
+  ],
+  "notifies": [
+   {
+    "text": "Inserting vector SVG...",
+    "opts": {
+     "timeout": 15000
+    }
+   },
+   {
+    "text": "Vector inserted: Icon / Check",
+    "opts": {
+     "timeout": 3000
+    }
+   },
+   {
+    "text": "Rolled back \"Insert SVG \"Icon / Check\"\" (1 removed, 0 restored)",
+    "opts": {
+     "timeout": 3500
+    }
+   }
+  ],
+  "cancels": 1,
+  "uiResizes": [],
+  "fontLoads": [],
+  "exports": [],
+  "modeSets": [],
+  "storage": {}
+ }
+}

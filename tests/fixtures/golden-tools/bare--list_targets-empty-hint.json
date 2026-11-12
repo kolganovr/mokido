@@ -1,0 +1,20 @@
+{
+  "call": {
+    "tool": "figma_list_targets",
+    "arguments": {}
+  },
+  "sent_to_plugin": {},
+  "reply": {
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": true,
+          "targets": [],
+          "hint": "No Figma file is connected. Ask the user to open the file in Figma DESKTOP and run the Mokido plugin (Ctrl+Alt+P / Cmd+Option+P) until it shows CONNECTED, then call figma_list_targets again. Nothing to debug in the server."
+        }
+      }
+    ]
+  }
+}

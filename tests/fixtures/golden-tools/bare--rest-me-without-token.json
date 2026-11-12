@@ -1,0 +1,21 @@
+{
+  "call": {
+    "tool": "get_me",
+    "arguments": {}
+  },
+  "sent_to_plugin": {},
+  "reply": {
+    "isError": true,
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": false,
+          "code": "REST_TOKEN_MISSING",
+          "error": "FIGMA_PERSONAL_ACCESS_TOKEN is required for Figma Cloud REST API calls. Provide your token in the MCP configuration.\n\nHINT: REST tools need FIGMA_PERSONAL_ACCESS_TOKEN in the MCP server environment. Live tools (figma_execute_code, figma_screenshot, ...) work without a token — prefer them when the file is open in Figma Desktop."
+        }
+      }
+    ]
+  }
+}

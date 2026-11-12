@@ -1,0 +1,29 @@
+{
+  "call": {
+    "tool": "figma_execute_code",
+    "arguments": {}
+  },
+  "sent_to_plugin": [
+    {
+      "description": "Execute JS Code",
+      "capture": false,
+      "capture_node_ids": null,
+      "diff": false,
+      "scale": 1,
+      "max_px": 1024
+    }
+  ],
+  "reply": {
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": true,
+          "result": "ok",
+          "duration_ms": 3
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "call": {
+    "tool": "figma_execute_code",
+    "arguments": {
+      "code": "for (const n of figma.currentPage.findAll(n => n.type === 'TEXT')) { n.name = 'x'; } return 1;"
+    }
+  },
+  "sent_to_plugin": [
+    {
+      "code": [
+        "for (const n of figma.currentPage.findAll(n => n.type === 'TEXT')) { n.name = 'x'; } return 1;"
+      ],
+      "description": "Execute JS Code",
+      "capture": false,
+      "capture_node_ids": null,
+      "diff": false,
+      "scale": 1,
+      "max_px": 1024
+    }
+  ],
+  "reply": {
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": true,
+          "lint": "Whole-page scan: figma.currentPage.findAll / a walk of the whole page freezes the plugin for minutes on a big file (747 s seen). Scope it to a section: figma_inspect with node_ids, find / find_type (name search), or view:\"flow\" for prototype links; or findAll on a section node in a write script.",
+          "result": 1,
+          "modified": [
+            "2:2"
+          ]
+        }
+      }
+    ]
+  }
+}

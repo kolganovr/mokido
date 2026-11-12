@@ -1,0 +1,21 @@
+{
+  "call": {
+    "tool": "nope",
+    "arguments": null
+  },
+  "sent_to_plugin": [],
+  "reply": {
+    "isError": true,
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": false,
+          "code": "UNKNOWN_TOOL",
+          "error": "Unknown tool: nope\n\nHINT: Call tools/list to see the tools this bridge actually exposes."
+        }
+      }
+    ]
+  }
+}

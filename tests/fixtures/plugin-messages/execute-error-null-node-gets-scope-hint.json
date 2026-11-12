@@ -1,0 +1,63 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "EXECUTE",
+    "id": "e1",
+    "code": "figma.getNodeById('9:9').remove();"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "e1",
+     "success": false,
+     "description": "AI Command Execution",
+     "error": "Cannot read properties of null (reading 'remove')\n  at line 1: figma.getNodeById('9:9').remove();\n\nHINT: Every call runs in a fresh scope, so helpers from a previous figma_execute_code call are gone, and anything declared through eval() never existed at all. Persist reusable code with bridge.define(\"kit\", \"...; module.exports = { helper }\") and reload it via bridge.require(\"kit\").",
+     "code": "SCOPE_LOST",
+     "durationMs": 0,
+     "line": 1,
+     "column": 25,
+     "at": "figma.getNodeById('9:9').remove();"
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "selection": []
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [],
+  "notifies": [
+   {
+    "text": "AI Command Execution...",
+    "opts": {
+     "timeout": 30000
+    }
+   },
+   {
+    "text": "Error: Cannot read properties of null (reading 'remove')",
+    "opts": {
+     "error": true,
+     "timeout": 6000
+    }
+   }
+  ],
+  "cancels": 1,
+  "uiResizes": [],
+  "fontLoads": [
+   "Inter/Regular",
+   "Inter/Medium",
+   "Inter/Bold"
+  ],
+  "exports": [],
+  "modeSets": [],
+  "storage": {}
+ }
+}

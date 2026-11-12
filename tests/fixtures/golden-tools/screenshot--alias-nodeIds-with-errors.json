@@ -1,0 +1,40 @@
+{
+  "call": {
+    "tool": "figma_screenshot",
+    "arguments": {
+      "nodeIds": "9:1,9:2"
+    }
+  },
+  "sent_to_plugin": [
+    {
+      "type": "SCREENSHOT",
+      "nodeIds": "9:1,9:2",
+      "scale": 1,
+      "max_px": 1024,
+      "description": "Figma Screenshot"
+    }
+  ],
+  "reply": {
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": true,
+          "result": "Captured 1",
+          "images": [
+            "Ok 10x10 ~1tok"
+          ],
+          "image_errors": [
+            "Bad: node is hidden"
+          ]
+        }
+      },
+      {
+        "type": "image",
+        "mimeType": "image/png",
+        "data": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKAAAAAAAAAAAA"
+      }
+    ]
+  }
+}

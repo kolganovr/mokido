@@ -1,0 +1,130 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "GET_VARIABLES",
+    "id": "g1",
+    "startTime": 2
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "g1",
+     "success": true,
+     "description": "Get Variables",
+     "result": {
+      "collections": [
+       {
+        "id": "c1",
+        "name": "Colors",
+        "defaultModeId": "m1",
+        "modes": [
+         {
+          "modeId": "m1",
+          "name": "Light"
+         },
+         {
+          "modeId": "m2",
+          "name": "Dark"
+         }
+        ]
+       },
+       {
+        "id": "c2",
+        "name": "Spacing",
+        "defaultModeId": "m3",
+        "modes": [
+         {
+          "modeId": "m3",
+          "name": "Default"
+         }
+        ]
+       }
+      ],
+      "tokens": [
+       {
+        "id": "v1",
+        "name": "bg/primary",
+        "resolvedType": "COLOR",
+        "collectionName": "Colors",
+        "description": "Main background",
+        "valuesByMode": {
+         "Light": {
+          "r": 1,
+          "g": 1,
+          "b": 1,
+          "a": 1
+         },
+         "Dark": {
+          "r": 0,
+          "g": 0,
+          "b": 0,
+          "a": 1
+         }
+        }
+       },
+       {
+        "id": "v2",
+        "name": "text/primary",
+        "resolvedType": "COLOR",
+        "collectionName": "Colors",
+        "valuesByMode": {
+         "Light": {
+          "r": 0,
+          "g": 0,
+          "b": 0,
+          "a": 1
+         },
+         "Dark": {
+          "type": "VARIABLE_ALIAS",
+          "id": "v1"
+         }
+        }
+       },
+       {
+        "id": "v3",
+        "name": "space/sm",
+        "resolvedType": "FLOAT",
+        "collectionName": "Spacing",
+        "valuesByMode": {
+         "Default": 8
+        }
+       },
+       {
+        "id": "v4",
+        "name": "space/md",
+        "resolvedType": "FLOAT",
+        "collectionName": "Spacing",
+        "description": "Medium",
+        "valuesByMode": {
+         "Default": 16
+        }
+       }
+      ]
+     },
+     "startTime": 2
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "selection": []
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [],
+  "notifies": [],
+  "cancels": 0,
+  "uiResizes": [],
+  "fontLoads": [],
+  "exports": [],
+  "modeSets": [],
+  "storage": {}
+ }
+}

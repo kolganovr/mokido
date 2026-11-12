@@ -1,0 +1,48 @@
+{
+  "call": {
+    "tool": "figma_get_canvas_layout",
+    "arguments": {
+      "direction": "DOWN",
+      "gap": 40,
+      "limit": 50,
+      "layout": "grid",
+      "columns": 3
+    }
+  },
+  "sent_to_plugin": [
+    {
+      "type": "GET_CANVAS_LAYOUT",
+      "direction": "DOWN",
+      "gap": 40,
+      "limit": 50,
+      "layout": "grid",
+      "columns": 3
+    }
+  ],
+  "reply": {
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": true,
+          "result": {
+            "free": {
+              "x": 0,
+              "y": 1200
+            },
+            "frames": [
+              {
+                "id": "1:1",
+                "x": 0,
+                "y": 0,
+                "w": 320,
+                "h": 120
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

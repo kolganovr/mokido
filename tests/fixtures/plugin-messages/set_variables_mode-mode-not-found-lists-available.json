@@ -1,0 +1,51 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "SET_VARIABLES_MODE",
+    "id": "m1",
+    "startTime": 3,
+    "collection_name": "Colors",
+    "mode_name": "Sepia"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "m1",
+     "success": false,
+     "description": "Set Variable Mode \"Sepia\" on \"Colors\"",
+     "error": "Mode \"Sepia\" not found in collection \"Colors\". Available modes: Light, Dark",
+     "startTime": 3
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "selection": []
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [],
+  "notifies": [
+   {
+    "text": "Error: Mode \"Sepia\" not found in collection \"Colors\". Available modes: Light, Dark",
+    "opts": {
+     "error": true,
+     "timeout": 6000
+    }
+   }
+  ],
+  "cancels": 0,
+  "uiResizes": [],
+  "fontLoads": [],
+  "exports": [],
+  "modeSets": [],
+  "storage": {}
+ }
+}

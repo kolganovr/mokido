@@ -1,0 +1,194 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "EXECUTE",
+    "id": "e1",
+    "code": "for (const id of ['1:1', '1:2', '1:3']) bridge.snapshot(figma.getNodeById(id));\nconst card = figma.getNodeById('1:1'); card.x = 99; card.y = 98; card.resize(10, 11); card.fills = [{ type: 'SOLID', color: { r: 1, g: 0, b: 0 } }]; card.visible = false;\nconst t = figma.getNodeById('1:2'); t.characters = 'Changed'; t.opacity = 1;\nconst h = figma.getNodeById('1:3'); h.cornerRadius = 40; h.reactions = [];\nreturn 'edited';"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "e1",
+     "success": true,
+     "description": "AI Command Execution",
+     "result": "edited",
+     "resultStashed": true,
+     "screenshot": null,
+     "screenshots": null,
+     "beforeScreenshot": null,
+     "captureNote": null,
+     "targetName": null,
+     "targetId": null,
+     "checkpointId": "cp_loyw3v28_1",
+     "created": [],
+     "modified": [
+      "1:1",
+      "1:2",
+      "1:3"
+     ],
+     "warnings": [],
+     "durationMs": 0
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "ROLLBACK",
+    "id": "b1",
+    "startTime": 9,
+    "checkpoint_id": "cp_loyw3v28_1"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "b1",
+     "success": true,
+     "description": "Rollback cp_loyw3v28_1",
+     "result": {
+      "checkpoint_id": "cp_loyw3v28_1",
+      "label": "AI Command Execution",
+      "removed": [],
+      "restored": [
+       "1:1",
+       "1:2",
+       "1:3"
+      ],
+      "missing": []
+     },
+     "startTime": 9
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "children": [
+     {
+      "id": "1:1",
+      "type": "FRAME",
+      "name": "Card",
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "width": 300,
+      "height": 200,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [
+       {
+        "type": "SOLID",
+        "color": {
+         "r": 1,
+         "g": 1,
+         "b": 1
+        }
+       }
+      ],
+      "strokes": [],
+      "layoutMode": "NONE",
+      "clipsContent": false,
+      "children": [
+       {
+        "id": "1:2",
+        "type": "TEXT",
+        "name": "Title",
+        "visible": true,
+        "x": 10,
+        "y": 10,
+        "width": 80,
+        "height": 20,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [],
+        "strokes": [],
+        "characters": "Hello",
+        "fontName": {
+         "family": "Inter",
+         "style": "Regular"
+        },
+        "fontSize": 14,
+        "textAutoResize": "WIDTH_AND_HEIGHT",
+        "opacity": 0.5
+       }
+      ]
+     },
+     {
+      "id": "1:3",
+      "type": "FRAME",
+      "name": "Hero",
+      "visible": true,
+      "x": 400,
+      "y": 0,
+      "width": 300,
+      "height": 200,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [],
+      "strokes": [],
+      "layoutMode": "NONE",
+      "clipsContent": false,
+      "cornerRadius": 4,
+      "reactions": [
+       {
+        "trigger": {
+         "type": "ON_CLICK"
+        }
+       }
+      ]
+     }
+    ],
+    "selection": []
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [
+   [
+    "1:1",
+    "1:2",
+    "1:3"
+   ]
+  ],
+  "notifies": [
+   {
+    "text": "AI Command Execution...",
+    "opts": {
+     "timeout": 30000
+    }
+   },
+   {
+    "text": "AI Command Execution — done!",
+    "opts": {
+     "timeout": 2500
+    }
+   },
+   {
+    "text": "Rolled back \"AI Command Execution\" (0 removed, 3 restored)",
+    "opts": {
+     "timeout": 3500
+    }
+   }
+  ],
+  "cancels": 1,
+  "uiResizes": [],
+  "fontLoads": [
+   "Inter/Regular",
+   "Inter/Medium",
+   "Inter/Bold"
+  ],
+  "exports": [],
+  "modeSets": [],
+  "storage": {}
+ }
+}

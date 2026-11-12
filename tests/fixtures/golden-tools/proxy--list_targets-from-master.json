@@ -1,0 +1,28 @@
+{
+  "call": {
+    "tool": "figma_list_targets",
+    "arguments": {}
+  },
+  "sent_to_plugin": [],
+  "reply": {
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": true,
+          "targets": [
+            {
+              "id": "<ws_id>",
+              "fileName": "Golden File",
+              "pageName": "Page 1",
+              "pluginVersion": "9.9.9",
+              "focused": true,
+              "lastSeenMsAgo": "<n>"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

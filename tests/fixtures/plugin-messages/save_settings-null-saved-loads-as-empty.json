@@ -1,0 +1,44 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "SAVE_SETTINGS",
+    "settings": null
+   },
+   "posted": []
+  },
+  {
+   "send": {
+    "type": "LOAD_SETTINGS"
+   },
+   "posted": [
+    {
+     "type": "SETTINGS_LOADED",
+     "settings": {}
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "selection": []
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [],
+  "notifies": [],
+  "cancels": 0,
+  "uiResizes": [],
+  "fontLoads": [],
+  "exports": [],
+  "modeSets": [],
+  "storage": {
+   "antigravity_settings": null
+  }
+ }
+}

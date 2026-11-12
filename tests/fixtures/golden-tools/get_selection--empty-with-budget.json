@@ -1,0 +1,53 @@
+{
+  "call": {
+    "tool": "figma_get_selection",
+    "arguments": {
+      "max_output_bytes": 800
+    }
+  },
+  "sent_to_plugin": [
+    {
+      "code": [
+        "",
+        "          function hex(c) {",
+        "            const b = (n) => Math.round(Math.max(0, Math.min(1, n)) * 255).toString(16).padStart(2, '0').toUpperCase();",
+        "            return '#' + b(c.r) + b(c.g) + b(c.b);",
+        "          }",
+        "          function fillsSummary(fills) {",
+        "            if (!fills || fills === figma.mixed || !Array.isArray(fills) || fills.length === 0) return null;",
+        "            return fills.filter(f => f.visible !== false).map(f => f.type === 'SOLID' ? hex(f.color) : f.type).join('; ') || null;",
+        "          }",
+        "          const selection = figma.currentPage.selection;",
+        "          return selection.map(node => ({",
+        "            id: node.id,",
+        "            name: node.name,",
+        "            type: node.type,",
+        "            width: Math.round(node.width || 0),",
+        "            height: Math.round(node.height || 0),",
+        "            x: Math.round(node.x || 0),",
+        "            y: Math.round(node.y || 0),",
+        "            page: figma.currentPage.name,",
+        "            parentId: node.parent ? node.parent.id : null,",
+        "            parentName: node.parent ? node.parent.name : null,",
+        "            layoutMode: ('layoutMode' in node && node.layoutMode !== 'NONE') ? node.layoutMode : undefined,",
+        "            fills: fillsSummary(node.fills),",
+        "            characters: node.type === 'TEXT' ? String(node.characters || '').slice(0, 200) : undefined",
+        "          }));",
+        "        "
+      ],
+      "description": "Get Selected Nodes"
+    }
+  ],
+  "reply": {
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": true,
+          "result": []
+        }
+      }
+    ]
+  }
+}

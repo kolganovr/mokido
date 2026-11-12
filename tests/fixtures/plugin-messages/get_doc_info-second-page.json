@@ -1,0 +1,45 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "GET_DOC_INFO"
+   },
+   "posted": [
+    {
+     "type": "DOC_INFO",
+     "fileKey": null,
+     "fileName": "Test File",
+     "pageName": "Page 2",
+     "pageId": "0:2"
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "selection": []
+   },
+   {
+    "id": "0:2",
+    "type": "PAGE",
+    "name": "Page 2",
+    "visible": true,
+    "selection": []
+   }
+  ],
+  "currentPage": "0:2",
+  "viewport": [],
+  "notifies": [],
+  "cancels": 0,
+  "uiResizes": [],
+  "fontLoads": [],
+  "exports": [],
+  "modeSets": [],
+  "storage": {}
+ }
+}

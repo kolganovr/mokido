@@ -1,0 +1,156 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "ROLLBACK",
+    "id": "b1",
+    "startTime": 9
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "b1",
+     "success": false,
+     "description": "Rollback last",
+     "error": "No rollback-eligible checkpoint found for \"last\". Use bridge.checkpoints() to list committed checkpoints.",
+     "startTime": 9
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "ROLLBACK",
+    "id": "b1",
+    "startTime": 9,
+    "checkpoint_id": "cp_nope"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "b1",
+     "success": false,
+     "description": "Rollback cp_nope",
+     "error": "No rollback-eligible checkpoint found for \"cp_nope\". Use bridge.checkpoints() to list committed checkpoints.",
+     "startTime": 9
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "EXECUTE",
+    "id": "e1",
+    "code": "figma.createFrame(); return 1;"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "e1",
+     "success": true,
+     "description": "AI Command Execution",
+     "result": 1,
+     "resultStashed": true,
+     "screenshot": null,
+     "screenshots": null,
+     "beforeScreenshot": null,
+     "captureNote": null,
+     "targetName": null,
+     "targetId": null,
+     "checkpointId": "cp_loyw3v28_1",
+     "created": [
+      "1:13"
+     ],
+     "modified": [],
+     "warnings": [],
+     "durationMs": 0
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "ROLLBACK",
+    "id": "b1",
+    "startTime": 9,
+    "checkpoint_id": "cp_loyw3v28_1"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "b1",
+     "success": true,
+     "description": "Rollback cp_loyw3v28_1",
+     "result": {
+      "checkpoint_id": "cp_loyw3v28_1",
+      "label": "AI Command Execution",
+      "removed": [
+       "1:13"
+      ],
+      "restored": [],
+      "missing": []
+     },
+     "startTime": 9
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "ROLLBACK",
+    "id": "b1",
+    "startTime": 9,
+    "checkpoint_id": "cp_loyw3v28_1"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "b1",
+     "success": false,
+     "description": "Rollback cp_loyw3v28_1",
+     "error": "Checkpoint \"cp_loyw3v28_1\" (\"AI Command Execution\") was already rolled back.",
+     "startTime": 9
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "selection": []
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [],
+  "notifies": [
+   {
+    "text": "AI Command Execution...",
+    "opts": {
+     "timeout": 30000
+    }
+   },
+   {
+    "text": "AI Command Execution — done!",
+    "opts": {
+     "timeout": 2500
+    }
+   },
+   {
+    "text": "Rolled back \"AI Command Execution\" (1 removed, 0 restored)",
+    "opts": {
+     "timeout": 3500
+    }
+   }
+  ],
+  "cancels": 1,
+  "uiResizes": [],
+  "fontLoads": [
+   "Inter/Regular",
+   "Inter/Medium",
+   "Inter/Bold"
+  ],
+  "exports": [],
+  "modeSets": [],
+  "storage": {}
+ }
+}

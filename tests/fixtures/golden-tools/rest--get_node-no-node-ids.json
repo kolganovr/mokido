@@ -1,0 +1,24 @@
+{
+  "call": {
+    "tool": "get_node",
+    "arguments": {
+      "file_key": "AbC123"
+    }
+  },
+  "sent_to_plugin": [],
+  "rest_requests": [],
+  "reply": {
+    "isError": true,
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": false,
+          "code": null,
+          "error": "No node_ids provided."
+        }
+      }
+    ]
+  }
+}

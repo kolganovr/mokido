@@ -1,0 +1,34 @@
+{
+  "call": {
+    "tool": "figma_read_canvas",
+    "arguments": {
+      "node_id": "1:1",
+      "format": "tree",
+      "include_hidden": true,
+      "depth": 2
+    }
+  },
+  "sent_to_plugin": [
+    {
+      "type": "READ_CANVAS",
+      "node_ids": "1:1",
+      "depth": 2,
+      "include_hidden": true
+    }
+  ],
+  "reply": {
+    "content": [
+      {
+        "type": "text",
+        "text": [
+          "<!-- Optimized Figma Layout (73.3% smaller than the raw API response | 1 KB -> 0.3 KB) -->",
+          "[FRAME] \"Card\" #1:1 col gap=12 pad=16 (320x120) bg=#FFFFFF r=12",
+          "  [TEXT] \"Title\" #1:2 (288x24) bg=#1A1A1A font=\"Inter Bold 16px\": \"Hello\"",
+          "  [TEXT] \"Hidden Layer\" #1:3 (10x10): \"secret\"",
+          "  [FRAME] \"Footer\" #1:5 (288x24)",
+          "    [TEXT] \"Description\" #1:6 (288x24) font=\"Inter 13px\": \"A longer paragraph of body copy neste...\""
+        ]
+      }
+    ]
+  }
+}

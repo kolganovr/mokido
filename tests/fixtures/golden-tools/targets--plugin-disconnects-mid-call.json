@@ -1,0 +1,30 @@
+{
+  "call": {
+    "tool": "figma_get_variables",
+    "arguments": {
+      "target": "Delta"
+    }
+  },
+  "sent_to_plugin": {
+    "Delta": [
+      {
+        "type": "GET_VARIABLES",
+        "limit": 300
+      }
+    ]
+  },
+  "reply": {
+    "isError": true,
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": false,
+          "code": "PLUGIN_DISCONNECTED",
+          "error": "The Figma plugin disconnected while this command was running, so its result is lost. It may or may not have finished: check the canvas with one cheap read before running it again."
+        }
+      }
+    ]
+  }
+}

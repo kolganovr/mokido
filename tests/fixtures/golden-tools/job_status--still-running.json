@@ -1,0 +1,33 @@
+{
+  "call": {
+    "tool": "figma_job_status",
+    "arguments": {
+      "job_id": "<cmd_id>",
+      "wait_ms": 30
+    }
+  },
+  "sent_to_plugin": [],
+  "reply": {
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": true,
+          "status": "running",
+          "job_id": "<cmd_id>",
+          "elapsed_ms": "<n>",
+          "waited_ms": "<n>",
+          "progress": [
+            {
+              "step": 1,
+              "of": 3,
+              "note": "working",
+              "ts": "<n>"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

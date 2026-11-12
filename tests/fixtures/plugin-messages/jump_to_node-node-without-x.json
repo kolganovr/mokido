@@ -1,0 +1,103 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "JUMP_TO_NODE",
+    "nodeId": "0:1"
+   },
+   "posted": []
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "children": [
+     {
+      "id": "1:1",
+      "type": "FRAME",
+      "name": "Card",
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "width": 300,
+      "height": 200,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [
+       {
+        "type": "SOLID",
+        "color": {
+         "r": 1,
+         "g": 1,
+         "b": 1
+        }
+       }
+      ],
+      "strokes": [],
+      "layoutMode": "NONE",
+      "clipsContent": false,
+      "children": [
+       {
+        "id": "1:2",
+        "type": "TEXT",
+        "name": "Title",
+        "visible": true,
+        "x": 10,
+        "y": 10,
+        "width": 80,
+        "height": 20,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [],
+        "strokes": [],
+        "characters": "Hello",
+        "fontName": {
+         "family": "Inter",
+         "style": "Regular"
+        },
+        "fontSize": 14,
+        "textAutoResize": "WIDTH_AND_HEIGHT"
+       }
+      ]
+     },
+     {
+      "id": "1:3",
+      "type": "FRAME",
+      "name": "Hero",
+      "visible": true,
+      "x": 400,
+      "y": 0,
+      "width": 300,
+      "height": 200,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [],
+      "strokes": [],
+      "layoutMode": "NONE",
+      "clipsContent": false
+     }
+    ],
+    "selection": []
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [],
+  "notifies": [],
+  "cancels": 0,
+  "uiResizes": [],
+  "fontLoads": [],
+  "exports": [],
+  "modeSets": [],
+  "storage": {}
+ }
+}

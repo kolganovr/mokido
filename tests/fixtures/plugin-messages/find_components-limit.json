@@ -1,0 +1,586 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "FIND_COMPONENTS",
+    "id": "f1",
+    "startTime": 1,
+    "limit": 1
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "f1",
+     "success": true,
+     "description": "Find Components",
+     "result": [
+      {
+       "id": "1:1",
+       "name": "Button",
+       "type": "COMPONENT_SET",
+       "key": "key-button",
+       "page": "Buttons",
+       "description": "Primary action",
+       "variants": {
+        "Size": [
+         "S",
+         "L"
+        ],
+        "State": [
+         "Default",
+         "Hover"
+        ]
+       },
+       "properties": {
+        "Label#1:0": {
+         "type": "TEXT",
+         "defaultValue": "Click"
+        }
+       }
+      }
+     ],
+     "startTime": 1
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "FIND_COMPONENTS",
+    "id": "f1",
+    "startTime": 1,
+    "limit": 2,
+    "query": "button"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "f1",
+     "success": true,
+     "description": "Find Components (\"button\")",
+     "result": [
+      {
+       "id": "1:1",
+       "name": "Button",
+       "type": "COMPONENT_SET",
+       "key": "key-button",
+       "page": "Buttons",
+       "description": "Primary action",
+       "variants": {
+        "Size": [
+         "S",
+         "L"
+        ],
+        "State": [
+         "Default",
+         "Hover"
+        ]
+       },
+       "properties": {
+        "Label#1:0": {
+         "type": "TEXT",
+         "defaultValue": "Click"
+        }
+       }
+      },
+      {
+       "id": "1:11",
+       "name": "Button Group",
+       "type": "COMPONENT",
+       "key": "key-group",
+       "page": "Buttons"
+      }
+     ],
+     "startTime": 1
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "FIND_COMPONENTS",
+    "id": "f1",
+    "startTime": 1,
+    "limit": 0
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "f1",
+     "success": true,
+     "description": "Find Components",
+     "result": [
+      {
+       "id": "1:1",
+       "name": "Button",
+       "type": "COMPONENT_SET",
+       "key": "key-button",
+       "page": "Buttons",
+       "description": "Primary action",
+       "variants": {
+        "Size": [
+         "S",
+         "L"
+        ],
+        "State": [
+         "Default",
+         "Hover"
+        ]
+       },
+       "properties": {
+        "Label#1:0": {
+         "type": "TEXT",
+         "defaultValue": "Click"
+        }
+       }
+      }
+     ],
+     "startTime": 1
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "FIND_COMPONENTS",
+    "id": "f1",
+    "startTime": 1,
+    "limit": null
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "f1",
+     "success": true,
+     "description": "Find Components",
+     "result": [
+      {
+       "id": "1:1",
+       "name": "Button",
+       "type": "COMPONENT_SET",
+       "key": "key-button",
+       "page": "Buttons",
+       "description": "Primary action",
+       "variants": {
+        "Size": [
+         "S",
+         "L"
+        ],
+        "State": [
+         "Default",
+         "Hover"
+        ]
+       },
+       "properties": {
+        "Label#1:0": {
+         "type": "TEXT",
+         "defaultValue": "Click"
+        }
+       }
+      }
+     ],
+     "startTime": 1
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Buttons",
+    "visible": true,
+    "children": [
+     {
+      "id": "1:1",
+      "type": "COMPONENT_SET",
+      "name": "Button",
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "width": 100,
+      "height": 100,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [],
+      "strokes": [],
+      "layoutMode": "NONE",
+      "clipsContent": false,
+      "description": "Primary action",
+      "key": "key-button",
+      "componentPropertyDefinitions": {
+       "Size": {
+        "type": "VARIANT",
+        "variantOptions": [
+         "S",
+         "L"
+        ],
+        "defaultValue": "S"
+       },
+       "State": {
+        "type": "VARIANT",
+        "variantOptions": [
+         "Default",
+         "Hover"
+        ],
+        "defaultValue": "Default"
+       },
+       "Label#1:0": {
+        "type": "TEXT",
+        "defaultValue": "Click"
+       }
+      },
+      "children": [
+       {
+        "id": "1:2",
+        "type": "COMPONENT",
+        "name": "Size=S, State=Default",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 80,
+        "height": 32,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [],
+        "strokes": [],
+        "layoutMode": "NONE",
+        "clipsContent": false,
+        "variantProperties": {
+         "Size": "S",
+         "State": "Default"
+        },
+        "componentProperties": {},
+        "children": [
+         {
+          "id": "1:3",
+          "type": "TEXT",
+          "name": "Label",
+          "visible": true,
+          "x": 0,
+          "y": 0,
+          "width": 100,
+          "height": 20,
+          "constraints": {
+           "horizontal": "MIN",
+           "vertical": "MIN"
+          },
+          "fills": [],
+          "strokes": [],
+          "characters": "Click",
+          "fontName": {
+           "family": "Inter",
+           "style": "Regular"
+          },
+          "fontSize": 14,
+          "textAutoResize": "WIDTH_AND_HEIGHT"
+         }
+        ]
+       },
+       {
+        "id": "1:4",
+        "type": "COMPONENT",
+        "name": "Size=S, State=Hover",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 80,
+        "height": 32,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [],
+        "strokes": [],
+        "layoutMode": "NONE",
+        "clipsContent": false,
+        "variantProperties": {
+         "Size": "S",
+         "State": "Hover"
+        },
+        "componentProperties": {},
+        "children": [
+         {
+          "id": "1:5",
+          "type": "TEXT",
+          "name": "Label",
+          "visible": true,
+          "x": 0,
+          "y": 0,
+          "width": 100,
+          "height": 20,
+          "constraints": {
+           "horizontal": "MIN",
+           "vertical": "MIN"
+          },
+          "fills": [],
+          "strokes": [],
+          "characters": "Click",
+          "fontName": {
+           "family": "Inter",
+           "style": "Regular"
+          },
+          "fontSize": 14,
+          "textAutoResize": "WIDTH_AND_HEIGHT"
+         }
+        ]
+       },
+       {
+        "id": "1:6",
+        "type": "COMPONENT",
+        "name": "Size=L, State=Default",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 120,
+        "height": 32,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [],
+        "strokes": [],
+        "layoutMode": "NONE",
+        "clipsContent": false,
+        "variantProperties": {
+         "Size": "L",
+         "State": "Default"
+        },
+        "componentProperties": {},
+        "children": [
+         {
+          "id": "1:7",
+          "type": "TEXT",
+          "name": "Label",
+          "visible": true,
+          "x": 0,
+          "y": 0,
+          "width": 100,
+          "height": 20,
+          "constraints": {
+           "horizontal": "MIN",
+           "vertical": "MIN"
+          },
+          "fills": [],
+          "strokes": [],
+          "characters": "Click",
+          "fontName": {
+           "family": "Inter",
+           "style": "Regular"
+          },
+          "fontSize": 14,
+          "textAutoResize": "WIDTH_AND_HEIGHT"
+         }
+        ]
+       },
+       {
+        "id": "1:8",
+        "type": "COMPONENT",
+        "name": "Size=L, State=Hover",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 120,
+        "height": 32,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [],
+        "strokes": [],
+        "layoutMode": "NONE",
+        "clipsContent": false,
+        "variantProperties": {
+         "Size": "L",
+         "State": "Hover"
+        },
+        "componentProperties": {},
+        "children": [
+         {
+          "id": "1:9",
+          "type": "TEXT",
+          "name": "Label",
+          "visible": true,
+          "x": 0,
+          "y": 0,
+          "width": 100,
+          "height": 20,
+          "constraints": {
+           "horizontal": "MIN",
+           "vertical": "MIN"
+          },
+          "fills": [],
+          "strokes": [],
+          "characters": "Click",
+          "fontName": {
+           "family": "Inter",
+           "style": "Regular"
+          },
+          "fontSize": 14,
+          "textAutoResize": "WIDTH_AND_HEIGHT"
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "id": "1:10",
+      "type": "COMPONENT",
+      "name": "Icon / Arrow",
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "width": 24,
+      "height": 24,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [],
+      "strokes": [],
+      "layoutMode": "NONE",
+      "clipsContent": false,
+      "description": "arrow glyph",
+      "key": "key-arrow",
+      "componentPropertyDefinitions": {
+       "Show": {
+        "type": "BOOLEAN",
+        "defaultValue": true
+       }
+      },
+      "componentProperties": {}
+     },
+     {
+      "id": "1:11",
+      "type": "COMPONENT",
+      "name": "Button Group",
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "width": 200,
+      "height": 40,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [],
+      "strokes": [],
+      "layoutMode": "NONE",
+      "clipsContent": false,
+      "key": "key-group",
+      "componentProperties": {}
+     }
+    ],
+    "selection": []
+   },
+   {
+    "id": "0:2",
+    "type": "PAGE",
+    "name": "Cards",
+    "visible": true,
+    "children": [
+     {
+      "id": "1:12",
+      "type": "COMPONENT",
+      "name": "Card",
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "width": 300,
+      "height": 180,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [],
+      "strokes": [],
+      "layoutMode": "NONE",
+      "clipsContent": false,
+      "key": "key-card",
+      "componentProperties": {},
+      "children": [
+       {
+        "id": "1:13",
+        "type": "TEXT",
+        "name": "Title",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 100,
+        "height": 20,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [],
+        "strokes": [],
+        "characters": "Card title",
+        "fontName": {
+         "family": "Inter",
+         "style": "Regular"
+        },
+        "fontSize": 14,
+        "textAutoResize": "WIDTH_AND_HEIGHT"
+       },
+       {
+        "id": "1:14",
+        "type": "TEXT",
+        "name": "Body",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 100,
+        "height": 20,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [],
+        "strokes": [],
+        "characters": "Card body",
+        "fontName": {
+         "family": "Inter",
+         "style": "Regular"
+        },
+        "fontSize": 14,
+        "textAutoResize": "WIDTH_AND_HEIGHT"
+       }
+      ]
+     },
+     {
+      "id": "1:15",
+      "type": "COMPONENT",
+      "name": "button icon",
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "width": 100,
+      "height": 100,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [],
+      "strokes": [],
+      "layoutMode": "NONE",
+      "clipsContent": false,
+      "key": "key-bicon",
+      "componentProperties": {}
+     }
+    ],
+    "selection": []
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [],
+  "notifies": [],
+  "cancels": 0,
+  "uiResizes": [],
+  "fontLoads": [],
+  "exports": [],
+  "modeSets": [],
+  "storage": {}
+ }
+}

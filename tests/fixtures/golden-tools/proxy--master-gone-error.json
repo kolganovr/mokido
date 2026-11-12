@@ -1,0 +1,21 @@
+{
+  "call": {
+    "tool": "figma_get_variables",
+    "arguments": {}
+  },
+  "sent_to_plugin": [],
+  "reply": {
+    "isError": true,
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": false,
+          "code": "BRIDGE_OFFLINE",
+          "error": "The bridge instance that owned :8765 is no longer running. This server is taking the port over — retry the call.\n\nHINT: The Figma plugin did not answer. Ask the user to open Figma DESKTOP (not the browser) and launch the Mokido plugin (Ctrl+Alt+P / Cmd+Option+P) until the status shows CONNECTED, then retry."
+        }
+      }
+    ]
+  }
+}

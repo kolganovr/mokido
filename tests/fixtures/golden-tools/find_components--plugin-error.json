@@ -1,0 +1,31 @@
+{
+  "call": {
+    "tool": "figma_find_components",
+    "arguments": {
+      "query": "x"
+    }
+  },
+  "sent_to_plugin": [
+    {
+      "type": "FIND_COMPONENTS",
+      "query": "x",
+      "include_variants": true,
+      "limit": 30,
+      "refresh_index": false
+    }
+  ],
+  "reply": {
+    "isError": true,
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": false,
+          "code": "INDEX_NOT_READY",
+          "error": "Index not ready"
+        }
+      }
+    ]
+  }
+}

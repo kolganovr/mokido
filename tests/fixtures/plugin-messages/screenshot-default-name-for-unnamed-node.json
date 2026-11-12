@@ -1,0 +1,89 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "SCREENSHOT",
+    "id": "s1",
+    "nodeIds": "1:1"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "s1",
+     "success": true,
+     "description": "Screenshot capture",
+     "result": "Captured 1 node(s)",
+     "screenshots": [
+      {
+       "id": "1:1",
+       "name": "Node",
+       "base64": "iVBORw0KGgo="
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "children": [
+     {
+      "id": "1:1",
+      "type": "FRAME",
+      "name": "",
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "width": 100,
+      "height": 100,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [],
+      "strokes": [],
+      "layoutMode": "NONE",
+      "clipsContent": false
+     }
+    ],
+    "selection": []
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [
+   [
+    "1:1"
+   ]
+  ],
+  "notifies": [
+   {
+    "text": "Capturing screenshot ()...",
+    "opts": {
+     "timeout": 2500
+    }
+   }
+  ],
+  "cancels": 0,
+  "uiResizes": [],
+  "fontLoads": [],
+  "exports": [
+   {
+    "id": "1:1",
+    "settings": {
+     "format": "PNG",
+     "constraint": {
+      "type": "SCALE",
+      "value": 1
+     }
+    }
+   }
+  ],
+  "modeSets": [],
+  "storage": {}
+ }
+}

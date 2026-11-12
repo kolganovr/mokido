@@ -1,0 +1,268 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "INSERT_COMPONENT_INSTANCE",
+    "id": "i1",
+    "startTime": 1,
+    "component_name": "Fancy",
+    "text_overrides": {
+     "Plain": "1",
+     "Mixed": "2",
+     "Old": "3"
+    }
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "i1",
+     "success": true,
+     "description": "Insert Component \"Fancy\"",
+     "result": {
+      "instanceId": "1:17",
+      "name": "Fancy",
+      "masterComponentId": "1:1",
+      "masterName": "Fancy",
+      "parentContainer": "Page 1",
+      "width": 100,
+      "height": 100
+     },
+     "screenshot": null,
+     "captureNote": null,
+     "targetName": "Fancy",
+     "targetId": "1:17",
+     "checkpointId": "cp_loyw3v28_1",
+     "created": [
+      "1:17",
+      "1:17"
+     ],
+     "modified": [],
+     "warnings": [],
+     "startTime": 1
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "children": [
+     {
+      "id": "1:1",
+      "type": "COMPONENT",
+      "name": "Fancy",
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "width": 100,
+      "height": 100,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [],
+      "strokes": [],
+      "layoutMode": "NONE",
+      "clipsContent": false,
+      "componentProperties": {},
+      "children": [
+       {
+        "id": "1:2",
+        "type": "TEXT",
+        "name": "Plain",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 100,
+        "height": 20,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [],
+        "strokes": [],
+        "characters": "p",
+        "fontName": {
+         "family": "Roboto",
+         "style": "Bold"
+        },
+        "fontSize": 14,
+        "textAutoResize": "WIDTH_AND_HEIGHT"
+       },
+       {
+        "id": "1:3",
+        "type": "TEXT",
+        "name": "Mixed",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 100,
+        "height": 20,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [],
+        "strokes": [],
+        "characters": "m",
+        "fontName": "[mixed]",
+        "fontSize": 14,
+        "textAutoResize": "WIDTH_AND_HEIGHT"
+       },
+       {
+        "id": "1:4",
+        "type": "TEXT",
+        "name": "Old",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 100,
+        "height": 20,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [],
+        "strokes": [],
+        "characters": "ab",
+        "fontName": "[mixed]",
+        "fontSize": 14,
+        "textAutoResize": "WIDTH_AND_HEIGHT"
+       }
+      ]
+     },
+     {
+      "id": "1:17",
+      "type": "INSTANCE",
+      "name": "Fancy",
+      "visible": true,
+      "x": 180,
+      "y": 0,
+      "width": 100,
+      "height": 100,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [],
+      "strokes": [],
+      "layoutMode": "NONE",
+      "clipsContent": false,
+      "componentProperties": {},
+      "variantProperties": null,
+      "layoutSizingHorizontal": "FIXED",
+      "layoutSizingVertical": "FIXED",
+      "layoutPositioning": "AUTO",
+      "mainComponent": "1:1",
+      "children": [
+       {
+        "id": "1:18",
+        "type": "TEXT",
+        "name": "Plain",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 100,
+        "height": 20,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [],
+        "strokes": [],
+        "characters": "1",
+        "fontName": {
+         "family": "Roboto",
+         "style": "Bold"
+        },
+        "fontSize": 14,
+        "textAutoResize": "WIDTH_AND_HEIGHT"
+       },
+       {
+        "id": "1:19",
+        "type": "TEXT",
+        "name": "Mixed",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 100,
+        "height": 20,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [],
+        "strokes": [],
+        "characters": "2",
+        "fontName": "[mixed]",
+        "fontSize": 14,
+        "textAutoResize": "WIDTH_AND_HEIGHT"
+       },
+       {
+        "id": "1:20",
+        "type": "TEXT",
+        "name": "Old",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 100,
+        "height": 20,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [],
+        "strokes": [],
+        "characters": "3",
+        "fontName": "[mixed]",
+        "fontSize": 14,
+        "textAutoResize": "WIDTH_AND_HEIGHT"
+       }
+      ]
+     }
+    ],
+    "selection": [
+     "1:17"
+    ]
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [
+   [
+    "1:17"
+   ]
+  ],
+  "notifies": [
+   {
+    "text": "Inserting component...",
+    "opts": {
+     "timeout": 15000
+    }
+   },
+   {
+    "text": "Inserted Fancy",
+    "opts": {
+     "timeout": 3000
+    }
+   }
+  ],
+  "cancels": 1,
+  "uiResizes": [],
+  "fontLoads": [
+   "Inter/Regular",
+   "Inter/Medium",
+   "Inter/Bold",
+   "Roboto/Bold",
+   "Lora/Italic",
+   "Oswald/Light",
+   "Georgia/Regular"
+  ],
+  "exports": [],
+  "modeSets": [],
+  "storage": {}
+ }
+}

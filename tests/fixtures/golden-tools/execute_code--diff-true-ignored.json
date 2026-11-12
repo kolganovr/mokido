@@ -1,0 +1,38 @@
+{
+  "call": {
+    "tool": "figma_execute_code",
+    "arguments": {
+      "code": "figma.createRectangle(); return 1;",
+      "diff": true
+    }
+  },
+  "sent_to_plugin": [
+    {
+      "code": [
+        "figma.createRectangle(); return 1;"
+      ],
+      "description": "Execute JS Code",
+      "capture": false,
+      "capture_node_ids": null,
+      "diff": false,
+      "scale": 1,
+      "max_px": 1024
+    }
+  ],
+  "reply": {
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": true,
+          "lint": "diff:true was ignored: its \"before\" screenshot stalls the plugin for minutes (bench 15.10); the change ran without it.",
+          "result": 1,
+          "created": [
+            "8:2"
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "call": {
+    "tool": "figma_execute_code",
+    "arguments": {
+      "code": "return 1;",
+      "async": true,
+      "target": "Alpha"
+    }
+  },
+  "sent_to_plugin": {
+    "Alpha": [
+      {
+        "code": [
+          "return 1;"
+        ],
+        "description": "Execute JS Code",
+        "capture": false,
+        "capture_node_ids": null,
+        "diff": false,
+        "scale": 1,
+        "max_px": 1024
+      }
+    ]
+  },
+  "reply": {
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": true,
+          "status": "running",
+          "job_id": "<cmd_id>",
+          "note": "Still running in Figma after 0s. Call figma_job_status({ job_id: \"<cmd_id>\" }) once — it waits for the result.",
+          "hint": "Slow call: if it searched the whole page (findAll / find without root), scope it to a section next time."
+        }
+      }
+    ]
+  }
+}

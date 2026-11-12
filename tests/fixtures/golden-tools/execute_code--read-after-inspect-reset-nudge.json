@@ -1,0 +1,34 @@
+{
+  "call": {
+    "tool": "figma_execute_code",
+    "arguments": {
+      "code": "const n = figma.getNodeById('1:3'); return n.characters;"
+    }
+  },
+  "sent_to_plugin": [
+    {
+      "code": [
+        "const n = figma.getNodeById('1:3'); return n.characters;"
+      ],
+      "description": "Execute JS Code",
+      "capture": false,
+      "capture_node_ids": null,
+      "diff": false,
+      "scale": 1,
+      "max_px": 1024
+    }
+  ],
+  "reply": {
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": true,
+          "use_instead": "figma_inspect {\"node_ids\":[\"1:3\"],\"depth\":0} — reads the same nodes in ONE call (one line per node: TYPE \"name\" #id WxH @x,y [layout] fill font \"text\" →component variant), every id at once; a long reply pages with offset=K. Hand-written read #1 in a row: each is a full model turn that re-sends the whole conversation.",
+          "result": "Hi"
+        }
+      }
+    ]
+  }
+}

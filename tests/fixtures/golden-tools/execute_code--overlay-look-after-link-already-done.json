@@ -1,0 +1,24 @@
+{
+  "call": {
+    "tool": "figma_execute_code",
+    "arguments": {
+      "code": "const o = figma.getNodeById('21:2086'); o.overlayPositionType = 'CENTER';"
+    }
+  },
+  "sent_to_plugin": [],
+  "reply": {
+    "isError": true,
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": false,
+          "code": "OVERLAY_ALREADY_LINKED",
+          "not_run": true,
+          "done": "Already done: bridge.openOverlay linked #21:2062 → overlay #21:2086. Its look is read-only for scripts (no setter anywhere): this is the MANUAL STEP. Answer now: tell the user to select frame #21:2086 > Prototype panel > Overlay and set position, background and click-outside there."
+        }
+      }
+    ]
+  }
+}

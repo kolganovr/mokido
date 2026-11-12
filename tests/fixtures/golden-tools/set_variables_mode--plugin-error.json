@@ -1,0 +1,33 @@
+{
+  "call": {
+    "tool": "figma_set_variables_mode",
+    "arguments": {
+      "collection_name": "Nope",
+      "mode_name": "Dark"
+    }
+  },
+  "sent_to_plugin": [
+    {
+      "type": "SET_VARIABLES_MODE",
+      "collection_name": "Nope",
+      "mode_name": "Dark",
+      "capture": false,
+      "scale": 1,
+      "max_px": 1024
+    }
+  ],
+  "reply": {
+    "isError": true,
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": false,
+          "code": "COLLECTION_NOT_FOUND",
+          "error": "Collection Nope not found"
+        }
+      }
+    ]
+  }
+}

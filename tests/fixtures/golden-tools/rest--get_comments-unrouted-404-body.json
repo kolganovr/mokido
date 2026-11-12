@@ -1,0 +1,34 @@
+{
+  "call": {
+    "tool": "get_comments",
+    "arguments": {
+      "file_key": "Unknown"
+    }
+  },
+  "sent_to_plugin": [],
+  "rest_requests": [
+    {
+      "method": "GET",
+      "path": "/files/Unknown/comments",
+      "headers": {
+        "X-Figma-Token": "test",
+        "Content-Type": "application/json"
+      },
+      "body": null
+    }
+  ],
+  "reply": {
+    "isError": true,
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": false,
+          "code": null,
+          "error": "Figma API error (404 Not Found): {\"status\":404,\"err\":\"stub: no route for GET /files/Unknown/comments\"}"
+        }
+      }
+    ]
+  }
+}

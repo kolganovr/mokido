@@ -1,0 +1,31 @@
+{
+  "call": {
+    "tool": "figma_get_canvas_layout",
+    "arguments": {}
+  },
+  "sent_to_plugin": [
+    {
+      "type": "GET_CANVAS_LAYOUT",
+      "direction": "RIGHT",
+      "gap": 80,
+      "limit": 200
+    }
+  ],
+  "reply": {
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": true,
+          "result": {
+            "free": {
+              "x": 1400,
+              "y": 0
+            }
+          }
+        }
+      }
+    ]
+  }
+}

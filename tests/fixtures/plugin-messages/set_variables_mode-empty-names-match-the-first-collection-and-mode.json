@@ -1,0 +1,95 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "SET_VARIABLES_MODE",
+    "id": "m1",
+    "startTime": 3,
+    "collection_name": "",
+    "mode_name": ""
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "m1",
+     "success": true,
+     "description": "Set Variable Mode \"\" on \"\"",
+     "result": "Successfully set mode \"Light\" (m1) for collection \"Colors\" on \"Page 1\"",
+     "screenshot": null,
+     "captureNote": null,
+     "targetName": "Page 1",
+     "targetId": "0:1",
+     "startTime": 3
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "SET_VARIABLES_MODE",
+    "id": "m2",
+    "startTime": 3
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "m2",
+     "success": true,
+     "description": "Set Variable Mode \"undefined\" on \"undefined\"",
+     "result": "Successfully set mode \"Light\" (m1) for collection \"Colors\" on \"Page 1\"",
+     "screenshot": null,
+     "captureNote": null,
+     "targetName": "Page 1",
+     "targetId": "0:1",
+     "startTime": 3
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "explicitModes": {
+     "c1": "m1"
+    },
+    "selection": []
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [],
+  "notifies": [
+   {
+    "text": "Theme switched to \"Light\" on Page 1",
+    "opts": {
+     "timeout": 3000
+    }
+   },
+   {
+    "text": "Theme switched to \"Light\" on Page 1",
+    "opts": {
+     "timeout": 3000
+    }
+   }
+  ],
+  "cancels": 0,
+  "uiResizes": [],
+  "fontLoads": [],
+  "exports": [],
+  "modeSets": [
+   {
+    "node": "0:1",
+    "collection": "c1",
+    "modeId": "m1"
+   },
+   {
+    "node": "0:1",
+    "collection": "c1",
+    "modeId": "m1"
+   }
+  ],
+  "storage": {}
+ }
+}

@@ -1,0 +1,63 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "EXECUTE",
+    "id": "e1",
+    "code": "const kit = 1;\n  return helperFromAnotherCall(kit);"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "e1",
+     "success": false,
+     "description": "AI Command Execution",
+     "error": "helperFromAnotherCall is not defined\n  at line 2: return helperFromAnotherCall(kit);\n\nHINT: Every call runs in a fresh scope, so helpers from a previous figma_execute_code call are gone, and anything declared through eval() never existed at all. Persist reusable code with bridge.define(\"kit\", \"...; module.exports = { helper }\") and reload it via bridge.require(\"kit\").",
+     "code": "SCOPE_LOST",
+     "durationMs": 0,
+     "line": 2,
+     "column": 3,
+     "at": "return helperFromAnotherCall(kit);"
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "selection": []
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [],
+  "notifies": [
+   {
+    "text": "AI Command Execution...",
+    "opts": {
+     "timeout": 30000
+    }
+   },
+   {
+    "text": "Error: helperFromAnotherCall is not defined",
+    "opts": {
+     "error": true,
+     "timeout": 6000
+    }
+   }
+  ],
+  "cancels": 1,
+  "uiResizes": [],
+  "fontLoads": [
+   "Inter/Regular",
+   "Inter/Medium",
+   "Inter/Bold"
+  ],
+  "exports": [],
+  "modeSets": [],
+  "storage": {}
+ }
+}

@@ -1,0 +1,30 @@
+{
+  "call": {
+    "tool": "figma_rollback",
+    "arguments": {}
+  },
+  "sent_to_plugin": [
+    {
+      "type": "ROLLBACK",
+      "checkpoint_id": "last"
+    }
+  ],
+  "reply": {
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": true,
+          "checkpoint_id": "cp_ov",
+          "label": "openOverlay",
+          "removed": [],
+          "restored": [
+            "21:2062"
+          ],
+          "missing": []
+        }
+      }
+    ]
+  }
+}

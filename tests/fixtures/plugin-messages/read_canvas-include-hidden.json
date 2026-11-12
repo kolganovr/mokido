@@ -1,0 +1,860 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "READ_CANVAS",
+    "id": "R1",
+    "startTime": 8,
+    "include_hidden": true
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "R1",
+     "success": true,
+     "description": "Read Canvas",
+     "result": {
+      "document": {
+       "id": "0:1",
+       "name": "Page 1",
+       "type": "CANVAS",
+       "children": [
+        {
+         "id": "1:1",
+         "name": "Chip",
+         "type": "COMPONENT",
+         "visible": true,
+         "absoluteBoundingBox": {
+          "x": 2000,
+          "y": 0,
+          "width": 100,
+          "height": 100
+         },
+         "fills": []
+        },
+        {
+         "id": "1:2",
+         "name": "Screen",
+         "type": "FRAME",
+         "visible": true,
+         "absoluteBoundingBox": {
+          "x": 0,
+          "y": 0,
+          "width": 375,
+          "height": 812
+         },
+         "layoutMode": "VERTICAL",
+         "itemSpacing": 16,
+         "paddingTop": 8,
+         "paddingRight": 12,
+         "paddingBottom": 8,
+         "paddingLeft": 12,
+         "counterAxisAlignItems": "CENTER",
+         "primaryAxisAlignItems": "MIN",
+         "layoutWrap": "WRAP",
+         "layoutSizingHorizontal": "FILL",
+         "layoutSizingVertical": "HUG",
+         "layoutPositioning": "ABSOLUTE",
+         "fills": [
+          {
+           "type": "SOLID",
+           "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+           }
+          }
+         ],
+         "strokes": [
+          {
+           "type": "SOLID",
+           "color": {
+            "r": 0,
+            "g": 0,
+            "b": 0
+           }
+          }
+         ],
+         "strokeWeight": 2,
+         "cornerRadius": 12,
+         "opacity": 0.9,
+         "clipsContent": true,
+         "children": [
+          {
+           "id": "1:3",
+           "name": "Title",
+           "type": "TEXT",
+           "visible": true,
+           "absoluteBoundingBox": {
+            "x": 0,
+            "y": 0,
+            "width": 100,
+            "height": 20
+           },
+           "fills": [
+            {
+             "type": "SOLID",
+             "color": {
+              "r": 0,
+              "g": 0,
+              "b": 0
+             }
+            }
+           ],
+           "characters": "Welcome",
+           "style": {
+            "fontFamily": "Inter",
+            "fontWeight": 600,
+            "fontSize": 24,
+            "lineHeightPx": 32,
+            "letterSpacing": -0.5,
+            "textAlignHorizontal": "LEFT"
+           }
+          },
+          {
+           "id": "1:4",
+           "name": "Mixed",
+           "type": "TEXT",
+           "visible": true,
+           "absoluteBoundingBox": {
+            "x": 0,
+            "y": 0,
+            "width": 100,
+            "height": 20
+           },
+           "characters": "a b",
+           "style": {
+            "textAlignHorizontal": "CENTER"
+           }
+          },
+          {
+           "id": "1:5",
+           "name": "Percent",
+           "type": "TEXT",
+           "visible": true,
+           "absoluteBoundingBox": {
+            "x": 0,
+            "y": 0,
+            "width": 100,
+            "height": 20
+           },
+           "fills": [],
+           "characters": "",
+           "style": {
+            "fontFamily": "Roboto",
+            "fontSize": 12,
+            "textAlignHorizontal": "RIGHT"
+           }
+          },
+          {
+           "id": "1:6",
+           "name": "Corners",
+           "type": "RECTANGLE",
+           "visible": true,
+           "absoluteBoundingBox": {
+            "x": 0,
+            "y": 0,
+            "width": 100,
+            "height": 100
+           },
+           "fills": [],
+           "rectangleCornerRadii": [
+            1,
+            2,
+            3,
+            4
+           ]
+          },
+          {
+           "id": "1:7",
+           "name": "Hidden box",
+           "type": "RECTANGLE",
+           "visible": false,
+           "absoluteBoundingBox": {
+            "x": 0,
+            "y": 0,
+            "width": 100,
+            "height": 100
+           },
+           "fills": []
+          },
+          {
+           "id": "1:8",
+           "name": "Chip instance",
+           "type": "INSTANCE",
+           "visible": true,
+           "absoluteBoundingBox": {
+            "x": 0,
+            "y": 0,
+            "width": 100,
+            "height": 100
+           },
+           "fills": [],
+           "componentId": "1:1",
+           "variantProperties": {
+            "Kind": "A"
+           },
+           "componentProperties": {
+            "Label": {
+             "type": "TEXT",
+             "value": "x"
+            }
+           }
+          },
+          {
+           "id": "1:9",
+           "name": "Detached-looking",
+           "type": "INSTANCE",
+           "visible": true,
+           "absoluteBoundingBox": {
+            "x": 0,
+            "y": 0,
+            "width": 100,
+            "height": 100
+           },
+           "fills": []
+          },
+          {
+           "id": "1:10",
+           "name": "With bbox",
+           "type": "FRAME",
+           "visible": true,
+           "absoluteBoundingBox": {
+            "x": 100,
+            "y": 200,
+            "width": 50,
+            "height": 60
+           },
+           "fills": [],
+           "children": [
+            {
+             "id": "1:11",
+             "name": "Plain nested",
+             "type": "FRAME",
+             "visible": true,
+             "absoluteBoundingBox": {
+              "x": 0,
+              "y": 0,
+              "width": 100,
+              "height": 100
+             },
+             "fills": []
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "id": "1:12",
+         "name": "No layout",
+         "type": "FRAME",
+         "visible": true,
+         "absoluteBoundingBox": {
+          "x": 0,
+          "y": 0,
+          "width": 100,
+          "height": 100
+         },
+         "fills": []
+        }
+       ]
+      },
+      "name": "Test File",
+      "truncatedTop": false
+     },
+     "startTime": 8
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "READ_CANVAS",
+    "id": "R1",
+    "startTime": 8,
+    "include_hidden": "true"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "R1",
+     "success": true,
+     "description": "Read Canvas",
+     "result": {
+      "document": {
+       "id": "0:1",
+       "name": "Page 1",
+       "type": "CANVAS",
+       "children": [
+        {
+         "id": "1:1",
+         "name": "Chip",
+         "type": "COMPONENT",
+         "visible": true,
+         "absoluteBoundingBox": {
+          "x": 2000,
+          "y": 0,
+          "width": 100,
+          "height": 100
+         },
+         "fills": []
+        },
+        {
+         "id": "1:2",
+         "name": "Screen",
+         "type": "FRAME",
+         "visible": true,
+         "absoluteBoundingBox": {
+          "x": 0,
+          "y": 0,
+          "width": 375,
+          "height": 812
+         },
+         "layoutMode": "VERTICAL",
+         "itemSpacing": 16,
+         "paddingTop": 8,
+         "paddingRight": 12,
+         "paddingBottom": 8,
+         "paddingLeft": 12,
+         "counterAxisAlignItems": "CENTER",
+         "primaryAxisAlignItems": "MIN",
+         "layoutWrap": "WRAP",
+         "layoutSizingHorizontal": "FILL",
+         "layoutSizingVertical": "HUG",
+         "layoutPositioning": "ABSOLUTE",
+         "fills": [
+          {
+           "type": "SOLID",
+           "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+           }
+          }
+         ],
+         "strokes": [
+          {
+           "type": "SOLID",
+           "color": {
+            "r": 0,
+            "g": 0,
+            "b": 0
+           }
+          }
+         ],
+         "strokeWeight": 2,
+         "cornerRadius": 12,
+         "opacity": 0.9,
+         "clipsContent": true,
+         "children": [
+          {
+           "id": "1:3",
+           "name": "Title",
+           "type": "TEXT",
+           "visible": true,
+           "absoluteBoundingBox": {
+            "x": 0,
+            "y": 0,
+            "width": 100,
+            "height": 20
+           },
+           "fills": [
+            {
+             "type": "SOLID",
+             "color": {
+              "r": 0,
+              "g": 0,
+              "b": 0
+             }
+            }
+           ],
+           "characters": "Welcome",
+           "style": {
+            "fontFamily": "Inter",
+            "fontWeight": 600,
+            "fontSize": 24,
+            "lineHeightPx": 32,
+            "letterSpacing": -0.5,
+            "textAlignHorizontal": "LEFT"
+           }
+          },
+          {
+           "id": "1:4",
+           "name": "Mixed",
+           "type": "TEXT",
+           "visible": true,
+           "absoluteBoundingBox": {
+            "x": 0,
+            "y": 0,
+            "width": 100,
+            "height": 20
+           },
+           "characters": "a b",
+           "style": {
+            "textAlignHorizontal": "CENTER"
+           }
+          },
+          {
+           "id": "1:5",
+           "name": "Percent",
+           "type": "TEXT",
+           "visible": true,
+           "absoluteBoundingBox": {
+            "x": 0,
+            "y": 0,
+            "width": 100,
+            "height": 20
+           },
+           "fills": [],
+           "characters": "",
+           "style": {
+            "fontFamily": "Roboto",
+            "fontSize": 12,
+            "textAlignHorizontal": "RIGHT"
+           }
+          },
+          {
+           "id": "1:6",
+           "name": "Corners",
+           "type": "RECTANGLE",
+           "visible": true,
+           "absoluteBoundingBox": {
+            "x": 0,
+            "y": 0,
+            "width": 100,
+            "height": 100
+           },
+           "fills": [],
+           "rectangleCornerRadii": [
+            1,
+            2,
+            3,
+            4
+           ]
+          },
+          {
+           "id": "1:8",
+           "name": "Chip instance",
+           "type": "INSTANCE",
+           "visible": true,
+           "absoluteBoundingBox": {
+            "x": 0,
+            "y": 0,
+            "width": 100,
+            "height": 100
+           },
+           "fills": [],
+           "componentId": "1:1",
+           "variantProperties": {
+            "Kind": "A"
+           },
+           "componentProperties": {
+            "Label": {
+             "type": "TEXT",
+             "value": "x"
+            }
+           }
+          },
+          {
+           "id": "1:9",
+           "name": "Detached-looking",
+           "type": "INSTANCE",
+           "visible": true,
+           "absoluteBoundingBox": {
+            "x": 0,
+            "y": 0,
+            "width": 100,
+            "height": 100
+           },
+           "fills": []
+          },
+          {
+           "id": "1:10",
+           "name": "With bbox",
+           "type": "FRAME",
+           "visible": true,
+           "absoluteBoundingBox": {
+            "x": 100,
+            "y": 200,
+            "width": 50,
+            "height": 60
+           },
+           "fills": [],
+           "children": [
+            {
+             "id": "1:11",
+             "name": "Plain nested",
+             "type": "FRAME",
+             "visible": true,
+             "absoluteBoundingBox": {
+              "x": 0,
+              "y": 0,
+              "width": 100,
+              "height": 100
+             },
+             "fills": []
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "id": "1:12",
+         "name": "No layout",
+         "type": "FRAME",
+         "visible": true,
+         "absoluteBoundingBox": {
+          "x": 0,
+          "y": 0,
+          "width": 100,
+          "height": 100
+         },
+         "fills": []
+        }
+       ]
+      },
+      "name": "Test File",
+      "truncatedTop": false
+     },
+     "startTime": 8
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "children": [
+     {
+      "id": "1:1",
+      "type": "COMPONENT",
+      "name": "Chip",
+      "visible": true,
+      "x": 2000,
+      "y": 0,
+      "width": 100,
+      "height": 100,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [],
+      "strokes": [],
+      "layoutMode": "NONE",
+      "clipsContent": false,
+      "componentProperties": {}
+     },
+     {
+      "id": "1:2",
+      "type": "FRAME",
+      "name": "Screen",
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "width": 375,
+      "height": 812,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [
+       {
+        "type": "SOLID",
+        "color": {
+         "r": 1,
+         "g": 1,
+         "b": 1
+        }
+       }
+      ],
+      "strokes": [
+       {
+        "type": "SOLID",
+        "color": {
+         "r": 0,
+         "g": 0,
+         "b": 0
+        }
+       }
+      ],
+      "layoutMode": "VERTICAL",
+      "clipsContent": true,
+      "itemSpacing": 16,
+      "paddingTop": 8,
+      "paddingRight": 12,
+      "paddingBottom": 8,
+      "paddingLeft": 12,
+      "counterAxisAlignItems": "CENTER",
+      "primaryAxisAlignItems": "MIN",
+      "layoutWrap": "WRAP",
+      "strokeWeight": 2,
+      "cornerRadius": 12,
+      "opacity": 0.9,
+      "layoutSizingHorizontal": "FILL",
+      "layoutSizingVertical": "HUG",
+      "layoutPositioning": "ABSOLUTE",
+      "children": [
+       {
+        "id": "1:3",
+        "type": "TEXT",
+        "name": "Title",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 100,
+        "height": 20,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [
+         {
+          "type": "SOLID",
+          "color": {
+           "r": 0,
+           "g": 0,
+           "b": 0
+          }
+         }
+        ],
+        "strokes": [],
+        "characters": "Welcome",
+        "fontName": {
+         "family": "Inter",
+         "style": "Semi Bold Italic"
+        },
+        "fontSize": 24,
+        "textAutoResize": "WIDTH_AND_HEIGHT",
+        "lineHeight": {
+         "unit": "PIXELS",
+         "value": 32
+        },
+        "letterSpacing": {
+         "unit": "PIXELS",
+         "value": -0.5
+        },
+        "textAlignHorizontal": "LEFT"
+       },
+       {
+        "id": "1:4",
+        "type": "TEXT",
+        "name": "Mixed",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 100,
+        "height": 20,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": "[mixed]",
+        "strokes": [],
+        "characters": "a b",
+        "fontName": "[mixed]",
+        "fontSize": "[mixed]",
+        "textAutoResize": "WIDTH_AND_HEIGHT",
+        "lineHeight": "[mixed]",
+        "letterSpacing": "[mixed]",
+        "textAlignHorizontal": "CENTER"
+       },
+       {
+        "id": "1:5",
+        "type": "TEXT",
+        "name": "Percent",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 100,
+        "height": 20,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [],
+        "strokes": [],
+        "characters": "",
+        "fontName": {
+         "family": "Roboto",
+         "style": "Mystery"
+        },
+        "fontSize": 12,
+        "textAutoResize": "WIDTH_AND_HEIGHT",
+        "lineHeight": {
+         "unit": "PERCENT",
+         "value": 120
+        },
+        "letterSpacing": {
+         "unit": "PERCENT",
+         "value": 5
+        },
+        "textAlignHorizontal": "RIGHT"
+       },
+       {
+        "id": "1:6",
+        "type": "RECTANGLE",
+        "name": "Corners",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 100,
+        "height": 100,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [],
+        "strokes": [],
+        "rectangleCornerRadii": [
+         1,
+         2,
+         3,
+         4
+        ],
+        "cornerRadius": "[mixed]"
+       },
+       {
+        "id": "1:7",
+        "type": "RECTANGLE",
+        "name": "Hidden box",
+        "visible": false,
+        "x": 0,
+        "y": 0,
+        "width": 100,
+        "height": 100,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [],
+        "strokes": []
+       },
+       {
+        "id": "1:8",
+        "type": "INSTANCE",
+        "name": "Chip instance",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 100,
+        "height": 100,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [],
+        "strokes": [],
+        "layoutMode": "NONE",
+        "clipsContent": false,
+        "variantProperties": {
+         "Kind": "A"
+        },
+        "componentProperties": {
+         "Label": {
+          "type": "TEXT",
+          "value": "x"
+         }
+        },
+        "mainComponent": "1:1"
+       },
+       {
+        "id": "1:9",
+        "type": "INSTANCE",
+        "name": "Detached-looking",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 100,
+        "height": 100,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [],
+        "strokes": [],
+        "layoutMode": "NONE",
+        "clipsContent": false,
+        "componentProperties": {}
+       },
+       {
+        "id": "1:10",
+        "type": "FRAME",
+        "name": "With bbox",
+        "visible": true,
+        "x": 10,
+        "y": 20,
+        "width": 5,
+        "height": 5,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [],
+        "strokes": [],
+        "layoutMode": "NONE",
+        "clipsContent": false,
+        "absoluteBoundingBox": {
+         "x": 100,
+         "y": 200,
+         "width": 50,
+         "height": 60
+        },
+        "children": [
+         {
+          "id": "1:11",
+          "type": "FRAME",
+          "name": "Plain nested",
+          "visible": true,
+          "x": 0,
+          "y": 0,
+          "width": 100,
+          "height": 100,
+          "constraints": {
+           "horizontal": "MIN",
+           "vertical": "MIN"
+          },
+          "fills": [],
+          "strokes": [],
+          "layoutMode": "NONE",
+          "clipsContent": false
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "id": "1:12",
+      "type": "FRAME",
+      "name": "No layout",
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "width": 100,
+      "height": 100,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [],
+      "strokes": [],
+      "layoutMode": "NONE",
+      "clipsContent": false
+     }
+    ],
+    "selection": []
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [],
+  "notifies": [],
+  "cancels": 0,
+  "uiResizes": [],
+  "fontLoads": [],
+  "exports": [],
+  "modeSets": [],
+  "storage": {}
+ }
+}

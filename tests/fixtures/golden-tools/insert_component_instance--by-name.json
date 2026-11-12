@@ -1,0 +1,58 @@
+{
+  "call": {
+    "tool": "figma_insert_component_instance",
+    "arguments": {
+      "component_name": "Button",
+      "properties": {
+        "Label": "Go"
+      },
+      "text_overrides": {
+        "title": "Hi"
+      },
+      "target_parent_id": "1:1",
+      "position": {
+        "x": 10,
+        "y": 20
+      }
+    }
+  },
+  "sent_to_plugin": [
+    {
+      "type": "INSERT_COMPONENT_INSTANCE",
+      "component_name": "Button",
+      "properties": {
+        "Label": "Go"
+      },
+      "text_overrides": {
+        "title": "Hi"
+      },
+      "target_parent_id": "1:1",
+      "position": {
+        "x": 10,
+        "y": 20
+      },
+      "capture": false,
+      "scale": 1,
+      "max_px": 1024
+    }
+  ],
+  "reply": {
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": true,
+          "result": "Inserted 6:6",
+          "created": [
+            "6:6"
+          ],
+          "warnings": [
+            "text overflows"
+          ],
+          "checkpoint_id": "cp_i"
+        }
+      }
+    ]
+  }
+}

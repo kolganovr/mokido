@@ -1,0 +1,23 @@
+{
+  "call": {
+    "tool": "figma_execute_code",
+    "arguments": {
+      "code": "return 1;"
+    }
+  },
+  "sent_to_plugin": {},
+  "reply": {
+    "isError": true,
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": false,
+          "code": "PLUGIN_TOKEN_REJECTED",
+          "error": "No Figma plugin is connected to the bridge. A Figma plugin tried to connect <N>s ago and was REJECTED: it brought a different bridge token, so Figma is running a plugin copy install.mjs did not produce (typically this repository's figma-plugin/ imported directly, or a copy from an older install).\n\nHINT: the user fixes it once: Figma → Plugins → Development → Import plugin from manifest… → <root>\\figma-plugin\\manifest.json, then remove the old entry (named \"Antigravity Bridge\" before 4.3.0, or a duplicate \"Mokido\"). Do NOT write the token into ui.html or any other source file — it would leak into the repository."
+        }
+      }
+    ]
+  }
+}

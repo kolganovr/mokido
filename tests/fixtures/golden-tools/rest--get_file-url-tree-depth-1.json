@@ -1,0 +1,42 @@
+{
+  "call": {
+    "tool": "get_file",
+    "arguments": {
+      "file_key": "https://www.figma.com/design/AbC123/My-File?node-id=1-1",
+      "depth": 1,
+      "format": "tree",
+      "include_hidden": true,
+      "max_depth": 3
+    }
+  },
+  "sent_to_plugin": [],
+  "rest_requests": [
+    {
+      "method": "GET",
+      "path": "/files/AbC123?depth=1",
+      "headers": {
+        "X-Figma-Token": "test",
+        "Content-Type": "application/json"
+      },
+      "body": null
+    }
+  ],
+  "reply": {
+    "content": [
+      {
+        "type": "text",
+        "text": [
+          "<!-- file=\"Golden file\" lastModified=2026-01-01T00:00:00Z -->",
+          "<!-- Optimized Figma Layout (75.7% smaller than the raw API response | 1 KB -> 0.3 KB) -->",
+          "[DOCUMENT] \"Document\" #0:0",
+          "  [CANVAS] \"Page 1\" #0:1",
+          "    [FRAME] \"Card\" #1:1 col gap=12 pad=16 (320x120) bg=#FFFFFF r=12",
+          "      [TEXT] \"Title\" #1:2 (288x24) bg=#1A1A1A font=\"Inter Bold 16px\": \"Hello\"",
+          "      [TEXT] \"Hidden Layer\" #1:3 (10x10): \"secret\"",
+          "      [FRAME] \"Footer\" #1:5 (288x24)",
+          "        [TEXT] \"Description\" #1:6 …truncated"
+        ]
+      }
+    ]
+  }
+}

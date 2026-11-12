@@ -1,0 +1,148 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "SET_VARIABLES_MODE",
+    "id": "m1",
+    "startTime": 3,
+    "collection_name": "Colors",
+    "mode_name": "Dark",
+    "target_id": "1:1",
+    "capture": true
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "m1",
+     "success": true,
+     "description": "Set Variable Mode \"Dark\" on \"Colors\"",
+     "result": "Successfully set mode \"Dark\" (m2) for collection \"Colors\" on \"Card\"",
+     "screenshot": null,
+     "captureNote": "Screenshot failed for \"Card\": nope",
+     "targetName": "Card",
+     "targetId": "1:1",
+     "startTime": 3
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "children": [
+     {
+      "id": "1:1",
+      "type": "FRAME",
+      "name": "Card",
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "width": 300,
+      "height": 200,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [
+       {
+        "type": "SOLID",
+        "color": {
+         "r": 1,
+         "g": 1,
+         "b": 1
+        }
+       }
+      ],
+      "strokes": [],
+      "layoutMode": "NONE",
+      "clipsContent": false,
+      "explicitModes": {
+       "c1": "m2"
+      },
+      "children": [
+       {
+        "id": "1:2",
+        "type": "TEXT",
+        "name": "Title",
+        "visible": true,
+        "x": 10,
+        "y": 10,
+        "width": 80,
+        "height": 20,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [],
+        "strokes": [],
+        "characters": "Hello",
+        "fontName": {
+         "family": "Inter",
+         "style": "Regular"
+        },
+        "fontSize": 14,
+        "textAutoResize": "WIDTH_AND_HEIGHT"
+       }
+      ]
+     },
+     {
+      "id": "1:3",
+      "type": "FRAME",
+      "name": "Hero",
+      "visible": true,
+      "x": 400,
+      "y": 0,
+      "width": 300,
+      "height": 200,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [],
+      "strokes": [],
+      "layoutMode": "NONE",
+      "clipsContent": false
+     }
+    ],
+    "selection": []
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [],
+  "notifies": [
+   {
+    "text": "Theme switched to \"Dark\" on Card",
+    "opts": {
+     "timeout": 3000
+    }
+   }
+  ],
+  "cancels": 0,
+  "uiResizes": [],
+  "fontLoads": [],
+  "exports": [
+   {
+    "id": "1:1",
+    "settings": {
+     "format": "PNG",
+     "constraint": {
+      "type": "SCALE",
+      "value": 1
+     }
+    }
+   }
+  ],
+  "modeSets": [
+   {
+    "node": "1:1",
+    "collection": "c1",
+    "modeId": "m2"
+   }
+  ],
+  "storage": {}
+ }
+}

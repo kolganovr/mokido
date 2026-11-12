@@ -1,0 +1,27 @@
+{
+  "call": {
+    "tool": "figma_job_status",
+    "arguments": {
+      "job_id": "<cmd_id>",
+      "wait_ms": 4000
+    }
+  },
+  "sent_to_plugin": [],
+  "reply": {
+    "isError": true,
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": false,
+          "code": "SCRIPT_RUNTIME_ERROR",
+          "error": "ReferenceError: x is not defined",
+          "line": 2,
+          "at": "x",
+          "job_id": "<cmd_id>"
+        }
+      }
+    ]
+  }
+}

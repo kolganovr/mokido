@@ -1,0 +1,24 @@
+{
+  "call": {
+    "tool": "figma_execute_code",
+    "arguments": {
+      "code": "const o = figma.getNodeById('51:2'); o.overlayPositionType = 'CENTER';"
+    }
+  },
+  "sent_to_plugin": [],
+  "reply": {
+    "isError": true,
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": false,
+          "code": "OVERLAY_ALREADY_LINKED",
+          "not_run": true,
+          "done": "Already done: bridge.openOverlay linked #51:1 → overlay #51:2 and set its look. Nothing left to do: answer now."
+        }
+      }
+    ]
+  }
+}

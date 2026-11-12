@@ -1,0 +1,171 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "EXECUTE",
+    "id": "e1",
+    "code": "const p = figma.createFrame(); p.layoutMode = 'VERTICAL'; p.primaryAxisSizingMode = 'AUTO';\nconst k = figma.createRectangle(); k.name = 'Grower'; k.layoutGrow = 1; p.appendChild(k);\nconst fixed = figma.createRectangle(); fixed.name = 'Fine'; fixed.layoutGrow = 0; p.appendChild(fixed);\nconst loose = figma.createFrame(); loose.layoutMode = 'NONE'; const r = figma.createRectangle(); r.layoutGrow = 1; loose.appendChild(r); return p.id;"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "e1",
+     "success": true,
+     "description": "AI Command Execution",
+     "result": "1:13",
+     "resultStashed": true,
+     "screenshot": null,
+     "screenshots": null,
+     "beforeScreenshot": null,
+     "captureNote": null,
+     "targetName": null,
+     "targetId": null,
+     "checkpointId": "cp_loyw3v28_1",
+     "created": [
+      "1:13",
+      "1:14",
+      "1:15",
+      "1:16",
+      "1:17"
+     ],
+     "modified": [],
+     "warnings": [
+      "\"Grower\" has layoutGrow set inside a hugging (AUTO) parent — grow has no effect there."
+     ],
+     "durationMs": 0
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "children": [
+     {
+      "id": "1:13",
+      "type": "FRAME",
+      "name": "Frame",
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "width": 100,
+      "height": 100,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [],
+      "strokes": [],
+      "layoutMode": "VERTICAL",
+      "clipsContent": false,
+      "primaryAxisSizingMode": "AUTO",
+      "children": [
+       {
+        "id": "1:14",
+        "type": "RECTANGLE",
+        "name": "Grower",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 100,
+        "height": 100,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [],
+        "strokes": [],
+        "layoutGrow": 1
+       },
+       {
+        "id": "1:15",
+        "type": "RECTANGLE",
+        "name": "Fine",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 100,
+        "height": 100,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [],
+        "strokes": [],
+        "layoutGrow": 0
+       }
+      ]
+     },
+     {
+      "id": "1:16",
+      "type": "FRAME",
+      "name": "Frame",
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "width": 100,
+      "height": 100,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [],
+      "strokes": [],
+      "layoutMode": "NONE",
+      "clipsContent": false,
+      "children": [
+       {
+        "id": "1:17",
+        "type": "RECTANGLE",
+        "name": "Rectangle",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 100,
+        "height": 100,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [],
+        "strokes": [],
+        "layoutGrow": 1
+       }
+      ]
+     }
+    ],
+    "selection": []
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [],
+  "notifies": [
+   {
+    "text": "AI Command Execution...",
+    "opts": {
+     "timeout": 30000
+    }
+   },
+   {
+    "text": "AI Command Execution — done!",
+    "opts": {
+     "timeout": 2500
+    }
+   }
+  ],
+  "cancels": 1,
+  "uiResizes": [],
+  "fontLoads": [
+   "Inter/Regular",
+   "Inter/Medium",
+   "Inter/Bold"
+  ],
+  "exports": [],
+  "modeSets": [],
+  "storage": {}
+ }
+}

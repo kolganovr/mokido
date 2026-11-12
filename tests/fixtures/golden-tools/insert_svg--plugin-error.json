@@ -1,0 +1,32 @@
+{
+  "call": {
+    "tool": "figma_insert_svg",
+    "arguments": {
+      "svg_code": "not svg"
+    }
+  },
+  "sent_to_plugin": [
+    {
+      "type": "INSERT_SVG",
+      "svg_code": "not svg",
+      "as_component": false,
+      "capture": false,
+      "scale": 2,
+      "max_px": 1024
+    }
+  ],
+  "reply": {
+    "isError": true,
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": false,
+          "code": "INVALID_SVG",
+          "error": "Invalid SVG"
+        }
+      }
+    ]
+  }
+}

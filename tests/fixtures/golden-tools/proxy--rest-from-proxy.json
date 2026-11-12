@@ -1,0 +1,28 @@
+{
+  "call": {
+    "tool": "get_comments",
+    "arguments": {
+      "file_key": "AbC123"
+    }
+  },
+  "sent_to_plugin": [],
+  "reply": {
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "comments": [
+            {
+              "id": "10",
+              "message": "Looks good",
+              "user": {
+                "handle": "tester"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

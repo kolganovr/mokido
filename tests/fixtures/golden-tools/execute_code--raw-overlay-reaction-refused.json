@@ -1,0 +1,24 @@
+{
+  "call": {
+    "tool": "figma_execute_code",
+    "arguments": {
+      "code": "const t = figma.getNodeById('21:2062'); await t.setReactionsAsync([{ trigger: { type: 'ON_CLICK' }, actions: [{ type: 'NODE', destinationId: '21:2086', navigation: 'OVERLAY' }] }]);"
+    }
+  },
+  "sent_to_plugin": [],
+  "reply": {
+    "isError": true,
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": false,
+          "code": "USE_OPEN_OVERLAY",
+          "error": "Not run. A hand-built OVERLAY reaction misses the overlay look and is easy to get wrong (`actions` array, `transition` key). If bridge.openOverlay already ran and said MANUAL STEP, the task is done: tell the user that step and stop. Otherwise one call makes the link and tries the look; its reply names what the user must set by hand (MANUAL STEP). Swap the ids if the order is wrong. A script that is not this: add /* run-anyway */.",
+          "use_instead": "await bridge.openOverlay(\"21:2062\", \"21:2086\", { position: 'BOTTOM_CENTER', dim: 0.4, closeOnOutside: true })"
+        }
+      }
+    ]
+  }
+}

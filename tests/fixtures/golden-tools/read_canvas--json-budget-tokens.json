@@ -1,0 +1,37 @@
+{
+  "call": {
+    "tool": "figma_read_canvas",
+    "arguments": {
+      "nodeIds": "1:1,1:2",
+      "format": "json",
+      "budget_tokens": 100
+    }
+  },
+  "sent_to_plugin": [
+    {
+      "type": "READ_CANVAS",
+      "node_ids": "1:1,1:2",
+      "depth": 6,
+      "include_hidden": false
+    }
+  ],
+  "reply": {
+    "content": [
+      {
+        "type": "text",
+        "text": [
+          "<!-- Optimized Figma Layout (66.4% smaller than the raw API response | 1 KB -> 0.4 KB) -->",
+          "{",
+          "  \"id\": \"1:1\",",
+          "  \"name\": \"Card\",",
+          "  \"type\": \"FRAME\",",
+          "  \"width\": 320,",
+          "  \"height\": 120,",
+          "  \"layout\": \"VERTICAL\"",
+          "",
+          "<!-- cut at depth=0 to fit 400 bytes. Read a specific node_id for more depth, or raise budget_tokens. -->"
+        ]
+      }
+    ]
+  }
+}

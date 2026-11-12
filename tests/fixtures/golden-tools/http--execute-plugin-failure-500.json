@@ -1,0 +1,24 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/execute?token=golden-test-token",
+    "headers": {},
+    "body": "{\"type\":\"GET_VARIABLES\"}"
+  },
+  "status": 500,
+  "headers": {
+    "content-type": "application/json",
+    "access-control-allow-methods": "GET, POST, OPTIONS",
+    "access-control-allow-headers": "Content-Type, X-Bridge-Token"
+  },
+  "body": {
+    "type": "text",
+    "compact_json": true,
+    "json": {
+      "success": false,
+      "error": "boom",
+      "code": "BOOM",
+      "line": 3
+    }
+  }
+}

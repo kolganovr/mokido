@@ -1,0 +1,25 @@
+{
+  "call": {
+    "tool": "figma_execute_code",
+    "arguments": {
+      "code": "const x = ;\nreturn x;"
+    }
+  },
+  "sent_to_plugin": [],
+  "reply": {
+    "isError": true,
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": false,
+          "code": "SCRIPT_SYNTAX_ERROR",
+          "error": "Unexpected token ';'\n\nHINT: Your code is compiled as an async function body: top-level await and return are allowed, import/export are not. Check for unbalanced braces or quotes in the code string.",
+          "line": 1,
+          "at": "const x = ;"
+        }
+      }
+    ]
+  }
+}

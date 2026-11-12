@@ -1,0 +1,27 @@
+{
+  "call": {
+    "tool": "figma_get_variables",
+    "arguments": {}
+  },
+  "sent_to_plugin": [
+    {
+      "type": "GET_VARIABLES",
+      "limit": 300
+    }
+  ],
+  "reply": {
+    "isError": true,
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": false,
+          "code": "VARIABLES_FAILED",
+          "error": "Collection list failed",
+          "line": 4
+        }
+      }
+    ]
+  }
+}

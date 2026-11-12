@@ -1,0 +1,36 @@
+{
+  "call": {
+    "tool": "figma_list_targets",
+    "arguments": {}
+  },
+  "sent_to_plugin": {},
+  "reply": {
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": true,
+          "targets": [
+            {
+              "id": "<ws_id>",
+              "fileName": "Alpha",
+              "pageName": "Page 1",
+              "pluginVersion": "9.9.9",
+              "focused": false,
+              "lastSeenMsAgo": "<n>"
+            },
+            {
+              "id": "<ws_id>",
+              "fileName": "Beta",
+              "pageName": "Page 1",
+              "pluginVersion": "9.9.9",
+              "focused": false,
+              "lastSeenMsAgo": "<n>"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

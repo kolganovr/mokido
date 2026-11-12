@@ -1,0 +1,23 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/job?token=golden-test-token&id=<cmd_id>&wait_ms=0",
+    "headers": {},
+    "body": null
+  },
+  "status": 200,
+  "headers": {
+    "content-type": "application/json",
+    "access-control-allow-methods": "GET, POST, OPTIONS",
+    "access-control-allow-headers": "Content-Type, X-Bridge-Token"
+  },
+  "body": {
+    "type": "text",
+    "compact_json": true,
+    "json": {
+      "ok": false,
+      "code": "JOB_NOT_FOUND",
+      "error": "No job \"<cmd_id>\". A job is forgotten once read after finishing, or after ~200 newer jobs have been created."
+    }
+  }
+}

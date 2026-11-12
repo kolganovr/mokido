@@ -1,0 +1,39 @@
+{
+  "call": {
+    "tool": "figma_execute_code",
+    "arguments": {
+      "code": "const log = []; log.push(1); figma.createFrame(); return log;"
+    }
+  },
+  "sent_to_plugin": [
+    {
+      "code": [
+        "{ const log = []; log.push(1); figma.createFrame(); return log;",
+        "}"
+      ],
+      "description": "Execute JS Code",
+      "capture": false,
+      "capture_node_ids": null,
+      "diff": false,
+      "scale": 1,
+      "max_px": 1024
+    }
+  ],
+  "reply": {
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": true,
+          "result": [
+            1
+          ],
+          "created": [
+            "8:1"
+          ]
+        }
+      }
+    ]
+  }
+}

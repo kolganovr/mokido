@@ -1,0 +1,344 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "INSERT_SVG",
+    "id": "v1",
+    "startTime": 4,
+    "svg_code": "<svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M0 0h24v24H0z\"/></svg>",
+    "target_parent_id": "1-1"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "v1",
+     "success": true,
+     "description": "Insert SVG \"Vector\"",
+     "result": {
+      "nodeId": "1:15",
+      "name": "SVG Vector",
+      "type": "FRAME",
+      "width": 24,
+      "height": 24,
+      "parentContainer": "Container"
+     },
+     "screenshot": null,
+     "captureNote": null,
+     "targetName": "SVG Vector",
+     "targetId": "1:15",
+     "checkpointId": "cp_loyw3v28_1",
+     "created": [
+      "1:15"
+     ],
+     "modified": [],
+     "warnings": [],
+     "startTime": 4
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "INSERT_SVG",
+    "id": "v1",
+    "startTime": 4,
+    "svg_code": "<svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M0 0h24v24H0z\"/></svg>",
+    "target_parent_id": "9:99",
+    "name": "via selection"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "v1",
+     "success": true,
+     "description": "Insert SVG \"via selection\"",
+     "result": {
+      "nodeId": "1:17",
+      "name": "via selection",
+      "type": "FRAME",
+      "width": 24,
+      "height": 24,
+      "parentContainer": "Container"
+     },
+     "screenshot": null,
+     "captureNote": null,
+     "targetName": "via selection",
+     "targetId": "1:17",
+     "checkpointId": "cp_loyw3v28_2",
+     "created": [
+      "1:17"
+     ],
+     "modified": [],
+     "warnings": [],
+     "startTime": 4
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "INSERT_SVG",
+    "id": "v1",
+    "startTime": 4,
+    "svg_code": "<svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M0 0h24v24H0z\"/></svg>",
+    "name": "page because text selected"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "v1",
+     "success": true,
+     "description": "Insert SVG \"page because text selected\"",
+     "result": {
+      "nodeId": "1:19",
+      "name": "page because text selected",
+      "type": "FRAME",
+      "width": 24,
+      "height": 24,
+      "parentContainer": "Page 1"
+     },
+     "screenshot": null,
+     "captureNote": null,
+     "targetName": "page because text selected",
+     "targetId": "1:19",
+     "checkpointId": "cp_loyw3v28_3",
+     "created": [
+      "1:19"
+     ],
+     "modified": [],
+     "warnings": [],
+     "startTime": 4
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "children": [
+     {
+      "id": "1:1",
+      "type": "FRAME",
+      "name": "Container",
+      "visible": true,
+      "x": 500,
+      "y": 0,
+      "width": 100,
+      "height": 100,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [],
+      "strokes": [],
+      "layoutMode": "NONE",
+      "clipsContent": false,
+      "children": [
+       {
+        "id": "1:15",
+        "type": "FRAME",
+        "name": "SVG Vector",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 24,
+        "height": 24,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [],
+        "strokes": [],
+        "layoutMode": "NONE",
+        "clipsContent": false,
+        "children": [
+         {
+          "id": "1:16",
+          "type": "VECTOR",
+          "name": "Vector",
+          "visible": true,
+          "x": 0,
+          "y": 0,
+          "width": 24,
+          "height": 24,
+          "constraints": {
+           "horizontal": "MIN",
+           "vertical": "MIN"
+          },
+          "fills": [
+           {
+            "type": "SOLID",
+            "color": {
+             "r": 0,
+             "g": 0,
+             "b": 0
+            }
+           }
+          ],
+          "strokes": []
+         }
+        ]
+       },
+       {
+        "id": "1:17",
+        "type": "FRAME",
+        "name": "via selection",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 24,
+        "height": 24,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [],
+        "strokes": [],
+        "layoutMode": "NONE",
+        "clipsContent": false,
+        "children": [
+         {
+          "id": "1:18",
+          "type": "VECTOR",
+          "name": "Vector",
+          "visible": true,
+          "x": 0,
+          "y": 0,
+          "width": 24,
+          "height": 24,
+          "constraints": {
+           "horizontal": "MIN",
+           "vertical": "MIN"
+          },
+          "fills": [
+           {
+            "type": "SOLID",
+            "color": {
+             "r": 0,
+             "g": 0,
+             "b": 0
+            }
+           }
+          ],
+          "strokes": []
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "id": "1:2",
+      "type": "TEXT",
+      "name": "T",
+      "visible": true,
+      "x": 900,
+      "y": 0,
+      "width": 100,
+      "height": 20,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [],
+      "strokes": [],
+      "characters": "",
+      "fontName": {
+       "family": "Inter",
+       "style": "Regular"
+      },
+      "fontSize": 14,
+      "textAutoResize": "WIDTH_AND_HEIGHT"
+     },
+     {
+      "id": "1:19",
+      "type": "FRAME",
+      "name": "page because text selected",
+      "visible": true,
+      "x": 1060,
+      "y": 0,
+      "width": 24,
+      "height": 24,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [],
+      "strokes": [],
+      "layoutMode": "NONE",
+      "clipsContent": false,
+      "children": [
+       {
+        "id": "1:20",
+        "type": "VECTOR",
+        "name": "Vector",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 24,
+        "height": 24,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [
+         {
+          "type": "SOLID",
+          "color": {
+           "r": 0,
+           "g": 0,
+           "b": 0
+          }
+         }
+        ],
+        "strokes": []
+       }
+      ]
+     }
+    ],
+    "selection": [
+     "1:19"
+    ]
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [
+   [
+    "1:15"
+   ],
+   [
+    "1:17"
+   ],
+   [
+    "1:19"
+   ]
+  ],
+  "notifies": [
+   {
+    "text": "Inserting vector SVG...",
+    "opts": {
+     "timeout": 15000
+    }
+   },
+   {
+    "text": "Vector inserted: SVG Vector",
+    "opts": {
+     "timeout": 3000
+    }
+   },
+   {
+    "text": "Inserting vector SVG...",
+    "opts": {
+     "timeout": 15000
+    }
+   }
+  ],
+  "cancels": 2,
+  "uiResizes": [],
+  "fontLoads": [],
+  "exports": [],
+  "modeSets": [],
+  "storage": {}
+ }
+}

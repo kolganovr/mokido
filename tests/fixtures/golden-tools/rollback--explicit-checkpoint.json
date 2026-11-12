@@ -1,0 +1,34 @@
+{
+  "call": {
+    "tool": "figma_rollback",
+    "arguments": {
+      "checkpoint_id": "cp_1"
+    }
+  },
+  "sent_to_plugin": [
+    {
+      "type": "ROLLBACK",
+      "checkpoint_id": "cp_1"
+    }
+  ],
+  "reply": {
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": true,
+          "checkpoint_id": "cp_1",
+          "label": "x",
+          "removed": [
+            "5:1"
+          ],
+          "restored": [],
+          "missing": [
+            "5:2"
+          ]
+        }
+      }
+    ]
+  }
+}

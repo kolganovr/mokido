@@ -1,0 +1,23 @@
+{
+  "call": {
+    "tool": "figma_get_variables",
+    "arguments": {
+      "target": "Delta"
+    }
+  },
+  "sent_to_plugin": {},
+  "reply": {
+    "isError": true,
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": false,
+          "code": "TARGET_NOT_FOUND",
+          "error": "No connected Figma document named \"Delta\". Currently open: Alpha, Beta, Gamma. Call figma_list_targets to check."
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "call": {
+    "tool": "figma_get_variables",
+    "arguments": {
+      "target": "Alpha"
+    }
+  },
+  "sent_to_plugin": {
+    "Alpha": [
+      {
+        "type": "GET_VARIABLES",
+        "limit": 300
+      }
+    ]
+  },
+  "reply": {
+    "isError": true,
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": false,
+          "code": "PLUGIN_BUSY",
+          "error": "Timed out after 1s: the plugin is still busy with <cmd_id> (\"Execute JS Code\"), running for 1s. Figma runs plugin code on a single thread, so retrying now will time out again — wait for it with figma_job_status({ job_id: \"<cmd_id>\" }) first."
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/nothing?token=golden-test-token",
+    "headers": {},
+    "body": null
+  },
+  "status": 404,
+  "headers": {
+    "access-control-allow-methods": "GET, POST, OPTIONS",
+    "access-control-allow-headers": "Content-Type, X-Bridge-Token"
+  },
+  "body": {
+    "type": "text",
+    "text": ""
+  }
+}

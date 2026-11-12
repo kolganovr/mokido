@@ -1,0 +1,37 @@
+{
+  "call": {
+    "tool": "post_comment",
+    "arguments": {
+      "file_key": "AbC123",
+      "message": "Nice",
+      "node_id": "1-2"
+    }
+  },
+  "sent_to_plugin": [],
+  "rest_requests": [
+    {
+      "method": "POST",
+      "path": "/files/AbC123/comments",
+      "headers": {
+        "X-Figma-Token": "test",
+        "Content-Type": "application/json"
+      },
+      "body": "{\"message\":\"Nice\",\"client_meta\":{\"node_id\":\"1:2\"}}"
+    }
+  ],
+  "reply": {
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "id": "11",
+          "message": "Nice",
+          "client_meta": {
+            "node_id": "1:2"
+          }
+        }
+      }
+    ]
+  }
+}

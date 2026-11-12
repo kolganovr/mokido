@@ -1,0 +1,30 @@
+{
+ "steps": [],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "selection": []
+   },
+   {
+    "id": "0:2",
+    "type": "PAGE",
+    "name": "Second",
+    "visible": true,
+    "selection": []
+   }
+  ],
+  "currentPage": "0:2",
+  "viewport": [],
+  "notifies": [],
+  "cancels": 0,
+  "uiResizes": [],
+  "fontLoads": [],
+  "exports": [],
+  "modeSets": [],
+  "storage": {}
+ }
+}

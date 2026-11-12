@@ -1,0 +1,35 @@
+{
+  "call": {
+    "tool": "figma_execute_code",
+    "arguments": {
+      "code": "return 1;"
+    }
+  },
+  "sent_to_plugin": [
+    {
+      "code": [
+        "return 1;"
+      ],
+      "description": "Execute JS Code",
+      "capture": false,
+      "capture_node_ids": null,
+      "diff": false,
+      "scale": 1,
+      "max_px": 1024
+    }
+  ],
+  "reply": {
+    "isError": true,
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": false,
+          "code": null,
+          "error": "Setting reactions failed validation: Required value missing at actions[0].transition; unknown key 'overlayPositionType'. A NODE action needs the key `transition` (null = instant). overlayPositionType / overlayBackground / overlayBackgroundInteraction are not action keys but READ-ONLY FRAME properties: link with bridge.openOverlay, tell the user to set the overlay look in the Prototype panel."
+        }
+      }
+    ]
+  }
+}

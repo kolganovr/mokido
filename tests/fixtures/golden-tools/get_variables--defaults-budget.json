@@ -1,0 +1,51 @@
+{
+  "call": {
+    "tool": "figma_get_variables",
+    "arguments": {
+      "max_output_bytes": 700
+    }
+  },
+  "sent_to_plugin": [
+    {
+      "type": "GET_VARIABLES",
+      "limit": 300
+    }
+  ],
+  "reply": {
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": true,
+          "result": {
+            "collections": [
+              "{object with 3 keys}",
+              "{object with 3 keys}",
+              "{object with 3 keys}",
+              "{object with 3 keys}",
+              "{object with 3 keys}",
+              "{object with 3 keys}",
+              "{object with 3 keys}",
+              "{object with 3 keys}",
+              "{object with 3 keys}",
+              "{object with 3 keys}",
+              "{object with 3 keys}",
+              "{object with 3 keys}",
+              "{object with 3 keys}",
+              "{object with 3 keys}",
+              "{object with 3 keys}",
+              "{object with 3 keys}",
+              "{object with 3 keys}",
+              "{object with 3 keys}",
+              "{object with 3 keys}",
+              "{object with 3 keys}",
+              "…+10 more (30 total)"
+            ]
+          },
+          "truncated": "result shrunk 1957→502 bytes (cuts marked with …). Return less. Narrow the query (query/limit/collection_name/node_ids) to see the rest."
+        }
+      }
+    ]
+  }
+}

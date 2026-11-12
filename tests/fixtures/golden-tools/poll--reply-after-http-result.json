@@ -1,0 +1,15 @@
+{
+  "reply": {
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": true,
+          "result": 42,
+          "duration_ms": 2
+        }
+      }
+    ]
+  }
+}

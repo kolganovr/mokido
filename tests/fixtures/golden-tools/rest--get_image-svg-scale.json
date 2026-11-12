@@ -1,0 +1,41 @@
+{
+  "call": {
+    "tool": "get_image",
+    "arguments": {
+      "file_key": "AbC123",
+      "node_ids": [
+        "1:1",
+        "1:2"
+      ],
+      "format": "svg",
+      "scale": 1
+    }
+  },
+  "sent_to_plugin": [],
+  "rest_requests": [
+    {
+      "method": "GET",
+      "path": "/images/AbC123?ids=1%3A1%2C1%3A2&format=svg&scale=1",
+      "headers": {
+        "X-Figma-Token": "test",
+        "Content-Type": "application/json"
+      },
+      "body": null
+    }
+  ],
+  "reply": {
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "err": null,
+          "images": {
+            "1:1": "https://example.test/1.svg",
+            "1:2": "https://example.test/2.svg"
+          }
+        }
+      }
+    ]
+  }
+}

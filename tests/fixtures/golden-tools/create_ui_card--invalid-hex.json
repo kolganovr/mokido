@@ -1,0 +1,23 @@
+{
+  "call": {
+    "tool": "figma_create_ui_card",
+    "arguments": {
+      "bg_color": "#12"
+    }
+  },
+  "sent_to_plugin": [],
+  "reply": {
+    "isError": true,
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": false,
+          "code": null,
+          "error": "Invalid hex color \"#12\". Use a 3- or 6-digit hex value such as \"#F5F0FF\"."
+        }
+      }
+    ]
+  }
+}

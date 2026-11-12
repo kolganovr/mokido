@@ -1,0 +1,222 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "INSERT_SVG",
+    "id": "v1",
+    "startTime": 4,
+    "svg_code": "<svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M0 0h24v24H0z\"/></svg>",
+    "as_component": true,
+    "name": "Icon / Check",
+    "width": 32
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "v1",
+     "success": true,
+     "description": "Insert SVG \"Icon / Check\"",
+     "result": {
+      "nodeId": "1:15",
+      "name": "Icon / Check",
+      "type": "COMPONENT",
+      "width": 32,
+      "height": 32,
+      "parentContainer": "Page 1"
+     },
+     "screenshot": null,
+     "captureNote": null,
+     "targetName": "Icon / Check",
+     "targetId": "1:15",
+     "checkpointId": "cp_loyw3v28_1",
+     "created": [
+      "1:13",
+      "1:15"
+     ],
+     "modified": [],
+     "warnings": [],
+     "startTime": 4
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "INSERT_SVG",
+    "id": "v1",
+    "startTime": 4,
+    "svg_code": "<svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M0 0h24v24H0z\"/></svg>",
+    "as_component": true
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "v1",
+     "success": true,
+     "description": "Insert SVG \"Vector\"",
+     "result": {
+      "nodeId": "1:18",
+      "name": "Icon / SVG Vector",
+      "type": "COMPONENT",
+      "width": 24,
+      "height": 24,
+      "parentContainer": "Page 1"
+     },
+     "screenshot": null,
+     "captureNote": null,
+     "targetName": "Icon / SVG Vector",
+     "targetId": "1:18",
+     "checkpointId": "cp_loyw3v28_2",
+     "created": [
+      "1:16",
+      "1:18"
+     ],
+     "modified": [],
+     "warnings": [],
+     "startTime": 4
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "children": [
+     {
+      "id": "1:15",
+      "type": "COMPONENT",
+      "name": "Icon / Check",
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [],
+      "strokes": [],
+      "layoutMode": "NONE",
+      "clipsContent": false,
+      "componentProperties": {},
+      "children": [
+       {
+        "id": "1:14",
+        "type": "VECTOR",
+        "name": "Vector",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 24,
+        "height": 24,
+        "constraints": {
+         "horizontal": "SCALE",
+         "vertical": "SCALE"
+        },
+        "fills": [
+         {
+          "type": "SOLID",
+          "color": {
+           "r": 0,
+           "g": 0,
+           "b": 0
+          }
+         }
+        ],
+        "strokes": []
+       }
+      ]
+     },
+     {
+      "id": "1:18",
+      "type": "COMPONENT",
+      "name": "Icon / SVG Vector",
+      "visible": true,
+      "x": 92,
+      "y": 0,
+      "width": 24,
+      "height": 24,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [],
+      "strokes": [],
+      "layoutMode": "NONE",
+      "clipsContent": false,
+      "componentProperties": {},
+      "children": [
+       {
+        "id": "1:17",
+        "type": "VECTOR",
+        "name": "Vector",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 24,
+        "height": 24,
+        "constraints": {
+         "horizontal": "MIN",
+         "vertical": "MIN"
+        },
+        "fills": [
+         {
+          "type": "SOLID",
+          "color": {
+           "r": 0,
+           "g": 0,
+           "b": 0
+          }
+         }
+        ],
+        "strokes": []
+       }
+      ]
+     }
+    ],
+    "selection": [
+     "1:18"
+    ]
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [
+   [
+    "1:15"
+   ],
+   [
+    "1:18"
+   ]
+  ],
+  "notifies": [
+   {
+    "text": "Inserting vector SVG...",
+    "opts": {
+     "timeout": 15000
+    }
+   },
+   {
+    "text": "Vector inserted: Icon / Check",
+    "opts": {
+     "timeout": 3000
+    }
+   },
+   {
+    "text": "Inserting vector SVG...",
+    "opts": {
+     "timeout": 15000
+    }
+   }
+  ],
+  "cancels": 2,
+  "uiResizes": [],
+  "fontLoads": [],
+  "exports": [],
+  "modeSets": [],
+  "storage": {}
+ }
+}
