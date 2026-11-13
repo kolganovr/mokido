@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- **Internal split, no behavior change.** The server moved from one 213 KB `figma/index.js` into modules under
+  `figma/lib/` (`index.js` stays the entry point and re-exports the same names for tests). The plugin is now
+  edited in `figma-plugin-src/` and built into `figma-plugin/code.js` by `node scripts/build-plugin.mjs`; the
+  built `code.js` is still in the repository and in the npm package. `tests/structure.test.js` fails when
+  `code.js` is out of date with its sources.
 - **The update notice now reaches npx installs.** The startup check compared the installed git commit with
   `main`, and an `npx mokido` install has no commit, so it never said anything. It now compares the server
   version with the latest `mokido` release on npm (once a day, cached in `~/.mokido/update-check.json`), so

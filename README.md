@@ -466,7 +466,7 @@ locked-down machines the previous note is about.
 
 ## Testing
 
-Seven dependency-free suites, all runnable with bare `node`:
+Dependency-free suites, all runnable with bare `node` (`for t in tests/*.test.js; do node "$t"; done` runs them all):
 
 ```bash
 node tests/bridge-runtime.test.js   # sandbox runtime, module persistence, checkpoint/rollback
@@ -476,6 +476,8 @@ node tests/mcp-protocol.test.js     # real server over stdio: initialize, tools/
 node tests/install.test.js          # config merge/reuse, token persistence, stale-file cleanup
 node tests/token-economy.test.js    # fake plugin over a real WebSocket: budgets, long-poll, proxy
 node tests/output-shrink.test.js    # line-wise shrinking, offset paging, output ceiling, syntax pre-check
+node tests/bridge-routing.test.js   # target selection and master/proxy failover on live processes
+node tests/structure.test.js        # code.js equals its build from figma-plugin-src/, no require cycles, file size cap
 ```
 
 `mcp-protocol.test.js` spawns the actual server as a child process and speaks NDJSON to it — the
@@ -488,13 +490,16 @@ same transport a real MCP client uses — rather than importing internals.
 ```
 mokido/
 ├── figma/                    # MCP server (Node.js, stdio + WebSocket)
-│   ├── index.js              # protocol, tool router, job ledger, target router
+│   ├── index.js              # entry point and facade (re-exports for tests)
+│   ├── lib/                  # server modules: bridge, job ledger, tool router, stdio, tool schemas, response shrinking
 │   ├── optimizer/            # AST pruner, style collapser, JSX/tree serializers
 ├── figma-plugin/             # Figma Desktop plugin
-│   ├── code.js               # sandbox executor, bridge runtime, checkpoints, capture
+│   ├── code.js               # built file (do not edit): sandbox executor, bridge runtime, checkpoints, capture
 │   └── ui.html               # HUD — stream, settings, control (pause / undo)
-├── docs/GUIDE.md             # long-form agent guide (server instructions are inline in index.js)
-├── tests/                    # 7 suites, 0 dependencies
+├── figma-plugin-src/         # sources of figma-plugin/code.js, concatenated by scripts/build-plugin.mjs
+├── scripts/build-plugin.mjs  # builds figma-plugin/code.js (--check compares without writing)
+├── docs/GUIDE.md             # long-form agent guide (server instructions are in figma/lib/instructions.js)
+├── tests/                    # 13 suites, 0 dependencies
 ├── install.mjs               # cross-platform installer, updater, doctor (Node only)
 └── AGENTS.md                 # onboarding protocol for AI agents
 ```

@@ -305,7 +305,7 @@ container.fills = [{ type: 'SOLID', color: { r: 0.96, g: 0.94, b: 1 } }];
 
 ## 7. Tool Reference
 
-Tools are registered in tiers (Core / Extended always on; REST only with `FIGMA_PERSONAL_ACCESS_TOKEN`; Legacy only with `FIGMA_MCP_LEGACY_TOOLS=1`) — see the top of `figma/index.js`'s `TOOL_TIERS` for the exact mapping.
+Tools are registered in tiers (Core / Extended always on; REST only with `FIGMA_PERSONAL_ACCESS_TOKEN`; Legacy only with `FIGMA_MCP_LEGACY_TOOLS=1`) — see `TOOL_TIERS` in `figma/lib/tools.js` for the exact mapping.
 
 | Tool | Mode | Description |
 |------|------|-------------|

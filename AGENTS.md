@@ -85,13 +85,15 @@ Your code is compiled by the plugin as `new AsyncFunction('figma', 'ensureFont',
 Errors carry `line` / `column` / `at` when known, and a `HINT:` line whenever the bridge recognises the failure mode (unloaded font, instance override, stale node id, hugging AutoLayout resize, `pluginData` limits, "helper from my last call is not defined"). Read the hint before retrying.
 
 ### Changing the runtime
-Six contract tests pin this behaviour; run the ones relevant to what you touched (or all of them — each finishes in well under a second, except `mcp-protocol.test.js` which spawns real server processes):
-- `node tests/bridge-runtime.test.js` — module persistence, chunking, store, `componentize`, `setPosition`, error hints, checkpoint/rollback. Run after touching `figma-plugin/code.js`'s Bridge Runtime block.
-- `node tests/layout-packer.test.js` — canvas placement (row/grid packing, collision grid). Run after touching `getFreeCanvasPosition*` / `autoPositionIfColliding` in `figma-plugin/code.js`.
+The contract tests pin this behaviour (the main ones are listed here; `tests/` has more); run the ones relevant to what you touched (or all of them — each finishes in well under a second, except `mcp-protocol.test.js` which spawns real server processes):
+- `node tests/bridge-runtime.test.js` — module persistence, chunking, store, `componentize`, `setPosition`, error hints, checkpoint/rollback. Run after touching the Bridge Runtime part of the plugin (`figma-plugin-src/`).
+- `node tests/layout-packer.test.js` — canvas placement (row/grid packing, collision grid). Run after touching `getFreeCanvasPosition*` / `autoPositionIfColliding` in `figma-plugin-src/placement.js`.
 - `node tests/optimizer.test.js` — REST/live token optimizer (jsx/tree/json, budget truncation). Run after touching `figma/optimizer/*.js`.
-- `node tests/mcp-protocol.test.js` — the real server over stdio: `initialize`, `tools/list`, tool tiering by env. Run after touching `figma/index.js`'s `TOOLS` array or `TOOL_TIERS`.
+- `node tests/mcp-protocol.test.js` — the real server over stdio: `initialize`, `tools/list`, tool tiering by env. Run after touching `figma/lib/tools*.js` (`TOOLS`, `TOOL_TIERS`).
 - `node tests/output-shrink.test.js` — pure functions, no sockets: line-wise shrinking and `offset` paging, the 3900-byte output ceiling, the syntax pre-check (`line`/`at`), error-location pass-through, the code `figma_inspect` generates. Run after touching `shrinkToBudget` / `pruneValue` / `fitLines`, `outputBudgetInfo`, `checkAgentSyntax` or `buildInspectCode`.
 - `node tests/token-economy.test.js` — real server + a fake plugin over a real WebSocket on an isolated port: output budgets, image sizing, blocking `figma_job_status`, `PLUGIN_BUSY`, disconnect/reconnect, proxy forwarding. Run after touching `sendCommandToPlugin`, the job ledger, or any tool's output rendering. After changing `TOOLS`, regenerate `figma/<tool>.json` from it (they mirror `TOOLS` for clients that read per-tool descriptors).
+- `node tests/bridge-routing.test.js` — live bridge processes: target selection and master/proxy failover. Run after touching `figma/lib/dispatch.js`, `master.js` or `server.js`.
+- `node tests/structure.test.js` — `figma-plugin/code.js` must equal the build of `figma-plugin-src/`, no `require` cycles in `figma/`, no file over 30 KB. The plugin is edited in `figma-plugin-src/` and then built with `node scripts/build-plugin.mjs`; never edit `figma-plugin/code.js` directly (this test catches it).
 
 ---
 

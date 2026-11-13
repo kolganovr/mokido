@@ -43,8 +43,9 @@ add a check for the behaviour it changes.
 
 ## Where things live
 
-- `figma/index.js`: MCP server, tool schemas, router, job ledger, WebSocket.
+- `figma/index.js`: entry point and facade only. The server lives in `figma/lib/`: `server.js` (WebSocket and HTTP), `dispatch.js` (target selection, commands to the plugin), `jobs.js` (job ledger), `router.js` (the tool router), `stdio.js` (MCP over stdio), `tools*.js` (tool schemas), `shrink.js` and `result.js` (response shrinking).
 - `figma/optimizer/`: token-optimized serializers (Pseudo-JSX, tree).
-- `figma-plugin/code.js`: sandbox executor, `bridge` runtime, checkpoints, capture.
+- `figma-plugin-src/`: sources of the plugin (sandbox executor, `bridge` runtime, checkpoints, capture). Edit here, then run `node scripts/build-plugin.mjs`.
+- `figma-plugin/code.js`: the built file, committed and shipped. Never edit it directly; `tests/structure.test.js` fails when it differs from the build.
 - `install.mjs`: installer, updater, doctor.
 - `docs/GUIDE.md`: long-form guide for agents.
