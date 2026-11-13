@@ -8,7 +8,7 @@ const { spawnSync } = require("child_process");
 
 const ROOT = path.join(__dirname, "..");
 const LIMIT = 30720;
-const OVERSIZE_ALLOWED = ["figma-plugin-src/bridge-api.js"];
+const OVERSIZE_ALLOWED = [];
 
 let failures = 0, checks = 0;
 function check(name, ok, detail) {

@@ -12,7 +12,7 @@ const OUT = path.join(ROOT, "figma-plugin", "code.js");
 
 export const PARTS = [
   "boot", "storage", "checkpoints", "node-format", "outline", "tables", "inspect",
-  "compare", "find-check", "text-context", "bridge-api", "errors", "transfer",
+  "compare", "find-check", "text-context", "api-store", "api-macros", "api-prototype", "api-reads", "errors", "transfer",
   "svg-text", "placement", "components", "capture-lint", "canvas-read",
   "msg-execute", "msg-components", "msg-variables-svg", "msg-canvas", "messages",
 ].map((n) => n + ".js");

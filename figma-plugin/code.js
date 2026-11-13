@@ -1867,8 +1867,30 @@ function contextOf(node, conventions) {
 
 function createBridgeApi() {
   const api = {};
-  let proxy = null;   // the object handed out; module sources get it too
+  const ctx = { proxy: null };   // the object handed out; module sources get it too
+  installBridgeStore(api, ctx);
+  installBridgeMacros(api, ctx);
+  installBridgePrototype(api, ctx);
+  installBridgeReads(api, ctx);
 
+  // Reading a helper that does not exist used to yield undefined and a cryptic
+  // "bridge.foo is not a function" one line later. Fail at the call instead,
+  // naming what does exist. Symbols and probe keys used by promises/serializers
+  // must stay undefined or awaiting/serializing the bridge would break.
+  ctx.proxy = new Proxy(api, {
+    get(target, key, receiver) {
+      if (typeof key !== "string" || key in target || BRIDGE_PROBE_KEYS.indexOf(key) !== -1) {
+        return Reflect.get(target, key, receiver);
+      }
+      return function () {
+        throw new Error("bridge." + key + " does not exist. Available: " + Object.keys(target).sort().join(", "));
+      };
+    }
+  });
+  return ctx.proxy;
+}
+
+function installBridgeStore(api, ctx) {
   // --- ephemeral scratch: survives calls, dies on plugin reload ------------
   api.state = BRIDGE_STATE;
 
@@ -1893,7 +1915,7 @@ function createBridgeApi() {
 
   // --- reusable code modules ----------------------------------------------
   api.define = function (name, source) {
-    const exported = bridgeCompile(name, source, proxy || api);   // fail fast before saving
+    const exported = bridgeCompile(name, source, ctx.proxy || api);   // fail fast before saving
     bridgeWrite("mod:" + name, source);
     bridgeIndexAdd("mod", name);
     return exported;
@@ -1908,7 +1930,7 @@ function createBridgeApi() {
         "Create it with bridge.define(\"" + name + "\", \"...source ending in module.exports = {...}...\")."
       );
     }
-    return bridgeCompile(name, source, proxy || api);
+    return bridgeCompile(name, source, ctx.proxy || api);
   };
 
   api.list = function () {
@@ -1924,7 +1946,9 @@ function createBridgeApi() {
     bridgeWrite("mod:" + name, "");
     bridgeIndexRemove("mod", name);
   };
+}
 
+function installBridgeMacros(api, ctx) {
   // --- platform workarounds ------------------------------------------------
   // figma.createComponentFromNode() can force every AutoLayout frame in the
   // subtree to FIXED sizing at whatever size it happened to have mid-convert.
@@ -2159,7 +2183,9 @@ function createBridgeApi() {
     else box.resize(w, h);
     return box;
   };
+}
 
+function installBridgePrototype(api, ctx) {
   // --- prototype reactions -------------------------------------------------
   // Figma's reactions validator answers a wrong shape with a union error of
   // several KB. These build the one valid shape. Overlay look (position, dim,
@@ -2284,7 +2310,9 @@ function createBridgeApi() {
     const o = opts || {};
     return api.setReaction(node, { trigger: o.trigger, action: "CLOSE", replace: o.replace });
   };
+}
 
+function installBridgeReads(api, ctx) {
   // --- cheap reads: facts as short text / flat maps instead of raw dumps ----
   api.summarize = function (refs, opts) { return summarizeNodes(refs, opts); };
   api.inspect = function (refs, props) { return inspectNodes(refs, props); };
@@ -2412,22 +2440,6 @@ function createBridgeApi() {
   api.snapshot = function (node) {
     return trackModification(node);
   };
-
-  // Reading a helper that does not exist used to yield undefined and a cryptic
-  // "bridge.foo is not a function" one line later. Fail at the call instead,
-  // naming what does exist. Symbols and probe keys used by promises/serializers
-  // must stay undefined or awaiting/serializing the bridge would break.
-  proxy = new Proxy(api, {
-    get(target, key, receiver) {
-      if (typeof key !== "string" || key in target || BRIDGE_PROBE_KEYS.indexOf(key) !== -1) {
-        return Reflect.get(target, key, receiver);
-      }
-      return function () {
-        throw new Error("bridge." + key + " does not exist. Available: " + Object.keys(target).sort().join(", "));
-      };
-    }
-  });
-  return proxy;
 }
 
 const BRIDGE_PROBE_KEYS = ["then", "toJSON", "constructor", "prototype", "$$typeof", "asymmetricMatch", "nodeType"];
