@@ -1,11 +1,14 @@
 // Mutable bridge state shared across modules. A CommonJS "let" cannot be handed
-// to another module (the receiver gets a copy), so the four fields that several
+// to another module (the receiver gets a copy), so the fields that several
 // modules read and write live on one object; never destructure them.
 const state = {
   commandResolvers: new Map(),
   lastPluginPing: 0,
   isBridgeMaster: false,
-  listenAttemptInFlight: false
+  listenAttemptInFlight: false,
+  // Late-result blocks a proxy got from the master (`__late` in /execute and
+  // /job replies), waiting for the router wrapper to hand them to the model.
+  lateInbox: []
 };
 
 // Commands queue instead of overwriting a single slot: two tool calls issued

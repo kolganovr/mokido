@@ -1,4 +1,4 @@
-const { BRIDGE_PORT, BRIDGE_TOKEN, ECONOMY } = require("./config");
+const { BRIDGE_PORT, BRIDGE_TOKEN, ECONOMY, ORIGIN_ID } = require("./config");
 const { state, wsClients, pendingCommands, waitForClient } = require("./state");
 const { recentlyRejectedPlugin, wrongPluginCopyMessage } = require("./auth");
 const { jobs, touchJob, findBusyJob, errorLocation } = require("./jobs");
@@ -69,7 +69,7 @@ async function sendCommandToPlugin(payload, timeoutMs = 45000, options = {}) {
   if (!state.isBridgeMaster) {
     return proxyToMaster("/execute", {
       method: "POST",
-      body: { ...payload, timeoutMs, ...(options.escalateMs ? { escalateMs: options.escalateMs } : {}) },
+      body: { ...payload, timeoutMs, origin: ORIGIN_ID, ...(options.escalateMs ? { escalateMs: options.escalateMs } : {}) },
       // The master enforces timeoutMs/escalateMs itself; this is only the
       // outer bound, so a slow-but-healthy call is not cut short by the hop.
       timeoutMs: (options.escalateMs ? Math.min(options.escalateMs, timeoutMs) : timeoutMs) + 5000
@@ -122,7 +122,9 @@ async function sendCommandToPlugin(payload, timeoutMs = 45000, options = {}) {
     // findBusyJob) needs in-flight commands, not just escalated ones.
     // target: the file the command went to, so figma_job_status (no target of
     // its own) re-reads a long write in that file, not the focused one (review 4.2.7 #44).
-    const startedAt = touchJob(id, { clientId, kind: cmdPayload.type || "EXECUTE", description: cmdPayload.description || null,
+    // origin: who runs it (a proxy passes its own id, an old proxy none => null).
+    const origin = options.origin !== undefined ? options.origin : ORIGIN_ID;
+    const startedAt = touchJob(id, { clientId, origin, kind: cmdPayload.type || "EXECUTE", description: cmdPayload.description || null,
       target: (targetClient && targetClient.fileName) || payload.target || null,
       script: typeof cmdPayload.code === "string" && cmdPayload.code.length < 60000 ? stripFontMemoCode(cmdPayload.code) : null }).createdAt;
 
@@ -130,7 +132,9 @@ async function sendCommandToPlugin(payload, timeoutMs = 45000, options = {}) {
       state.commandResolvers.delete(id);
       const queuedAt = pendingCommands.findIndex(c => c.id === id);
       if (queuedAt !== -1) pendingCommands.splice(queuedAt, 1);
-      jobs.delete(id);
+      // Never sent (still queued): nothing can answer. Sent: keep the record, the
+      // plugin may still answer and then the result is told as a late one.
+      if (queuedAt !== -1) jobs.delete(id); else touchJob(id, { detached: "timeout" });
       const busy = findBusyJob(clientId, id, startedAt);
       let err;
       if (busy) {
@@ -153,7 +157,7 @@ async function sendCommandToPlugin(payload, timeoutMs = 45000, options = {}) {
         if (!state.commandResolvers.has(id)) return; // already settled through the normal path
         state.commandResolvers.delete(id);
         clearTimeout(hardTimer);
-        touchJob(id, {}); // ensure a ledger entry exists even if no PROGRESS frame ever arrived
+        touchJob(id, { detached: "escalated" });
         resolve({ __escalated: true, job_id: id, elapsed_ms: options.escalateMs });
       }, options.escalateMs);
     }
@@ -190,7 +194,18 @@ async function sendCommandToPlugin(payload, timeoutMs = 45000, options = {}) {
 // calls and made the proxy "take over" a port that was never free — two
 // wasted agent turns per heavy call. Now a /status probe at the 10s mark
 // decides: answered => master alive, keep waiting; silent => zombie, abort.
+// The master piggybacks a late-result block on its replies (`__late`); a proxy
+// moves it to state.lateInbox so the router wrapper can show it to the model.
+function foldLate(data) {
+  if (data && typeof data === "object" && data.__late) {
+    state.lateInbox.push(data.__late);
+    delete data.__late;
+  }
+}
+
 async function proxyToMaster(pathname, { method = "GET", body, timeoutMs = 45000 } = {}) {
+  // /job tells the master whose late results to hand back (the router builds the path).
+  if (pathname.indexOf("/job?") === 0) pathname += "&origin=" + encodeURIComponent(ORIGIN_ID);
   const controller = new AbortController();
   let zombie = false;
   const abortTimer = setTimeout(() => controller.abort(), timeoutMs);
@@ -227,6 +242,7 @@ async function proxyToMaster(pathname, { method = "GET", body, timeoutMs = 45000
         detail = parsed.error || errText;
         code = parsed.code || null;
         loc = errorLocation(parsed);
+        foldLate(parsed);
       } catch (e) {}
       // A 500 from /execute is the master relaying a real tool failure
       // (NO_CONNECTED_CLIENTS, a sandbox error...) — pass it through as-is.
@@ -236,6 +252,7 @@ async function proxyToMaster(pathname, { method = "GET", body, timeoutMs = 45000
       throw err;
     }
     const data = await res.json();
+    foldLate(data);
     if (pathname !== "/execute" || data.success || data.__escalated) return data;
     const err = new Error(data.error || "Execution failed in Figma sandbox");
     if (data.code) err.code = data.code;

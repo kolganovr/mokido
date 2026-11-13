@@ -82,11 +82,16 @@ const ECONOMY = {
   jobWaitMs: envNumber("FIGMA_MCP_JOB_WAIT_MS", 45000),          // how long figma_job_status blocks by default
   jobWaitMaxMs: 55000,                                           // keep under ~60s client tool timeouts
   reconnectGraceMs: envNumber("FIGMA_MCP_RECONNECT_GRACE_MS", 8000), // wait for a reloading plugin instead of failing
-  stalledAfterMs: 120000                                         // no progress for this long => report as stalled
+  stalledAfterMs: envNumber("FIGMA_MCP_STALLED_MS", 120000),     // no progress for this long => report as stalled
+  jobExpireMs: envNumber("FIGMA_MCP_JOB_EXPIRE_MS", 30 * 60 * 1000) // a job nobody waits for, silent this long => JOB_EXPIRED (0 = never)
 };
+
+// Who started a command. Proxies send it to the master so a late result goes
+// back to the process (agent) that ran it, not to whoever calls next.
+const ORIGIN_ID = "o_" + require("crypto").randomBytes(6).toString("hex");
 
 // Paths: FIGMA_DIR is the figma/ folder, PACKAGE_ROOT the package root above it.
 const FIGMA_DIR = path.join(__dirname, "..");
 const PACKAGE_ROOT = path.join(FIGMA_DIR, "..");
 
-module.exports = { FIGMA_TOKEN, BRIDGE_PORT, BRIDGE_TOKEN, ALLOWED_ORIGINS, MAX_WS_MESSAGE_BYTES, MAX_HTTP_BODY_BYTES, TIMEOUTS, SERVER_VERSION, ECONOMY, envNumber, FIGMA_DIR, PACKAGE_ROOT };
+module.exports = { FIGMA_TOKEN, BRIDGE_PORT, BRIDGE_TOKEN, ALLOWED_ORIGINS, MAX_WS_MESSAGE_BYTES, MAX_HTTP_BODY_BYTES, TIMEOUTS, SERVER_VERSION, ECONOMY, ORIGIN_ID, envNumber, FIGMA_DIR, PACKAGE_ROOT };

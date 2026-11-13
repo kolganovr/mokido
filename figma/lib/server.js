@@ -3,7 +3,7 @@ const http = require("http");
 const { BRIDGE_PORT, ALLOWED_ORIGINS, MAX_WS_MESSAGE_BYTES, MAX_HTTP_BODY_BYTES, SERVER_VERSION, TIMEOUTS, ECONOMY } = require("./config");
 const { state, wsClients, pendingCommands, wakeClientWaiters } = require("./state");
 const { isAuthorized, isOriginAllowed } = require("./auth");
-const { jobs, touchJob, settleCommand, errorLocation, failCommandsOfClient, readJobSnapshot } = require("./jobs");
+const { jobs, settleCommand, errorLocation, failCommandsOfClient, readJobSnapshot, takeLate } = require("./jobs");
 const { tryBecomeMaster, attachServer } = require("./master");
 const { sendCommandToPlugin, listTargets } = require("./dispatch");
 
@@ -230,7 +230,8 @@ function handleClientMessage(client, data) {
   }
 
   if (data.type === "PROGRESS" && data.id) {
-    const job = touchJob(data.id, {});
+    const job = jobs.get(data.id);
+    if (!job) return; // unknown id (journal lost, or a read already forgotten): nothing to attach it to
     job.progress.push({ step: data.step, of: data.of, note: data.note, ts: data.ts || Date.now() });
     if (job.progress.length > 50) job.progress.shift();
     return;
@@ -240,7 +241,7 @@ function handleClientMessage(client, data) {
     // Goes to the blocked caller if there still is one, otherwise into the job
     // ledger — a call that already escalated past TIMEOUTS.escalate has
     // nothing left in commandResolvers, but figma_job_status needs to see it.
-    settleCommand(data);
+    settleCommand(data, client);
   }
 }
 
@@ -350,20 +351,25 @@ const bridgeServer = http.createServer((req, res) => {
 
   if (pathname === "/execute" && req.method === "POST") {
     readBody(req).then(async (body) => {
+      let origin = null;
       try {
         const payload = JSON.parse(body);
         const timeoutMs = payload.timeoutMs || 45000;
         const escalateMs = payload.escalateMs;
+        origin = typeof payload.origin === "string" && payload.origin ? payload.origin : null; // old proxies send none
         delete payload.timeoutMs;
         delete payload.escalateMs;
+        delete payload.origin;
         // A proxy's call escalates here, in the master that owns the job
         // ledger, so its figma_job_status (forwarded to /job) can find it.
-        const result = await sendCommandToPlugin(payload, timeoutMs, escalateMs ? { escalateMs } : {});
+        const result = await sendCommandToPlugin(payload, timeoutMs, { origin, ...(escalateMs ? { escalateMs } : {}) });
+        const late = takeLate(origin);
         res.writeHead(200, { "Content-Type": "application/json" });
-        res.end(JSON.stringify(result));
+        res.end(JSON.stringify(late ? { ...result, __late: late } : result));
       } catch (err) {
+        const late = takeLate(origin);
         res.writeHead(500, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ success: false, error: err.message, code: err.code || null, ...errorLocation(err) }));
+        res.end(JSON.stringify({ success: false, error: err.message, code: err.code || null, ...errorLocation(err), ...(late ? { __late: late } : {}) }));
       }
     }).catch((err) => {
       if (res.writableEnded) return;
@@ -376,16 +382,20 @@ const bridgeServer = http.createServer((req, res) => {
   // Job long-poll for proxies: the ledger only exists in the master process.
   if (pathname === "/job" && req.method === "GET") {
     const url = new URL(req.url, `http://127.0.0.1:${BRIDGE_PORT}`);
-    readJobSnapshot(url.searchParams.get("id"), Number(url.searchParams.get("wait_ms")) || 0)
+    const jobId = url.searchParams.get("id");
+    const jobOrigin = url.searchParams.get("origin") || null;
+    readJobSnapshot(jobId, Number(url.searchParams.get("wait_ms")) || 0)
       .then((snap) => {
         if (res.writableEnded) return;
+        const late = takeLate(jobOrigin, jobId);
         res.writeHead(200, { "Content-Type": "application/json" });
-        res.end(JSON.stringify(snap));
+        res.end(JSON.stringify(late ? { ...snap, __late: late } : snap));
       })
       .catch((err) => {
         if (res.writableEnded) return;
+        const late = takeLate(jobOrigin, jobId);
         res.writeHead(500, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ ok: false, error: err.message }));
+        res.end(JSON.stringify({ ok: false, error: err.message, ...(late ? { __late: late } : {}) }));
       });
     return;
   }

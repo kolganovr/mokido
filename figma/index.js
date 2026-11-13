@@ -3,13 +3,15 @@
 const { startBridge } = require("./lib/server");
 const { startOfficialSdkServer, startUniversalStdioServer } = require("./lib/stdio");
 const { checkForUpdates, isNewerVersion, updateNotice } = require("./lib/update");
-const { TIMEOUTS, ECONOMY } = require("./lib/config");
+const { TIMEOUTS, ECONOMY, ORIGIN_ID } = require("./lib/config");
+const { state } = require("./lib/state");
+const { proxyToMaster, sendCommandToPlugin } = require("./lib/dispatch");
 const { TOOLS, getActiveTools } = require("./lib/tools");
 const { SERVER_INSTRUCTIONS } = require("./lib/instructions");
 const { byteLength, shrinkToBudget } = require("./lib/shrink");
 const { compressValidationError } = require("./lib/validation");
 const { FONT_MEMO_PRELUDE, shieldParams, withFontMemo, stripFontMemo } = require("./lib/script-prep");
-const { jobs, readJobSnapshot } = require("./lib/jobs");
+const { jobs, JOBS_MAX, readJobSnapshot, touchJob, sweepJobs, takeLate, settleCommand, findBusyJob, failCommandsOfClient } = require("./lib/jobs");
 const { MCP_CLIENT, activeOutputCeiling, outputBudgetInfo, similarHint, truncationNote } = require("./lib/budget");
 const { pngSize, collectImages, buildStructuredResult, captureOptions, buildErrorEnvelope, checkAgentSyntax, applyLineOffset, applyTokenBudget } = require("./lib/result");
 const { buildInspectCode } = require("./lib/inspect-code");
@@ -31,6 +33,7 @@ if (require.main === module) {
   module.exports = {
     TOOLS, SERVER_INSTRUCTIONS, ECONOMY, TIMEOUTS, CAPS_NOTE, WHAT_YOU_GET,
     shrinkToBudget, pngSize, collectImages, buildStructuredResult, captureOptions, getActiveTools,
-    buildInspectCode, applyTokenBudget, byteLength, outputBudgetInfo, truncationNote, similarHint, afterWriteOutline, readNudge, classifyScript, suggestInspect, READ_STATE, postWrite, resetReadStreak, readGuard, guardRefusal, pageWideScan, macroGuard, overlayCall, overlayDone, OVERLAY_LINKED, linkOverlay, linkedOverlay, unlinkCheckpoint, resultIds, overlayPairs, withFontMemo, stripFontMemo, FONT_MEMO_PRELUDE, shieldParams, rewriteComponentize, compressValidationError, readJobSnapshot, jobs, MCP_CLIENT, activeOutputCeiling, applyLineOffset, checkAgentSyntax, buildErrorEnvelope, isNewerVersion, updateNotice
+    buildInspectCode, applyTokenBudget, byteLength, outputBudgetInfo, truncationNote, similarHint, afterWriteOutline, readNudge, classifyScript, suggestInspect, READ_STATE, postWrite, resetReadStreak, readGuard, guardRefusal, pageWideScan, macroGuard, overlayCall, overlayDone, OVERLAY_LINKED, linkOverlay, linkedOverlay, unlinkCheckpoint, resultIds, overlayPairs, withFontMemo, stripFontMemo, FONT_MEMO_PRELUDE, shieldParams, rewriteComponentize, compressValidationError, readJobSnapshot, jobs, MCP_CLIENT, activeOutputCeiling, applyLineOffset, checkAgentSyntax, buildErrorEnvelope, isNewerVersion, updateNotice,
+    ORIGIN_ID, state, proxyToMaster, sendCommandToPlugin, JOBS_MAX, touchJob, sweepJobs, takeLate, settleCommand, findBusyJob, failCommandsOfClient
   };
 }
