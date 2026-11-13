@@ -13,7 +13,8 @@ const OUT = path.join(ROOT, "figma-plugin", "code.js");
 export const PARTS = [
   "boot", "storage", "checkpoints", "node-format", "outline", "tables", "inspect",
   "compare", "find-check", "text-context", "bridge-api", "errors", "transfer",
-  "svg-text", "placement", "components", "capture-lint", "canvas-read", "messages",
+  "svg-text", "placement", "components", "capture-lint", "canvas-read",
+  "msg-execute", "msg-components", "msg-variables-svg", "msg-canvas", "messages",
 ].map((n) => n + ".js");
 
 const toLF = (b) => Buffer.from(b.toString("utf8").replace(/\r\n/g, "\n"), "utf8");
