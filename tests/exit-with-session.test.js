@@ -39,6 +39,7 @@ function serverEnv(extra) {
   return {
     ...process.env,
     FIGMA_MCP_NO_UPDATE_CHECK: "1",
+    FIGMA_MCP_LOG_FILE: "0",
     FIGMA_BRIDGE_PORT: String(nextPort++),
     ...extra
   };

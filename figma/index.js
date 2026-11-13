@@ -19,8 +19,11 @@ const { WHAT_YOU_GET, CAPS_NOTE, classifyScript, resultIds, suggestInspect, page
 const { OVERLAY_LINKED, linkOverlay, linkedOverlay, unlinkCheckpoint, overlayCall, overlayPairs, overlayDone } = require("./lib/overlay");
 const { READ_STATE, macroGuard, readGuard, guardRefusal, readNudge, resetReadStreak } = require("./lib/guards");
 const { afterWriteOutline, postWrite } = require("./lib/post-write");
+const { startJournal } = require("./lib/journal");
+const { lateBlock, attachLate } = require("./lib/late");
 
 if (require.main === module) {
+  startJournal();
   startBridge();
   checkForUpdates();
 
@@ -34,6 +37,6 @@ if (require.main === module) {
     TOOLS, SERVER_INSTRUCTIONS, ECONOMY, TIMEOUTS, CAPS_NOTE, WHAT_YOU_GET,
     shrinkToBudget, pngSize, collectImages, buildStructuredResult, captureOptions, getActiveTools,
     buildInspectCode, applyTokenBudget, byteLength, outputBudgetInfo, truncationNote, similarHint, afterWriteOutline, readNudge, classifyScript, suggestInspect, READ_STATE, postWrite, resetReadStreak, readGuard, guardRefusal, pageWideScan, macroGuard, overlayCall, overlayDone, OVERLAY_LINKED, linkOverlay, linkedOverlay, unlinkCheckpoint, resultIds, overlayPairs, withFontMemo, stripFontMemo, FONT_MEMO_PRELUDE, shieldParams, rewriteComponentize, compressValidationError, readJobSnapshot, jobs, MCP_CLIENT, activeOutputCeiling, applyLineOffset, checkAgentSyntax, buildErrorEnvelope, isNewerVersion, updateNotice,
-    ORIGIN_ID, state, proxyToMaster, sendCommandToPlugin, JOBS_MAX, touchJob, sweepJobs, takeLate, settleCommand, findBusyJob, failCommandsOfClient
+    ORIGIN_ID, state, lateBlock, attachLate, proxyToMaster, sendCommandToPlugin, JOBS_MAX, touchJob, sweepJobs, takeLate, settleCommand, findBusyJob, failCommandsOfClient
   };
 }

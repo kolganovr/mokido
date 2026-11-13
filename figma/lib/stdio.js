@@ -4,6 +4,7 @@ const { getActiveTools } = require("./tools");
 const { SERVER_INSTRUCTIONS } = require("./instructions");
 const { MCP_CLIENT, activeOutputCeiling } = require("./budget");
 const { handleCallTool } = require("./router");
+const { logError, logExit } = require("./journal");
 
 // ==========================================
 // MCP SDK Loader & Universal Stdio Loop
@@ -43,6 +44,8 @@ function startOfficialSdkServer() {
       const transport = new StdioServerTransport();
       server.connect(transport).catch(err => {
         console.error("MCP connection error:", err);
+        logExit("SDK connection error");
+        logError("sdk-error", err);
         process.exit(1);
       });
       return true;

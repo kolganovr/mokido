@@ -13,7 +13,7 @@ const SERVER_PATH = path.join(__dirname, "..", "figma", "index.js");
 
 function startServer(env) {
   const child = spawn(process.execPath, [SERVER_PATH], {
-    env: { ...process.env, ...env },
+    env: { ...process.env, FIGMA_MCP_LOG_FILE: "0", ...env },
     stdio: ["pipe", "pipe", "pipe"]
   });
   child.stderr.on("data", () => {}); // startup warnings (e.g. no FIGMA_BRIDGE_TOKEN) are expected noise here

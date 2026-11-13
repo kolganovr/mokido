@@ -7,6 +7,8 @@
 // WebSocket, driven by raw HTTP the way a proxy does (/execute, /job with origin).
 // Part 1 also uses a fake master on :18831 for the proxy side. Needs Node >= 22.
 const path = require("path");
+const fs = require("fs");
+const os = require("os");
 const http = require("http");
 const { spawnSync } = require("child_process");
 
@@ -626,10 +628,341 @@ async function live() {
   }
 }
 
+
+// ---------------------------------------------------------------------------
+// T-075 delivery: late_result block (late.js), figma_job_status, process journal
+// ---------------------------------------------------------------------------
+const late = require("../figma/lib/late");
+const router = require("../figma/lib/router");
+const bl = (s) => Buffer.byteLength(s, "utf8");
+const J = (res, i) => JSON.parse(res.content[i || 0].text);
+const hasLate = (res) => /"late_result"/.test(res.content[0].text);
+
+function blockUnits() {
+  console.log("== late_result block: size and shape ==");
+  const base = { job_id: "cmd_ab12cd3", status: "done", was: "stalled", description: "Build cards", kind: "EXECUTE", finished_s_ago: 42, created: ids(14, "12"), created_count: 14, modified_count: 2, checkpoint_id: "cp_m1x_7", error: null, orphan: false, file: null, more: 0 };
+  const f = JSON.parse(late.lateBlock(base, 100));
+  check("full block: the ADR shape", f.late_result && f.late_result.job_id === "cmd_ab12cd3" && f.late_result.status === "done" && f.late_result.was === "stalled" && f.late_result.description === "Build cards" && f.late_result.finished_s_ago === 42 && f.late_result.created_count === 14 && f.late_result.modified_count === 2 && f.late_result.checkpoint_id === "cp_m1x_7" && /rerun/i.test(f.late_result.note), f);
+  check("full block lists ids in creation order", f.late_result.created[0] === "12:0" && f.late_result.created.every((x, i) => x === "12:" + i), f.late_result.created);
+  const worst = { ...base, description: "Очень длинное описание сборки карточек ".repeat(5), created: ids(20, "1234"), created_count: 999, modified_count: 999, checkpoint_id: "cp_m1x_7abcdef", orphan: true, file: "A very long Figma file name.fig that goes on", more: 12, finished_s_ago: 123456 };
+  const w = late.lateBlock(worst, 0);
+  const wj = JSON.parse(w);
+  check("worst case (long description, 20 ids, orphan, more): at most 300 bytes", bl(w) <= 300, bl(w));
+  check("worst case (every field maxed) still names job, status, the first id, counts, orphan, more", wj.late_result.job_id === base.job_id && wj.late_result.created.length >= 1 && wj.late_result.created[0] === "1234:0" && wj.late_result.created_count === 999 && wj.late_result.orphan === true && wj.late_result.more === 12, wj);
+  const w2 = late.lateBlock({ ...base, created: ids(20, "9"), description: "x".repeat(500) }, 0);
+  check("20 ids and a 500-char description: at most 300 bytes", bl(w2) <= 300 && JSON.parse(w2).late_result.created.length >= 3, bl(w2));
+  const er = JSON.parse(late.lateBlock({ ...base, status: "error", error: "ReferenceError: " + "boom ".repeat(100), created: [], created_count: 0 }, 0));
+  check("error: error text (at most 120 chars) instead of ids", typeof er.late_result.error === "string" && er.late_result.error.length <= 120 && er.late_result.error.indexOf("ReferenceError") === 0 && er.late_result.created === undefined && bl(JSON.stringify(er)) <= 300, er);
+  for (const st of ["lost", "expired"]) {
+    const o = JSON.parse(late.lateBlock({ ...base, status: st, created: [], created_count: 0, modified_count: 0, checkpoint_id: null }, 0));
+    check(st + ": note says outcome unknown and one cheap canvas read", /unknown/i.test(o.late_result.note) && /cheap read/i.test(o.late_result.note) && o.late_result.created === undefined, o);
+  }
+  // boundary: some padding makes the full block exactly 300 bytes and it is still the full form
+  let exact = null;
+  for (let pad = 0; pad < 80 && !exact; pad++) {
+    const d = { ...base, description: null, created: ["1:1"], created_count: 1, modified_count: 0, checkpoint_id: "c".repeat(pad + 3) };
+    const t = JSON.stringify(late.fullBlock(d));
+    if (bl(t) === 300 && JSON.parse(t).late_result.created) exact = d;
+  }
+  check("a full block of exactly 300 bytes exists and keeps its id", !!exact);
+  if (exact) {
+    const over = late.fullBlock({ ...exact, checkpoint_id: exact.checkpoint_id + "c" });
+    check("one byte more: the block shrinks, never exceeds 300", over && bl(JSON.stringify(over)) <= 300, over && bl(JSON.stringify(over)));
+  }
+  // short form
+  const sh = late.lateBlock(base, 3900);
+  const shj = JSON.parse(sh);
+  check("main text over the ceiling: short form, at most 120 bytes, job_id + status + created_count", bl(sh) <= 120 && shj.late_result.job_id === base.job_id && shj.late_result.status === "done" && shj.late_result.created_count === 14 && shj.late_result.created === undefined, sh);
+  const shw = late.lateBlock({ ...worst, status: "expired", job_id: "cmd_" + "x".repeat(40) }, 3900);
+  check("short form with a long job id stays at most 120 bytes", bl(shw) <= 120, bl(shw));
+  // ceiling boundary: exactly at 3900 total is full, one byte more is short
+  const fullLen = bl(JSON.stringify(late.fullBlock(base)));
+  check("main + full block exactly 3900: full form", late.lateBlock(base, 3900 - fullLen) === JSON.stringify(late.fullBlock(base)));
+  check("main + full block 3901: short form", bl(late.lateBlock(base, 3901 - fullLen)) <= 120);
+
+  console.log("== attachLate: first content item, ceiling, which tools ==");
+  const prevMaster = state.isBridgeMaster;
+  state.isBridgeMaster = false;
+  const mainText = (n) => ({ content: [{ type: "text", text: "x".repeat(n) }, { type: "image", data: "AAAA", mimeType: "image/png" }] });
+  state.lateInbox.push({ ...base });
+  const a1 = late.attachLate(mainText(100), "figma_inspect", {}, () => null);
+  check("block is the FIRST content item, type text, original items follow", a1.content.length === 3 && a1.content[0].type === "text" && JSON.parse(a1.content[0].text).late_result.job_id === base.job_id && a1.content[1].text.length === 100 && a1.content[2].type === "image", a1.content.map((c) => c.type));
+  state.lateInbox.push({ ...base });
+  const e1 = late.attachLate({ isError: true, content: [{ type: "text", text: "{}" }] }, "figma_execute_code", {}, () => null);
+  check("an error reply carries the block too, isError kept", e1.isError === true && hasLate(e1) && e1.content.length === 2);
+  for (const t of ["get_file", "get_me", "post_comment", "figma_list_targets", "no_such_tool"]) {
+    state.lateInbox.push({ ...base });
+    const r = late.attachLate(mainText(10), t, {}, () => null);
+    check(t + ": no block (REST / no journal)", r.content.length === 2 && state.lateInbox.length === 1, r.content.length);
+    state.lateInbox.length = 0;
+  }
+  state.lateInbox.push({ ...base });
+  const edge = late.attachLate(mainText(3900), "figma_inspect", {}, () => null);
+  const edgeText = edge.content.filter((c) => c.type === "text").reduce((n, c) => n + bl(c.text), 0);
+  check("reply at the 3900-byte ceiling plus the block: at most 4020 bytes of text, short form", edgeText <= 4020 && bl(edge.content[0].text) <= 120, edgeText);
+  state.lateInbox.push({ ...base });
+  const roomy = late.attachLate(mainText(3000), "figma_inspect", {}, () => null);
+  check("room below the ceiling: full form (more than 120 bytes), total under 3900", bl(roomy.content[0].text) > 120 && bl(roomy.content[0].text) <= 300 && bl(roomy.content[0].text) + 3000 <= 3900);
+  state.lateInbox.push({ ...base, job_id: "cmd_self" });
+  const skip = late.attachLate(mainText(10), "figma_job_status", { job_id: "cmd_self" }, () => null);
+  check("a block about the job this very call reads is skipped", skip.content.length === 2 && state.lateInbox.length === 0);
+  state.lateInbox.push({ job_id: "cmd_broken" });
+  let threw = false;
+  let br;
+  try { br = late.attachLate(mainText(10), "figma_inspect", {}, () => null); } catch (e) { threw = true; }
+  check("a malformed block never throws", !threw && br && br.content.length >= 2);
+  state.lateInbox.length = 0;
+  state.isBridgeMaster = true;
+  let asked = null;
+  const m = late.attachLate(mainText(10), "figma_job_status", { job_id: "cmd_q" }, (origin, except) => { asked = [origin, except]; return { ...base, job_id: "cmd_m" }; });
+  check("master: takes the block from the journal with its own origin, except the job read", asked && asked[0] === srv.ORIGIN_ID && asked[1] === "cmd_q" && JSON.parse(m.content[0].text).late_result.job_id === "cmd_m", asked);
+  state.isBridgeMaster = prevMaster;
+  reset();
+
+  console.log("== figma_job_status helpers ==");
+  const u = late.unknownJob("cmd_z");
+  check("JOB_STATE_UNKNOWN: ok false, status unknown, job_id, hint without connection jargon", u.ok === false && u.status === "unknown" && u.code === "JOB_STATE_UNKNOWN" && u.job_id === "cmd_z" && /late_result/.test(u.hint) && !/fetch failed|ECONNREFUSED|establish/i.test(JSON.stringify(u)), u);
+  check("BRIDGE_OFFLINE becomes the structured answer, other errors stay errors", late.jobStatusError({ code: "BRIDGE_OFFLINE" }, "cmd_z").code === "JOB_STATE_UNKNOWN" && late.jobStatusError({ code: "X" }, "cmd_z") === null && late.jobStatusError(new Error("x"), "c") === null);
+  check("JOB_NOT_FOUND for an id never issued stays JOB_NOT_FOUND", late.jobStatusSnap({ ok: false, code: "JOB_NOT_FOUND" }, "cmd_never").code === "JOB_NOT_FOUND");
+  late.noteIssued("cmd_i1");
+  check("JOB_NOT_FOUND for an issued id becomes JOB_STATE_UNKNOWN", late.jobStatusSnap({ ok: false, code: "JOB_NOT_FOUND" }, "cmd_i1").code === "JOB_STATE_UNKNOWN");
+  late.jobStatusSnap({ ok: true, status: "done" }, "cmd_i1");
+  check("after a successful read the id is forgotten: JOB_NOT_FOUND is real again", late.jobStatusSnap({ ok: false, code: "JOB_NOT_FOUND" }, "cmd_i1").code === "JOB_NOT_FOUND");
+  late.noteIssued("cmd_i2");
+  late.jobStatusSnap({ ok: false, status: "error", code: "SCRIPT_RUNTIME_ERROR" }, "cmd_i2");
+  check("a read error result forgets the id as well", late.jobStatusSnap({ ok: false, code: "JOB_NOT_FOUND" }, "cmd_i2").code === "JOB_NOT_FOUND");
+  late.noteIssued("cmd_i3");
+  late.jobStatusSnap({ ok: true, status: "running" }, "cmd_i3");
+  check("a running answer keeps the id", late.jobStatusSnap({ ok: false, code: "JOB_NOT_FOUND" }, "cmd_i3").code === "JOB_STATE_UNKNOWN");
+  for (let i = 0; i < 60; i++) late.noteIssued("cmd_bulk" + i);
+  check("only the last 50 ids are remembered", late.jobStatusSnap({ ok: false, code: "JOB_NOT_FOUND" }, "cmd_bulk5").code === "JOB_NOT_FOUND" && late.jobStatusSnap({ ok: false, code: "JOB_NOT_FOUND" }, "cmd_bulk59").code === "JOB_STATE_UNKNOWN");
+}
+
+// New proxy against a master that knows nothing of __late
+async function compatUnits() {
+  console.log("== compat: new proxy with a master that sends no __late ==");
+  reset();
+  const fake = http.createServer((req, res) => {
+    res.writeHead(200, { "Content-Type": "application/json" });
+    res.end(JSON.stringify(req.url.indexOf("/job") === 0 ? { ok: false, code: "JOB_NOT_FOUND", error: "No job" } : { success: true, result: [] }));
+  });
+  await new Promise((r) => fake.listen(18831, "127.0.0.1", r));
+  const prev = state.isBridgeMaster;
+  state.isBridgeMaster = false;
+  try {
+    const r = await router.handleCallTool("figma_get_selection", {});
+    check("proxy + master without __late: plain reply, no block, no error", !r.isError && r.content.length === 1 && !hasLate(r), r);
+    const nf = await router.handleCallTool("figma_job_status", { job_id: "cmd_old", wait_ms: 0 });
+    check("job_status for a never-issued id through such a master: JOB_NOT_FOUND as before", nf.isError === true && J(nf).code === "JOB_NOT_FOUND", nf);
+    late.noteIssued("cmd_iss");
+    const un = await router.handleCallTool("figma_job_status", { job_id: "cmd_iss", wait_ms: 0 });
+    check("an issued id the master no longer knows: JOB_STATE_UNKNOWN, not an error", !un.isError && J(un).code === "JOB_STATE_UNKNOWN" && J(un).job_id === "cmd_iss", un);
+  } finally {
+    state.isBridgeMaster = prev;
+    await new Promise((r) => fake.close(r));
+    reset();
+  }
+}
+
+const baseEnv = { FIGMA_MCP_STALLED_MS: "600", FIGMA_MCP_ESCALATE_MS: "300" };
+async function liveTools() {
+  console.log("== live, through MCP tools: master, proxies, killed master ==");
+  const plans = {};
+  const plugins = [];
+  const servers = [];
+  const spawn = (port, env) => { const s = startServer({ port, env: { ...baseEnv, ...(env || {}) } }); servers.push(s); return s; };
+  const plugin = async (server, n) => {
+    const p = startFakePlugin({ port: server.port, token: server.token, handler: (cmd) => (plans[cmd.description] ? plans[cmd.description](cmd) : { result: "ok" }) });
+    plugins.push(p);
+    await p.opened;
+    await waitClients(server, n);
+    return p;
+  };
+  const delayed = (ms, out) => () => sleep(ms).then(() => out);
+  try {
+    // ---- master: running -> stalled -> plugin answers
+    const M = spawn(18840, { FIGMA_MCP_TIMEOUT_MS: "1200" });
+    await M.initialize();
+    await waitMaster(M);
+    await plugin(M, 1);
+    plans.build = delayed(1700, { result: { built: true }, created: ["1:1", "1:2", "1:3"], modified: ["1:9"], checkpointId: "cp_1" });
+    const esc = await M.tool("figma_execute_code", { code: "await 1; return 1;", description: "build" });
+    const jid = J(esc).job_id;
+    check("M1: long script returns running + job_id", J(esc).status === "running" && /^cmd_/.test(jid) && !hasLate(esc), esc);
+    const run1 = await M.tool("figma_job_status", { job_id: jid, wait_ms: 0 });
+    check("M1: job_status while quiet is short: running, not stalled", J(run1).status === "running" && !J(run1).stalled, run1);
+    await sleep(800);
+    const st = await M.tool("figma_job_status", { job_id: jid, wait_ms: 0 });
+    check("M1: silent past the threshold: stalled true + stop true (master)", J(st).stalled === true && J(st).stop === true && /late_result/.test(J(st).hint) && /do not rerun/i.test(J(st).hint), st);
+    const st2 = await M.tool("figma_job_status", { job_id: jid, wait_ms: 0 });
+    check("M1: the second stalled report is the short one", J(st2).stalled === true && /Already reported/.test(J(st2).hint) && !/late_result/.test(J(st2).hint), st2);
+    await sleep(1200); // the plugin answers at ~1700 ms
+    const next = await M.tool("figma_get_selection", {});
+    const blk = J(next);
+    check("M1: the next call to the plugin carries late_result FIRST, with the created id", blk.late_result && blk.late_result.job_id === jid && blk.late_result.status === "done" && blk.late_result.was === "stalled" && blk.late_result.created[0] === "1:1" && blk.late_result.created_count === 3 && blk.late_result.checkpoint_id === "cp_1" && blk.late_result.description === "build" && bl(next.content[0].text) <= 300, next.content[0].text);
+    check("M1: the call's own answer follows the block", next.content.length >= 2 && !/late_result/.test(next.content[1].text), next.content.map((c) => c.text));
+    const next2 = await M.tool("figma_get_selection", {});
+    check("M1: the call after that carries no block", !hasLate(next2), next2);
+    const full = await M.tool("figma_job_status", { job_id: jid, wait_ms: 0 });
+    check("M1: job_status gives the full result once, with late: true", J(full).status === "done" && J(full).late === true && J(full).result && J(full).result.built === true && !hasLate(full), full.content[0].text.slice(0, 300));
+    const gone = await M.tool("figma_job_status", { job_id: jid, wait_ms: 0 });
+    check("M1: read again: JOB_NOT_FOUND (really read), not JOB_STATE_UNKNOWN", gone.isError === true && J(gone).code === "JOB_NOT_FOUND", gone);
+
+    // a job that was never stalled: no late flag
+    plans.fine = delayed(500, { result: { ok: 1 }, created: ["2:1"] });
+    const e2 = await M.tool("figma_execute_code", { code: "await 1; return 2;", description: "fine" });
+    const f2 = await M.tool("figma_job_status", { job_id: J(e2).job_id, wait_ms: 3000 });
+    check("M2: finished in time: done without the late flag, and no block", J(f2).status === "done" && J(f2).late === undefined && !hasLate(f2), f2.content[0].text.slice(0, 200));
+
+    // ---- PLUGIN_BUSY text on a frozen plugin
+    plans.freeze = () => HANG;
+    plans["Get Selected Nodes"] = () => HANG;
+    const fz = await M.tool("figma_execute_code", { code: "await 1; return 3;", description: "freeze" });
+    await sleep(800);
+    const busy = await M.tool("figma_get_selection", {});
+    const bj = J(busy);
+    check("M3: a call behind a frozen job: PLUGIN_BUSY says not responding, stop and ask the user, no 'wait via job_status'", busy.isError === true && bj.code === "PLUGIN_BUSY" && /not responding/.test(bj.error) && /ask the user/i.test(bj.error) && bj.error.indexOf(J(fz).job_id) !== -1 && !/wait for it with figma_job_status/.test(bj.error), bj);
+    delete plans["Get Selected Nodes"];
+
+    // ---- proxies: block goes to the agent that ran the job
+    const A = spawn(18841);
+    await A.initialize();
+    await waitMaster(A);
+    await plugin(A, 1);
+    const B = spawn(18841);
+    const C = spawn(18841);
+    await B.initialize();
+    await C.initialize();
+    plans.pbuild = delayed(1700, { result: { built: true }, created: ["5:1", "5:2"], checkpointId: "cp_p" });
+    const pesc = await B.tool("figma_execute_code", { code: "await 1; return 1;", description: "pbuild" });
+    const pjid = J(pesc).job_id;
+    check("P1: proxy B gets running + job_id from the master", J(pesc).status === "running" && /^cmd_/.test(pjid), pesc);
+    await sleep(1000);
+    const pst = await B.tool("figma_job_status", { job_id: pjid, wait_ms: 0 });
+    check("P1: job_status through the proxy: stalled true + late_result phrase", J(pst).stalled === true && J(pst).stop === true && /late_result/.test(J(pst).hint), pst);
+    await sleep(1100);
+    const cNext = await C.tool("figma_get_selection", {});
+    check("P1: the second agent (proxy C) gets no block", !hasLate(cNext), cNext.content[0].text.slice(0, 200));
+    const bNext = await B.tool("figma_get_selection", {});
+    const bb = J(bNext);
+    check("P1: the agent that ran it (proxy B) gets late_result first", bb.late_result && bb.late_result.job_id === pjid && bb.late_result.created.join() === "5:1,5:2" && bb.late_result.was === "stalled" && bb.late_result.checkpoint_id === "cp_p", bNext.content[0].text);
+    check("P1: told once", !hasLate(await B.tool("figma_get_selection", {})));
+    const pfull = await B.tool("figma_job_status", { job_id: pjid, wait_ms: 0 });
+    check("P1: full result once via the proxy, with late: true, no block about itself", J(pfull).status === "done" && J(pfull).late === true && !hasLate(pfull), pfull.content[0].text.slice(0, 200));
+
+    // ---- master killed mid-job
+    const K = spawn(18842);
+    await K.initialize();
+    await waitMaster(K);
+    const kp = await plugin(K, 1);
+    const L = spawn(18842);
+    await L.initialize();
+    plans.kjob = () => HANG;
+    const kesc = await L.tool("figma_execute_code", { code: "await 1; return 1;", description: "kjob" });
+    const kjid = J(kesc).job_id;
+    check("K1: proxy L started a job on master K", J(kesc).status === "running", kesc);
+    K.child.kill("SIGKILL");
+    await new Promise((r) => (K.child.exitCode !== null || K.child.signalCode ? r() : K.child.once("exit", r)));
+    kp.close();
+    const ku = await L.tool("figma_job_status", { job_id: kjid, wait_ms: 0 });
+    const kt = ku.content[0].text;
+    check("K1: master gone: job_status answers JOB_STATE_UNKNOWN with job_id, not an error", !ku.isError && J(ku).code === "JOB_STATE_UNKNOWN" && J(ku).status === "unknown" && J(ku).job_id === kjid, kt);
+    check("K1: no connection jargon in the text", !/fetch failed|ECONNREFUSED|establish|retry the call/i.test(kt), kt);
+    await waitMaster(L, 8000); // L took the port over
+    const ku2 = await L.tool("figma_job_status", { job_id: kjid, wait_ms: 0 });
+    check("K2: former proxy is the master now with an empty journal: still JOB_STATE_UNKNOWN (issued id)", !ku2.isError && J(ku2).code === "JOB_STATE_UNKNOWN", ku2.content[0].text);
+    const kp2 = await plugin(L, 1);
+    kp2.ws.send(JSON.stringify({ type: "RESULT", success: true, id: kjid, result: "done anyway", created: ["8:1", "8:2"], checkpointId: "cp_k" }));
+    await sleep(300);
+    const orph = await L.tool("figma_get_selection", {});
+    const ob = J(orph);
+    check("K3: the plugin answered the old id: it arrives as an orphan late_result with ids and file", ob.late_result && ob.late_result.job_id === kjid && ob.late_result.orphan === true && ob.late_result.created.join() === "8:1,8:2" && ob.late_result.checkpoint_id === "cp_k" && ob.late_result.file === "Golden File", orph.content[0].text);
+    check("K3: not told twice", !hasLate(await L.tool("figma_get_selection", {})));
+  } finally {
+    for (const p of plugins) p.close();
+    for (const s of servers) await s.stop();
+  }
+}
+
+async function journalTests() {
+  console.log("== process journal ==");
+  const readLog = (p) => { try { return fs.readFileSync(p, "utf8"); } catch (e) { return ""; } };
+  const exited = (s) => new Promise((r) => (s.child.exitCode !== null || s.child.signalCode ? r() : s.child.once("exit", r)));
+  const tmpDirs = [];
+  const mkdir = () => { const d = fs.mkdtempSync(path.join(os.tmpdir(), "mokido-j-")); tmpDirs.push(d); return d; };
+  try {
+    // (a) stdin closed -> reason line; and no script code, file name or token in the file
+    const dir = mkdir();
+    const f1 = path.join(dir, "a.log");
+    const S = startServer({ port: 18850, env: { FIGMA_MCP_LOG_FILE: f1 } });
+    await S.initialize();
+    await waitMaster(S);
+    const p = startFakePlugin({ port: 18850, token: S.token, fileName: "Secret Brand File", handler: () => ({ result: "ok" }) });
+    await p.opened;
+    await waitClients(S, 1);
+    await S.tool("figma_execute_code", { code: "return 'SCRIPT_MARKER_7731';", description: "marker job" });
+    p.close();
+    await sleep(150);
+    const midLog = readLog(f1);
+    check("journal: a start line (pid, version) and a role line", /start v\d+\.\d+\.\d+/.test(midLog) && midLog.indexOf("pid=" + S.child.pid) !== -1 && /role master/.test(midLog), midLog);
+    await S.stop();
+    await exited(S);
+    const log1 = readLog(f1);
+    check("journal: closing stdin leaves 'exit ... reason=stdin closed' and the exit code", /exit role=master reason=stdin closed/.test(log1) && /process exit code=0/.test(log1), log1);
+    check("journal: no script code, no file name, no bridge token", log1.indexOf("SCRIPT_MARKER_7731") === -1 && log1.indexOf("Secret Brand File") === -1 && log1.indexOf("marker job") === -1 && log1.indexOf(S.token) === -1, log1);
+
+    // (b) uncaught exception and unhandled rejection: stack in the file, process still dies
+    for (const [mode, kind, msg] of [["1", "uncaughtException", "test crash"], ["reject", "unhandledRejection", "test rejection"]]) {
+      const f = path.join(mkdir(), mode + ".log");
+      const C = startServer({ port: 18851, env: { FIGMA_MCP_LOG_FILE: f, FIGMA_MCP_TEST_CRASH: mode } });
+      await C.initialize();
+      await exited(C);
+      const lg = readLog(f);
+      check("journal " + kind + ": the line, the message and a stack", lg.indexOf(kind) !== -1 && lg.indexOf(msg) !== -1 && /\n\s+at /.test(lg), lg);
+      check("journal " + kind + ": behaviour unchanged: exit code 1 and the error still on stderr", C.child.exitCode === 1 && C.stderr().indexOf(msg) !== -1, [C.child.exitCode, C.stderr().slice(0, 200)]);
+    }
+
+    // (c) default path is os.tmpdir()/mokido-server.log; =0 writes nothing
+    const tdir = mkdir();
+    const D = startServer({ port: 18852, env: { TEMP: tdir, TMP: tdir, TMPDIR: tdir, FIGMA_MCP_LOG_FILE: "" } });
+    await D.initialize();
+    await waitMaster(D);
+    await D.stop();
+    await exited(D);
+    check("journal: on by default, in the temp dir as mokido-server.log", /start v/.test(readLog(path.join(tdir, "mokido-server.log"))), fs.readdirSync(tdir));
+    const tdir2 = mkdir();
+    const Z = startServer({ port: 18853, env: { TEMP: tdir2, TMP: tdir2, TMPDIR: tdir2, FIGMA_MCP_LOG_FILE: "0" } });
+    await Z.initialize();
+    await waitMaster(Z);
+    await Z.stop();
+    await exited(Z);
+    check("journal: FIGMA_MCP_LOG_FILE=0 creates no file", fs.readdirSync(tdir2).length === 0, fs.readdirSync(tdir2));
+
+    // (d) an oversized file is cut to its tail at start
+    const f4 = path.join(mkdir(), "big.log");
+    fs.writeFileSync(f4, "old line of the journal that is long enough to fill space\n".repeat(6000));
+    const big0 = fs.statSync(f4).size;
+    const G = startServer({ port: 18854, env: { FIGMA_MCP_LOG_FILE: f4 } });
+    await G.initialize();
+    await waitMaster(G);
+    await G.stop();
+    await exited(G);
+    const big1 = fs.statSync(f4).size;
+    const lg4 = readLog(f4);
+    check("journal: a file over 256 KB is cut to its tail on start, the new lines are at the end", big0 > 256 * 1024 && big1 <= 256 * 1024 && /start v/.test(lg4) && /exit role=master/.test(lg4) && lg4.indexOf("old line") === 0, [big0, big1]);
+  } finally {
+    for (const d of tmpDirs) { try { fs.rmSync(d, { recursive: true, force: true }); } catch (e) {} }
+  }
+}
+
 (async () => {
   await units();
   await proxyUnits();
   await live();
+  blockUnits();
+  await compatUnits();
+  await liveTools();
+  await journalTests();
   console.log(failures === 0 ? `\nALL PASS (${checks} checks passed)` : `\n${failures} FAILURES (of ${checks} checks)`);
   process.exit(failures ? 1 : 0);
 })().catch((e) => { console.log("  FAIL crashed -> " + (e && e.stack || e)); process.exit(1); });

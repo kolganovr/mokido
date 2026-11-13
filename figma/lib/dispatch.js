@@ -1,7 +1,7 @@
 const { BRIDGE_PORT, BRIDGE_TOKEN, ECONOMY, ORIGIN_ID } = require("./config");
 const { state, wsClients, pendingCommands, waitForClient } = require("./state");
 const { recentlyRejectedPlugin, wrongPluginCopyMessage } = require("./auth");
-const { jobs, touchJob, findBusyJob, errorLocation } = require("./jobs");
+const { jobs, touchJob, findBusyJob, quietMs, errorLocation } = require("./jobs");
 const { tryBecomeMaster } = require("./master");
 const { stripFontMemoCode } = require("./script-prep");
 
@@ -137,7 +137,13 @@ async function sendCommandToPlugin(payload, timeoutMs = 45000, options = {}) {
       if (queuedAt !== -1) jobs.delete(id); else touchJob(id, { detached: "timeout" });
       const busy = findBusyJob(clientId, id, startedAt);
       let err;
-      if (busy) {
+      if (busy && quietMs(busy) > ECONOMY.stalledAfterMs) {
+        err = new Error(
+          `Timed out after ${Math.round(timeoutMs / 1000)}s: the plugin is not responding, ${busy.id} has been silent for ${Math.round(quietMs(busy) / 1000)}s. ` +
+          "Stop now and ask the user to look at Figma (close or reload the plugin, Ctrl+Alt+P); do not retry and do not poll."
+        );
+        err.code = "PLUGIN_BUSY";
+      } else if (busy) {
         err = new Error(
           `Timed out after ${Math.round(timeoutMs / 1000)}s: the plugin is still busy with ${busy.id}` +
           `${busy.description ? ` ("${busy.description}")` : ""}, running for ${Math.round((Date.now() - busy.createdAt) / 1000)}s. ` +

@@ -4,7 +4,8 @@ const { parseFigmaUrlOrKey, figmaApiRequest } = require("./rest");
 const { normalizeNodeIds, toJson } = require("./hints");
 const { DIFF_OFF_NOTE, shieldParams, withFontMemo, stripFontMemo } = require("./script-prep");
 const { state } = require("./state");
-const { readJobSnapshot, errorLocation } = require("./jobs");
+const { readJobSnapshot, takeLate, errorLocation } = require("./jobs");
+const { attachLate, noteIssued, jobStatusError, jobStatusSnap } = require("./late");
 const { listTargets, sendCommandToPlugin, proxyToMaster } = require("./dispatch");
 const { budgetOptions, similarHint } = require("./budget");
 const { collectImages, renderPluginResponse, captureOptions, buildErrorEnvelope, checkAgentSyntax, applyLineOffset, jsonResult, applyTokenBudget, budgetBytesFromTokens } = require("./result");
@@ -14,7 +15,7 @@ const { OVERLAY_LINKED, linkedOverlay, unlinkCheckpoint, callFile, OVERLAY_HEADE
 const { macroGuard, readGuard, guardRefusal, resetReadStreak } = require("./guards");
 const { postWrite } = require("./post-write");
 
-async function handleCallTool(name, args = {}) {
+async function routeTool(name, args = {}) {
   try {
     switch (name) {
       case "figma_execute_code": {
@@ -63,6 +64,7 @@ async function handleCallTool(name, args = {}) {
         stripFontMemo(response);
 
         if (response.__escalated) {
+          noteIssued(response.job_id);
           return {
             content: [{
               type: "text",
@@ -108,11 +110,19 @@ async function handleCallTool(name, args = {}) {
 
       case "figma_job_status": {
         const waitMs = args.wait_ms != null && Number.isFinite(Number(args.wait_ms)) ? Number(args.wait_ms) : ECONOMY.jobWaitMs;
-        const snap = state.isBridgeMaster
-          ? await readJobSnapshot(args.job_id, waitMs)
-          : await proxyToMaster(`/job?id=${encodeURIComponent(args.job_id || "")}&wait_ms=${Math.round(waitMs)}`, {
-              timeoutMs: Math.min(waitMs, ECONOMY.jobWaitMaxMs) + 10000
-            });
+        let snap;
+        try {
+          snap = state.isBridgeMaster
+            ? await readJobSnapshot(args.job_id, waitMs)
+            : await proxyToMaster(`/job?id=${encodeURIComponent(args.job_id || "")}&wait_ms=${Math.round(waitMs)}`, {
+                timeoutMs: Math.min(waitMs, ECONOMY.jobWaitMaxMs) + 10000
+              });
+        } catch (e) {
+          snap = jobStatusError(e, args.job_id);
+          if (!snap) throw e;
+        }
+        snap = jobStatusSnap(snap, args.job_id);
+        if (snap.code === "JOB_STATE_UNKNOWN") return { content: [{ type: "text", text: toJson(snap) }] };
 
         if (snap.status === "done") {
           // a write that ran long gets the same reply as one that did not (h13 T6: job_status, then a verify turn)
@@ -120,12 +130,12 @@ async function handleCallTool(name, args = {}) {
           try {
             if (snap.script) lead = await postWrite(snap.script, snap.response, { target: snap.target || undefined, file: snap.target || null });
           } catch (e) { lead = null; }
-          return renderPluginResponse(snap.response, { status: "done", job_id: snap.job_id }, { ...budgetOptions(args), lead });
+          return renderPluginResponse(snap.response, { status: "done", job_id: snap.job_id, ...(snap.late ? { late: true } : {}) }, { ...budgetOptions(args), lead });
         }
         if (snap.ok === false) {
           return {
             isError: true,
-            content: [{ type: "text", text: toJson(snap.code === "JOB_NOT_FOUND" ? snap : { ...buildErrorEnvelope({ message: snap.error, code: snap.code, ...errorLocation(snap) }), job_id: snap.job_id }) }]
+            content: [{ type: "text", text: toJson(snap.code === "JOB_NOT_FOUND" ? snap : { ...buildErrorEnvelope({ message: snap.error, code: snap.code, ...errorLocation(snap) }), job_id: snap.job_id, ...(snap.late ? { late: true } : {}) }) }]
           };
         }
         return { content: [{ type: "text", text: toJson(snap) }] };
@@ -575,6 +585,12 @@ async function handleCallTool(name, args = {}) {
       content: [{ type: "text", text: toJson(buildErrorEnvelope(error)) }]
     };
   }
+}
+
+// The one entry point: the routed answer plus, when a job finished after nobody was
+// waiting, the late_result block as its first content item (see late.js).
+async function handleCallTool(name, args = {}) {
+  return attachLate(await routeTool(name, args), name, args, takeLate);
 }
 
 module.exports = { handleCallTool };

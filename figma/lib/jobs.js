@@ -299,7 +299,7 @@ async function readJobSnapshot(id, waitMs) {
       snap.stalled = true;
       snap.stop = true;
       snap.hint = job.stalledReports === 1
-        ? `STOP. No result or progress for ${Math.round(quiet / 1000)}s: the Figma plugin is frozen on a heavy operation (usually a page-wide scan). Do not call figma_job_status again and do not rerun the script. Reply to the user now: ask them to look at Figma (close or reload the plugin, Ctrl+Alt+P) and tell you when it is back; then continue with a smaller, section-scoped step.`
+        ? `STOP. No result or progress for ${Math.round(quiet / 1000)}s: the Figma plugin is frozen on a heavy operation (usually a page-wide scan). Do not call figma_job_status again and do not rerun the script (if it still finishes, the next Mokido call reports it in late_result). Reply to the user now: ask them to look at Figma (close or reload the plugin, Ctrl+Alt+P) and tell you when it is back; then continue with a smaller, section-scoped step.`
         : "Already reported as stalled. Do not poll again: write your reply to the user (check Figma, reload the plugin) and wait for their answer.";
     }
     return snap;
@@ -307,8 +307,10 @@ async function readJobSnapshot(id, waitMs) {
   // Lost or expired jobs stay (marked told): the plugin may still answer, and its
   // answer then replaces the guess. Everything else is read once and forgotten.
   if (isUnknownOutcome(job)) job.claimed = true; else jobs.delete(job.id);
-  if (job.status === "error") return { ok: false, status: "error", job_id: job.id, code: job.code, error: job.error, ...errorLocation(job) };
-  return { ok: true, status: "done", job_id: job.id, response: job.result, script: job.script || null, target: job.target || null };
+  // late: it was shown as stalled and then answered after all.
+  const late = job.stalledReports > 0 && !isUnknownOutcome(job) ? { late: true } : {};
+  if (job.status === "error") return { ok: false, status: "error", job_id: job.id, code: job.code, error: job.error, ...errorLocation(job), ...late };
+  return { ok: true, status: "done", job_id: job.id, response: job.result, script: job.script || null, target: job.target || null, ...late };
 }
 
-module.exports = { jobs, jobWaiters, JOBS_MAX, touchJob, sweepJobs, takeLate, waitForJob, errorLocation, settleCommand, findBusyJob, failCommandsOfClient, readJobSnapshot };
+module.exports = { jobs, jobWaiters, JOBS_MAX, touchJob, sweepJobs, takeLate, quietMs, waitForJob, errorLocation, settleCommand, findBusyJob, failCommandsOfClient, readJobSnapshot };

@@ -19,6 +19,7 @@ const BASE_ENV = {
   FIGMA_API_KEY: "",
   FIGMA_MCP_LEGACY_TOOLS: "",
   FIGMA_MCP_NO_UPDATE_CHECK: "1",
+  FIGMA_MCP_LOG_FILE: "0", // the process journal must not litter the shared temp dir
   FIGMA_MCP_ESCALATE_MS: "400",
   FIGMA_MCP_TIMEOUT_MS: "4000",
   FIGMA_MCP_TIMEOUT_FAST_MS: "4000",

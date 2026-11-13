@@ -6,6 +6,7 @@ const { isAuthorized, isOriginAllowed } = require("./auth");
 const { jobs, settleCommand, errorLocation, failCommandsOfClient, readJobSnapshot, takeLate } = require("./jobs");
 const { tryBecomeMaster, attachServer } = require("./master");
 const { sendCommandToPlugin, listTargets } = require("./dispatch");
+const { logExit, logRole } = require("./journal");
 
 // Encode unmasked text frame (Server -> Client) as per RFC 6455
 function encodeWsFrame(data) {
@@ -419,6 +420,7 @@ const bridgeServer = http.createServer((req, res) => {
   res.end();
 });
 attachServer(bridgeServer);
+bridgeServer.on("listening", () => logRole("master"));
 
 // Attach WebSocket Upgrade Handler
 bridgeServer.on("upgrade", (req, socket, head) => {
@@ -434,6 +436,7 @@ bridgeServer.on("error", (err) => {
   if (err.code === "EADDRINUSE") {
     state.isBridgeMaster = false;
     state.listenAttemptInFlight = false;
+    logRole("proxy");
     console.error(`[Mokido] Port ${BRIDGE_PORT} is already in use. Forwarding commands to existing bridge instance.`);
   } else {
     console.error(`[Mokido] Server error:`, err);
@@ -450,16 +453,17 @@ function startBridge() {
   if (masterWatchdog.unref) masterWatchdog.unref();
 
   let exiting = false;
-  const cleanup = () => {
+  const cleanup = (reason) => {
     if (exiting) return;
     exiting = true;
+    logExit(reason);
     try { bridgeServer.close(); } catch (e) {}
     process.exit(0);
   };
-  process.on("SIGINT", cleanup);
-  process.on("SIGTERM", cleanup);
-  process.stdin.on("end", cleanup);
-  process.stdin.on("close", cleanup);
+  process.on("SIGINT", () => cleanup("SIGINT"));
+  process.on("SIGTERM", () => cleanup("SIGTERM"));
+  process.stdin.on("end", () => cleanup("stdin closed"));
+  process.stdin.on("close", () => cleanup("stdin closed"));
 
   // The server must not outlive its MCP session: an orphan keeps :8765 and the
   // plugin socket, so live sessions proxy into a dead one. stdin end covers the
@@ -476,7 +480,7 @@ function startBridge() {
       }
       if (gone) {
         console.error(`[Mokido] Parent process ${parentPid} is gone, exiting.`);
-        cleanup();
+        cleanup("parent process gone");
       }
     }, parentCheckMs);
     if (parentWatchdog.unref) parentWatchdog.unref();
