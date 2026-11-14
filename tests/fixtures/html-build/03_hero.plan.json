@@ -1,0 +1,551 @@
+{
+ "root": {
+  "id": "p10",
+  "dom": 10,
+  "name": "body",
+  "type": "FRAME",
+  "x": 0,
+  "y": 0,
+  "w": 390,
+  "h": 700,
+  "visible": true,
+  "layoutMode": "VERTICAL",
+  "layoutWrap": "NO_WRAP",
+  "itemSpacing": 20,
+  "counterAxisSpacing": 0,
+  "padding": [
+   32,
+   24,
+   32,
+   24
+  ],
+  "primaryAxisAlignItems": "MIN",
+  "counterAxisAlignItems": "MIN",
+  "sizingH": "FIXED",
+  "sizingV": "FIXED",
+  "positioning": "AUTO",
+  "opacity": 1,
+  "clips": false,
+  "fills": [
+   {
+    "type": "GRADIENT_LINEAR",
+    "hex": "#101828",
+    "opacity": 1,
+    "var": null
+   }
+  ],
+  "strokes": [],
+  "strokeWeight": 0,
+  "radius": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "effects": [],
+  "bound": {},
+  "component": null,
+  "text": null,
+  "build": {
+   "gradient": "linear-gradient(to bottom, #101828, rgba(16, 24, 40, 0.5) 60%, #ffffff00)"
+  },
+  "children": [
+   {
+    "id": "p1",
+    "dom": 1,
+    "name": "logo",
+    "type": "SVG",
+    "x": 24,
+    "y": 32,
+    "w": 120,
+    "h": 32,
+    "visible": true,
+    "layoutMode": "NONE",
+    "layoutWrap": "NO_WRAP",
+    "itemSpacing": 0,
+    "counterAxisSpacing": 0,
+    "padding": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "primaryAxisAlignItems": "MIN",
+    "counterAxisAlignItems": "MIN",
+    "sizingH": "FIXED",
+    "sizingV": "FIXED",
+    "positioning": "AUTO",
+    "opacity": 1,
+    "clips": false,
+    "fills": [],
+    "strokes": [],
+    "strokeWeight": 0,
+    "radius": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "effects": [],
+    "bound": {},
+    "component": null,
+    "text": null,
+    "build": {
+     "svg": "<svg width=\"120\" height=\"32\" viewBox=\"0 0 120 32\"><rect width=\"120\" height=\"32\" fill=\"#fff\"/></svg>"
+    },
+    "children": []
+   },
+   {
+    "id": "p2",
+    "dom": 2,
+    "name": "broken",
+    "type": "SVG",
+    "x": 24,
+    "y": 84,
+    "w": 40,
+    "h": 40,
+    "visible": true,
+    "layoutMode": "NONE",
+    "layoutWrap": "NO_WRAP",
+    "itemSpacing": 0,
+    "counterAxisSpacing": 0,
+    "padding": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "primaryAxisAlignItems": "MIN",
+    "counterAxisAlignItems": "MIN",
+    "sizingH": "FIXED",
+    "sizingV": "FIXED",
+    "positioning": "AUTO",
+    "opacity": 1,
+    "clips": false,
+    "fills": [],
+    "strokes": [],
+    "strokeWeight": 0,
+    "radius": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "effects": [],
+    "bound": {},
+    "component": null,
+    "text": null,
+    "build": {
+     "svg": "<svg BADSVG/>"
+    },
+    "children": []
+   },
+   {
+    "id": "p3",
+    "dom": 3,
+    "name": "corrupt",
+    "type": "IMAGE",
+    "x": 24,
+    "y": 144,
+    "w": 100,
+    "h": 100,
+    "visible": true,
+    "layoutMode": "NONE",
+    "layoutWrap": "NO_WRAP",
+    "itemSpacing": 0,
+    "counterAxisSpacing": 0,
+    "padding": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "primaryAxisAlignItems": "MIN",
+    "counterAxisAlignItems": "MIN",
+    "sizingH": "FIXED",
+    "sizingV": "FIXED",
+    "positioning": "AUTO",
+    "opacity": 1,
+    "clips": false,
+    "fills": [
+     {
+      "type": "IMAGE",
+      "hex": null,
+      "opacity": 1,
+      "var": null
+     }
+    ],
+    "strokes": [],
+    "strokeWeight": 0,
+    "radius": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "effects": [],
+    "bound": {},
+    "component": null,
+    "text": null,
+    "build": {
+     "img": "data:image/png;base64,AAAA"
+    },
+    "children": []
+   },
+   {
+    "id": "p4",
+    "dom": 4,
+    "name": "svg-data",
+    "type": "IMAGE",
+    "x": 24,
+    "y": 264,
+    "w": 24,
+    "h": 24,
+    "visible": true,
+    "layoutMode": "NONE",
+    "layoutWrap": "NO_WRAP",
+    "itemSpacing": 0,
+    "counterAxisSpacing": 0,
+    "padding": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "primaryAxisAlignItems": "MIN",
+    "counterAxisAlignItems": "MIN",
+    "sizingH": "FIXED",
+    "sizingV": "FIXED",
+    "positioning": "AUTO",
+    "opacity": 1,
+    "clips": false,
+    "fills": [],
+    "strokes": [],
+    "strokeWeight": 0,
+    "radius": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "effects": [],
+    "bound": {},
+    "component": null,
+    "text": null,
+    "build": {
+     "img": "data:image/svg+xml;utf8,%3Csvg%20width%3D%2224%22%20height%3D%2224%22%3E%3C%2Fsvg%3E"
+    },
+    "children": []
+   },
+   {
+    "id": "p7",
+    "dom": 7,
+    "name": "chip row",
+    "type": "FRAME",
+    "x": 24,
+    "y": 308,
+    "w": 342,
+    "h": 40,
+    "visible": true,
+    "layoutMode": "HORIZONTAL",
+    "layoutWrap": "NO_WRAP",
+    "itemSpacing": 8,
+    "counterAxisSpacing": 0,
+    "padding": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "primaryAxisAlignItems": "MIN",
+    "counterAxisAlignItems": "BASELINE",
+    "sizingH": "FILL",
+    "sizingV": "HUG",
+    "positioning": "AUTO",
+    "opacity": 1,
+    "clips": false,
+    "fills": [
+     {
+      "type": "GRADIENT_LINEAR",
+      "hex": "#ff957a",
+      "opacity": 0.5,
+      "var": null
+     }
+    ],
+    "strokes": [],
+    "strokeWeight": 0,
+    "radius": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "effects": [],
+    "bound": {},
+    "component": null,
+    "text": null,
+    "build": {
+     "gradient": "linear-gradient(to right, #ff957a, #ffb08f, #ffd7c2)"
+    },
+    "children": [
+     {
+      "id": "p5",
+      "dom": 5,
+      "name": "hidden",
+      "type": "TEXT",
+      "x": 24,
+      "y": 308,
+      "w": 40,
+      "h": 20,
+      "visible": false,
+      "layoutMode": "NONE",
+      "layoutWrap": "NO_WRAP",
+      "itemSpacing": 0,
+      "counterAxisSpacing": 0,
+      "padding": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "primaryAxisAlignItems": "MIN",
+      "counterAxisAlignItems": "MIN",
+      "sizingH": "HUG",
+      "sizingV": "HUG",
+      "positioning": "AUTO",
+      "opacity": 1,
+      "clips": false,
+      "fills": [
+       {
+        "type": "SOLID",
+        "hex": "#1d1a18",
+        "opacity": 1,
+        "var": null
+       }
+      ],
+      "strokes": [],
+      "strokeWeight": 0,
+      "radius": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "effects": [],
+      "bound": {},
+      "component": null,
+      "text": {
+       "characters": "hid",
+       "fontFamily": "Inter",
+       "fontStyle": "Regular",
+       "fontSize": 16,
+       "lineHeight": 24,
+       "styleName": null,
+       "align": "LEFT",
+       "autoResize": "WIDTH_AND_HEIGHT",
+       "ranges": []
+      },
+      "build": {},
+      "children": []
+     },
+     {
+      "id": "p6",
+      "dom": 6,
+      "name": "chip",
+      "type": "TEXT",
+      "x": 72,
+      "y": 308,
+      "w": 80,
+      "h": 20,
+      "visible": true,
+      "layoutMode": "NONE",
+      "layoutWrap": "NO_WRAP",
+      "itemSpacing": 0,
+      "counterAxisSpacing": 0,
+      "padding": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "primaryAxisAlignItems": "MIN",
+      "counterAxisAlignItems": "MIN",
+      "sizingH": "HUG",
+      "sizingV": "HUG",
+      "positioning": "AUTO",
+      "opacity": 0.5,
+      "clips": false,
+      "fills": [
+       {
+        "type": "SOLID",
+        "hex": "#1d1a18",
+        "opacity": 1,
+        "var": null
+       }
+      ],
+      "strokes": [],
+      "strokeWeight": 0,
+      "radius": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "effects": [],
+      "bound": {},
+      "component": null,
+      "text": {
+       "characters": "Chip",
+       "fontFamily": "Inter",
+       "fontStyle": "Regular",
+       "fontSize": 16,
+       "lineHeight": 24,
+       "styleName": null,
+       "align": "LEFT",
+       "autoResize": "WIDTH_AND_HEIGHT",
+       "ranges": []
+      },
+      "build": {},
+      "children": []
+     }
+    ]
+   },
+   {
+    "id": "p8",
+    "dom": 8,
+    "name": "fancy",
+    "type": "TEXT",
+    "x": 24,
+    "y": 368,
+    "w": 342,
+    "h": 30,
+    "visible": true,
+    "layoutMode": "NONE",
+    "layoutWrap": "NO_WRAP",
+    "itemSpacing": 0,
+    "counterAxisSpacing": 0,
+    "padding": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "primaryAxisAlignItems": "MIN",
+    "counterAxisAlignItems": "MIN",
+    "sizingH": "FILL",
+    "sizingV": "HUG",
+    "positioning": "AUTO",
+    "opacity": 1,
+    "clips": false,
+    "fills": [
+     {
+      "type": "SOLID",
+      "hex": "#1d1a18",
+      "opacity": 1,
+      "var": null
+     }
+    ],
+    "strokes": [],
+    "strokeWeight": 0,
+    "radius": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "effects": [],
+    "bound": {},
+    "component": null,
+    "text": {
+     "characters": "Шрифт, которого нет",
+     "fontFamily": "Fancy Sans",
+     "fontStyle": "Black",
+     "fontSize": 24,
+     "lineHeight": 30,
+     "styleName": null,
+     "align": "LEFT",
+     "autoResize": "HEIGHT",
+     "ranges": [
+      {
+       "start": 0,
+       "end": 5,
+       "fontStyle": "Bold",
+       "hex": "#ff957a",
+       "fontSize": null,
+       "decoration": null
+      },
+      {
+       "start": 15,
+       "end": 999,
+       "fontStyle": null,
+       "hex": "#ffffff",
+       "fontSize": 18,
+       "decoration": null
+      }
+     ]
+    },
+    "build": {},
+    "children": []
+   },
+   {
+    "id": "p9",
+    "dom": 9,
+    "name": "divider",
+    "type": "RECTANGLE",
+    "x": 24,
+    "y": 418,
+    "w": 342,
+    "h": 1,
+    "visible": true,
+    "layoutMode": "NONE",
+    "layoutWrap": "NO_WRAP",
+    "itemSpacing": 0,
+    "counterAxisSpacing": 0,
+    "padding": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "primaryAxisAlignItems": "MIN",
+    "counterAxisAlignItems": "MIN",
+    "sizingH": "FILL",
+    "sizingV": "FIXED",
+    "positioning": "AUTO",
+    "opacity": 1,
+    "clips": false,
+    "fills": [
+     {
+      "type": "SOLID",
+      "hex": "#ffffff",
+      "opacity": 0.2,
+      "var": null
+     }
+    ],
+    "strokes": [],
+    "strokeWeight": 0,
+    "radius": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "effects": [],
+    "bound": {},
+    "component": null,
+    "text": null,
+    "build": {},
+    "children": []
+   }
+  ]
+ },
+ "count": 10,
+ "warnings": [],
+ "stats": {
+  "frames": 2,
+  "auto_layout": 2,
+  "absolute": 0,
+  "collapsed": 0,
+  "text": 3
+ }
+}

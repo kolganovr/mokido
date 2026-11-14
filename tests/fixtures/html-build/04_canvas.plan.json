@@ -1,0 +1,381 @@
+{
+ "root": {
+  "id": "p7",
+  "dom": 7,
+  "name": "body",
+  "type": "FRAME",
+  "x": 0,
+  "y": 0,
+  "w": 600,
+  "h": 400,
+  "visible": true,
+  "layoutMode": "NONE",
+  "layoutWrap": "NO_WRAP",
+  "itemSpacing": 0,
+  "counterAxisSpacing": 0,
+  "padding": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "primaryAxisAlignItems": "MIN",
+  "counterAxisAlignItems": "MIN",
+  "sizingH": "FIXED",
+  "sizingV": "FIXED",
+  "positioning": "AUTO",
+  "opacity": 1,
+  "clips": true,
+  "fills": [
+   {
+    "type": "SOLID",
+    "hex": "#ffffff",
+    "opacity": 1,
+    "var": null
+   }
+  ],
+  "strokes": [],
+  "strokeWeight": 0,
+  "radius": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "effects": [],
+  "bound": {},
+  "component": null,
+  "text": null,
+  "build": {},
+  "children": [
+   {
+    "id": "p1",
+    "dom": 1,
+    "name": "bar",
+    "type": "RECTANGLE",
+    "x": 20,
+    "y": 20,
+    "w": 200,
+    "h": 12,
+    "visible": true,
+    "layoutMode": "NONE",
+    "layoutWrap": "NO_WRAP",
+    "itemSpacing": 0,
+    "counterAxisSpacing": 0,
+    "padding": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "primaryAxisAlignItems": "MIN",
+    "counterAxisAlignItems": "MIN",
+    "sizingH": "FILL",
+    "sizingV": "FIXED",
+    "positioning": "AUTO",
+    "opacity": 1,
+    "clips": false,
+    "fills": [
+     {
+      "type": "SOLID",
+      "hex": "#ff957a",
+      "opacity": 1,
+      "var": null
+     }
+    ],
+    "strokes": [],
+    "strokeWeight": 0,
+    "radius": [
+     6,
+     6,
+     6,
+     6
+    ],
+    "effects": [],
+    "bound": {},
+    "component": null,
+    "text": null,
+    "build": {},
+    "children": []
+   },
+   {
+    "id": "p3",
+    "dom": 3,
+    "name": "panel",
+    "type": "FRAME",
+    "x": 40,
+    "y": 60,
+    "w": 300,
+    "h": 200,
+    "visible": true,
+    "layoutMode": "NONE",
+    "layoutWrap": "NO_WRAP",
+    "itemSpacing": 0,
+    "counterAxisSpacing": 0,
+    "padding": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "primaryAxisAlignItems": "MIN",
+    "counterAxisAlignItems": "MIN",
+    "sizingH": "FIXED",
+    "sizingV": "FIXED",
+    "positioning": "AUTO",
+    "opacity": 1,
+    "clips": false,
+    "fills": [
+     {
+      "type": "SOLID",
+      "hex": "#f1ece7",
+      "opacity": 1,
+      "var": null
+     }
+    ],
+    "strokes": [
+     {
+      "type": "SOLID",
+      "hex": "#d6cfc8",
+      "opacity": 1,
+      "var": null
+     }
+    ],
+    "strokeWeight": 1,
+    "radius": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "effects": [],
+    "bound": {},
+    "component": null,
+    "text": null,
+    "build": {
+     "strokeSides": [
+      1,
+      0,
+      1,
+      0
+     ]
+    },
+    "children": [
+     {
+      "id": "p2",
+      "dom": 2,
+      "name": "lab",
+      "type": "TEXT",
+      "x": 56,
+      "y": 76,
+      "w": 100,
+      "h": 20,
+      "visible": true,
+      "layoutMode": "NONE",
+      "layoutWrap": "NO_WRAP",
+      "itemSpacing": 0,
+      "counterAxisSpacing": 0,
+      "padding": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "primaryAxisAlignItems": "MIN",
+      "counterAxisAlignItems": "MIN",
+      "sizingH": "HUG",
+      "sizingV": "HUG",
+      "positioning": "AUTO",
+      "opacity": 1,
+      "clips": false,
+      "fills": [
+       {
+        "type": "SOLID",
+        "hex": "#1d1a18",
+        "opacity": 1,
+        "var": null
+       }
+      ],
+      "strokes": [],
+      "strokeWeight": 0,
+      "radius": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "effects": [],
+      "bound": {},
+      "component": null,
+      "text": {
+       "characters": "Absolute",
+       "fontFamily": "Inter",
+       "fontStyle": "Regular",
+       "fontSize": 14,
+       "lineHeight": 24,
+       "styleName": null,
+       "align": "CENTER",
+       "autoResize": "WIDTH_AND_HEIGHT",
+       "ranges": []
+      },
+      "build": {},
+      "children": []
+     }
+    ]
+   },
+   {
+    "id": "p6",
+    "dom": 6,
+    "name": "stack",
+    "type": "FRAME",
+    "x": 360,
+    "y": 60,
+    "w": 200,
+    "h": 100,
+    "visible": true,
+    "layoutMode": "VERTICAL",
+    "layoutWrap": "NO_WRAP",
+    "itemSpacing": 4,
+    "counterAxisSpacing": 0,
+    "padding": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "primaryAxisAlignItems": "MIN",
+    "counterAxisAlignItems": "MIN",
+    "sizingH": "FIXED",
+    "sizingV": "FIXED",
+    "positioning": "AUTO",
+    "opacity": 1,
+    "clips": false,
+    "fills": [],
+    "strokes": [],
+    "strokeWeight": 0,
+    "radius": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "effects": [],
+    "bound": {},
+    "component": null,
+    "text": null,
+    "build": {},
+    "children": [
+     {
+      "id": "p4",
+      "dom": 4,
+      "name": "hugrect",
+      "type": "RECTANGLE",
+      "x": 360,
+      "y": 60,
+      "w": 200,
+      "h": 20,
+      "visible": true,
+      "layoutMode": "NONE",
+      "layoutWrap": "NO_WRAP",
+      "itemSpacing": 0,
+      "counterAxisSpacing": 0,
+      "padding": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "primaryAxisAlignItems": "MIN",
+      "counterAxisAlignItems": "MIN",
+      "sizingH": "HUG",
+      "sizingV": "FIXED",
+      "positioning": "AUTO",
+      "opacity": 1,
+      "clips": false,
+      "fills": [
+       {
+        "type": "SOLID",
+        "hex": "#000000",
+        "opacity": 0.1,
+        "var": null
+       }
+      ],
+      "strokes": [],
+      "strokeWeight": 0,
+      "radius": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "effects": [],
+      "bound": {},
+      "component": null,
+      "text": null,
+      "build": {},
+      "children": []
+     },
+     {
+      "id": "p5",
+      "dom": 5,
+      "name": "plainframe",
+      "type": "FRAME",
+      "x": 360,
+      "y": 84,
+      "w": 200,
+      "h": 20,
+      "visible": true,
+      "layoutMode": "NONE",
+      "layoutWrap": "NO_WRAP",
+      "itemSpacing": 0,
+      "counterAxisSpacing": 0,
+      "padding": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "primaryAxisAlignItems": "MIN",
+      "counterAxisAlignItems": "MIN",
+      "sizingH": "HUG",
+      "sizingV": "HUG",
+      "positioning": "AUTO",
+      "opacity": 1,
+      "clips": false,
+      "fills": [
+       {
+        "type": "SOLID",
+        "hex": "#000000",
+        "opacity": 0.2,
+        "var": null
+       }
+      ],
+      "strokes": [],
+      "strokeWeight": 0,
+      "radius": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "effects": [],
+      "bound": {},
+      "component": null,
+      "text": null,
+      "build": {},
+      "children": []
+     }
+    ]
+   }
+  ]
+ },
+ "count": 7,
+ "warnings": [],
+ "stats": {
+  "frames": 4,
+  "auto_layout": 1,
+  "absolute": 0,
+  "collapsed": 0,
+  "text": 1
+ }
+}

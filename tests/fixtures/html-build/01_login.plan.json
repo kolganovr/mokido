@@ -1,0 +1,1223 @@
+{
+ "root": {
+  "id": "p22",
+  "dom": 22,
+  "name": "body",
+  "type": "FRAME",
+  "x": 0,
+  "y": 0,
+  "w": 1440,
+  "h": 900,
+  "visible": true,
+  "layoutMode": "HORIZONTAL",
+  "layoutWrap": "NO_WRAP",
+  "itemSpacing": 0,
+  "counterAxisSpacing": 0,
+  "padding": [
+   48,
+   48,
+   48,
+   48
+  ],
+  "primaryAxisAlignItems": "CENTER",
+  "counterAxisAlignItems": "CENTER",
+  "sizingH": "FIXED",
+  "sizingV": "FIXED",
+  "positioning": "AUTO",
+  "opacity": 1,
+  "clips": false,
+  "fills": [
+   {
+    "type": "SOLID",
+    "hex": "#faf8f6",
+    "opacity": 1,
+    "var": null
+   }
+  ],
+  "strokes": [],
+  "strokeWeight": 0,
+  "radius": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "effects": [],
+  "bound": {},
+  "component": null,
+  "text": null,
+  "build": {},
+  "children": [
+   {
+    "id": "p21",
+    "dom": 21,
+    "name": "Login card",
+    "type": "FRAME",
+    "x": 510,
+    "y": 176,
+    "w": 420,
+    "h": 548,
+    "visible": true,
+    "layoutMode": "VERTICAL",
+    "layoutWrap": "NO_WRAP",
+    "itemSpacing": 24,
+    "counterAxisSpacing": 0,
+    "padding": [
+     32,
+     32,
+     32,
+     32
+    ],
+    "primaryAxisAlignItems": "MIN",
+    "counterAxisAlignItems": "MIN",
+    "sizingH": "FIXED",
+    "sizingV": "HUG",
+    "positioning": "AUTO",
+    "opacity": 1,
+    "clips": false,
+    "fills": [
+     {
+      "type": "SOLID",
+      "hex": "#ffffff",
+      "opacity": 1,
+      "var": null
+     }
+    ],
+    "strokes": [
+     {
+      "type": "SOLID",
+      "hex": "#e8e2dc",
+      "opacity": 1,
+      "var": null
+     }
+    ],
+    "strokeWeight": 1,
+    "radius": [
+     16,
+     16,
+     16,
+     16
+    ],
+    "effects": [
+     {
+      "type": "DROP_SHADOW",
+      "radius": 24,
+      "offset": [
+       0,
+       8
+      ],
+      "hex": "#1d1a18",
+      "spread": 0,
+      "opacity": 0.12
+     }
+    ],
+    "bound": {},
+    "component": null,
+    "text": null,
+    "build": {
+     "strokeSides": [
+      1,
+      1,
+      1,
+      1
+     ]
+    },
+    "children": [
+     {
+      "id": "p4",
+      "dom": 4,
+      "name": "brand",
+      "type": "FRAME",
+      "x": 543,
+      "y": 209,
+      "w": 354,
+      "h": 32,
+      "visible": true,
+      "layoutMode": "HORIZONTAL",
+      "layoutWrap": "NO_WRAP",
+      "itemSpacing": 8,
+      "counterAxisSpacing": 0,
+      "padding": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "primaryAxisAlignItems": "MIN",
+      "counterAxisAlignItems": "CENTER",
+      "sizingH": "FILL",
+      "sizingV": "HUG",
+      "positioning": "AUTO",
+      "opacity": 1,
+      "clips": false,
+      "fills": [],
+      "strokes": [],
+      "strokeWeight": 0,
+      "radius": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "effects": [],
+      "bound": {},
+      "component": null,
+      "text": null,
+      "build": {},
+      "children": [
+       {
+        "id": "p2",
+        "dom": 2,
+        "name": "mark",
+        "type": "FRAME",
+        "x": 543,
+        "y": 209,
+        "w": 32,
+        "h": 32,
+        "visible": true,
+        "layoutMode": "HORIZONTAL",
+        "layoutWrap": "NO_WRAP",
+        "itemSpacing": 0,
+        "counterAxisSpacing": 0,
+        "padding": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "primaryAxisAlignItems": "CENTER",
+        "counterAxisAlignItems": "CENTER",
+        "sizingH": "FIXED",
+        "sizingV": "FIXED",
+        "positioning": "AUTO",
+        "opacity": 1,
+        "clips": false,
+        "fills": [
+         {
+          "type": "SOLID",
+          "hex": "#ff957a",
+          "opacity": 1,
+          "var": null
+         }
+        ],
+        "strokes": [],
+        "strokeWeight": 0,
+        "radius": [
+         8,
+         8,
+         8,
+         8
+        ],
+        "effects": [],
+        "bound": {},
+        "component": null,
+        "text": null,
+        "build": {},
+        "children": [
+         {
+          "id": "p1",
+          "dom": 1,
+          "name": "icon",
+          "type": "SVG",
+          "x": 550,
+          "y": 216,
+          "w": 18,
+          "h": 18,
+          "visible": true,
+          "layoutMode": "NONE",
+          "layoutWrap": "NO_WRAP",
+          "itemSpacing": 0,
+          "counterAxisSpacing": 0,
+          "padding": [
+           0,
+           0,
+           0,
+           0
+          ],
+          "primaryAxisAlignItems": "MIN",
+          "counterAxisAlignItems": "MIN",
+          "sizingH": "FIXED",
+          "sizingV": "FIXED",
+          "positioning": "AUTO",
+          "opacity": 1,
+          "clips": false,
+          "fills": [],
+          "strokes": [],
+          "strokeWeight": 0,
+          "radius": [
+           0,
+           0,
+           0,
+           0
+          ],
+          "effects": [],
+          "bound": {},
+          "component": null,
+          "text": null,
+          "build": {
+           "svg": "<svg width=\"18\" height=\"18\" viewBox=\"0 0 18 18\"><path d=\"M3 9l4 4 8-8\" stroke=\"#fff\"/></svg>"
+          },
+          "children": []
+         }
+        ]
+       },
+       {
+        "id": "p3",
+        "dom": 3,
+        "name": "Etalon",
+        "type": "TEXT",
+        "x": 583,
+        "y": 211,
+        "w": 60,
+        "h": 28,
+        "visible": true,
+        "layoutMode": "NONE",
+        "layoutWrap": "NO_WRAP",
+        "itemSpacing": 0,
+        "counterAxisSpacing": 0,
+        "padding": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "primaryAxisAlignItems": "MIN",
+        "counterAxisAlignItems": "MIN",
+        "sizingH": "HUG",
+        "sizingV": "HUG",
+        "positioning": "AUTO",
+        "opacity": 1,
+        "clips": false,
+        "fills": [
+         {
+          "type": "SOLID",
+          "hex": "#1d1a18",
+          "opacity": 1,
+          "var": null
+         }
+        ],
+        "strokes": [],
+        "strokeWeight": 0,
+        "radius": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "effects": [],
+        "bound": {},
+        "component": null,
+        "text": {
+         "characters": "Etalon",
+         "fontFamily": "Inter",
+         "fontStyle": "Bold",
+         "fontSize": 20,
+         "lineHeight": 28,
+         "styleName": null,
+         "align": "LEFT",
+         "autoResize": "WIDTH_AND_HEIGHT",
+         "ranges": []
+        },
+        "build": {},
+        "children": []
+       }
+      ]
+     },
+     {
+      "id": "p7",
+      "dom": 7,
+      "name": "head",
+      "type": "FRAME",
+      "x": 543,
+      "y": 265,
+      "w": 354,
+      "h": 84,
+      "visible": true,
+      "layoutMode": "VERTICAL",
+      "layoutWrap": "NO_WRAP",
+      "itemSpacing": 8,
+      "counterAxisSpacing": 0,
+      "padding": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "primaryAxisAlignItems": "MIN",
+      "counterAxisAlignItems": "MIN",
+      "sizingH": "FILL",
+      "sizingV": "HUG",
+      "positioning": "AUTO",
+      "opacity": 1,
+      "clips": false,
+      "fills": [],
+      "strokes": [],
+      "strokeWeight": 0,
+      "radius": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "effects": [],
+      "bound": {},
+      "component": null,
+      "text": null,
+      "build": {},
+      "children": [
+       {
+        "id": "p5",
+        "dom": 5,
+        "name": "Sign in",
+        "type": "TEXT",
+        "x": 543,
+        "y": 265,
+        "w": 354,
+        "h": 36,
+        "visible": true,
+        "layoutMode": "NONE",
+        "layoutWrap": "NO_WRAP",
+        "itemSpacing": 0,
+        "counterAxisSpacing": 0,
+        "padding": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "primaryAxisAlignItems": "MIN",
+        "counterAxisAlignItems": "MIN",
+        "sizingH": "FILL",
+        "sizingV": "HUG",
+        "positioning": "AUTO",
+        "opacity": 1,
+        "clips": false,
+        "fills": [
+         {
+          "type": "SOLID",
+          "hex": "#1d1a18",
+          "opacity": 1,
+          "var": null
+         }
+        ],
+        "strokes": [],
+        "strokeWeight": 0,
+        "radius": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "effects": [],
+        "bound": {},
+        "component": null,
+        "text": {
+         "characters": "Sign in",
+         "fontFamily": "Inter",
+         "fontStyle": "Semi Bold",
+         "fontSize": 28,
+         "lineHeight": 36,
+         "styleName": null,
+         "align": "LEFT",
+         "autoResize": "HEIGHT",
+         "ranges": []
+        },
+        "build": {},
+        "children": []
+       },
+       {
+        "id": "p6",
+        "dom": 6,
+        "name": "lead",
+        "type": "TEXT",
+        "x": 543,
+        "y": 309,
+        "w": 354,
+        "h": 40,
+        "visible": true,
+        "layoutMode": "NONE",
+        "layoutWrap": "NO_WRAP",
+        "itemSpacing": 0,
+        "counterAxisSpacing": 0,
+        "padding": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "primaryAxisAlignItems": "MIN",
+        "counterAxisAlignItems": "MIN",
+        "sizingH": "FILL",
+        "sizingV": "HUG",
+        "positioning": "AUTO",
+        "opacity": 1,
+        "clips": false,
+        "fills": [
+         {
+          "type": "SOLID",
+          "hex": "#6f6862",
+          "opacity": 1,
+          "var": null
+         }
+        ],
+        "strokes": [],
+        "strokeWeight": 0,
+        "radius": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "effects": [],
+        "bound": {},
+        "component": null,
+        "text": {
+         "characters": "Войдите, чтобы продолжить работу в Etalon.",
+         "fontFamily": "Inter",
+         "fontStyle": "Regular",
+         "fontSize": 14,
+         "lineHeight": 20,
+         "styleName": null,
+         "align": "LEFT",
+         "autoResize": "HEIGHT",
+         "ranges": [
+          {
+           "start": 35,
+           "end": 41,
+           "fontStyle": "Bold",
+           "hex": "#1d1a18",
+           "fontSize": null,
+           "decoration": null
+          }
+         ]
+        },
+        "build": {},
+        "children": []
+       }
+      ]
+     },
+     {
+      "id": "p20",
+      "dom": 20,
+      "name": "Login form",
+      "type": "FRAME",
+      "x": 543,
+      "y": 373,
+      "w": 354,
+      "h": 274,
+      "visible": true,
+      "layoutMode": "VERTICAL",
+      "layoutWrap": "NO_WRAP",
+      "itemSpacing": 16,
+      "counterAxisSpacing": 0,
+      "padding": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "primaryAxisAlignItems": "MIN",
+      "counterAxisAlignItems": "MIN",
+      "sizingH": "FILL",
+      "sizingV": "HUG",
+      "positioning": "AUTO",
+      "opacity": 1,
+      "clips": false,
+      "fills": [],
+      "strokes": [],
+      "strokeWeight": 0,
+      "radius": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "effects": [],
+      "bound": {},
+      "component": null,
+      "text": null,
+      "build": {},
+      "children": [
+       {
+        "id": "p11",
+        "dom": 11,
+        "name": "Input",
+        "type": "FRAME",
+        "x": 543,
+        "y": 373,
+        "w": 354,
+        "h": 78,
+        "visible": true,
+        "layoutMode": "VERTICAL",
+        "layoutWrap": "NO_WRAP",
+        "itemSpacing": 8,
+        "counterAxisSpacing": 0,
+        "padding": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "primaryAxisAlignItems": "MIN",
+        "counterAxisAlignItems": "MIN",
+        "sizingH": "FILL",
+        "sizingV": "HUG",
+        "positioning": "AUTO",
+        "opacity": 1,
+        "clips": false,
+        "fills": [],
+        "strokes": [],
+        "strokeWeight": 0,
+        "radius": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "effects": [],
+        "bound": {},
+        "component": null,
+        "text": null,
+        "build": {},
+        "children": [
+         {
+          "id": "p8",
+          "dom": 8,
+          "name": "Email",
+          "type": "TEXT",
+          "x": 543,
+          "y": 373,
+          "w": 354,
+          "h": 20,
+          "visible": true,
+          "layoutMode": "NONE",
+          "layoutWrap": "NO_WRAP",
+          "itemSpacing": 0,
+          "counterAxisSpacing": 0,
+          "padding": [
+           0,
+           0,
+           0,
+           0
+          ],
+          "primaryAxisAlignItems": "MIN",
+          "counterAxisAlignItems": "MIN",
+          "sizingH": "FILL",
+          "sizingV": "HUG",
+          "positioning": "AUTO",
+          "opacity": 1,
+          "clips": false,
+          "fills": [
+           {
+            "type": "SOLID",
+            "hex": "#1d1a18",
+            "opacity": 1,
+            "var": null
+           }
+          ],
+          "strokes": [],
+          "strokeWeight": 0,
+          "radius": [
+           0,
+           0,
+           0,
+           0
+          ],
+          "effects": [],
+          "bound": {},
+          "component": null,
+          "text": {
+           "characters": "Email",
+           "fontFamily": "Inter",
+           "fontStyle": "Medium",
+           "fontSize": 14,
+           "lineHeight": 20,
+           "styleName": null,
+           "align": "LEFT",
+           "autoResize": "HEIGHT",
+           "ranges": []
+          },
+          "build": {},
+          "children": []
+         },
+         {
+          "id": "p10",
+          "dom": 10,
+          "name": "field",
+          "type": "FRAME",
+          "x": 543,
+          "y": 401,
+          "w": 354,
+          "h": 50,
+          "visible": true,
+          "layoutMode": "HORIZONTAL",
+          "layoutWrap": "NO_WRAP",
+          "itemSpacing": 0,
+          "counterAxisSpacing": 0,
+          "padding": [
+           12,
+           14,
+           12,
+           14
+          ],
+          "primaryAxisAlignItems": "MIN",
+          "counterAxisAlignItems": "CENTER",
+          "sizingH": "FILL",
+          "sizingV": "HUG",
+          "positioning": "AUTO",
+          "opacity": 1,
+          "clips": true,
+          "fills": [
+           {
+            "type": "SOLID",
+            "hex": "#ffffff",
+            "opacity": 1,
+            "var": null
+           }
+          ],
+          "strokes": [
+           {
+            "type": "SOLID",
+            "hex": "#d6cfc8",
+            "opacity": 1,
+            "var": null
+           }
+          ],
+          "strokeWeight": 1,
+          "radius": [
+           10,
+           10,
+           10,
+           10
+          ],
+          "effects": [],
+          "bound": {},
+          "component": null,
+          "text": null,
+          "build": {
+           "strokeSides": [
+            1,
+            1,
+            1,
+            1
+           ]
+          },
+          "children": [
+           {
+            "id": "p9",
+            "dom": 9,
+            "name": "placeholder",
+            "type": "TEXT",
+            "x": 558,
+            "y": 414,
+            "w": 120,
+            "h": 24,
+            "visible": true,
+            "layoutMode": "NONE",
+            "layoutWrap": "NO_WRAP",
+            "itemSpacing": 0,
+            "counterAxisSpacing": 0,
+            "padding": [
+             0,
+             0,
+             0,
+             0
+            ],
+            "primaryAxisAlignItems": "MIN",
+            "counterAxisAlignItems": "MIN",
+            "sizingH": "HUG",
+            "sizingV": "HUG",
+            "positioning": "AUTO",
+            "opacity": 1,
+            "clips": false,
+            "fills": [
+             {
+              "type": "SOLID",
+              "hex": "#a39b94",
+              "opacity": 1,
+              "var": null
+             }
+            ],
+            "strokes": [],
+            "strokeWeight": 0,
+            "radius": [
+             0,
+             0,
+             0,
+             0
+            ],
+            "effects": [],
+            "bound": {},
+            "component": null,
+            "text": {
+             "characters": "you@example.com",
+             "fontFamily": "Inter",
+             "fontStyle": "Regular",
+             "fontSize": 16,
+             "lineHeight": 24,
+             "styleName": null,
+             "align": "LEFT",
+             "autoResize": "WIDTH_AND_HEIGHT",
+             "ranges": []
+            },
+            "build": {},
+            "children": []
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "id": "p14",
+        "dom": 14,
+        "name": "row",
+        "type": "FRAME",
+        "x": 543,
+        "y": 467,
+        "w": 354,
+        "h": 24,
+        "visible": true,
+        "layoutMode": "HORIZONTAL",
+        "layoutWrap": "NO_WRAP",
+        "itemSpacing": 0,
+        "counterAxisSpacing": 0,
+        "padding": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "primaryAxisAlignItems": "SPACE_BETWEEN",
+        "counterAxisAlignItems": "CENTER",
+        "sizingH": "FILL",
+        "sizingV": "HUG",
+        "positioning": "AUTO",
+        "opacity": 1,
+        "clips": false,
+        "fills": [],
+        "strokes": [],
+        "strokeWeight": 0,
+        "radius": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "effects": [],
+        "bound": {},
+        "component": null,
+        "text": null,
+        "build": {},
+        "children": [
+         {
+          "id": "p12",
+          "dom": 12,
+          "name": "remember",
+          "type": "TEXT",
+          "x": 543,
+          "y": 467,
+          "w": 110,
+          "h": 24,
+          "visible": true,
+          "layoutMode": "NONE",
+          "layoutWrap": "NO_WRAP",
+          "itemSpacing": 0,
+          "counterAxisSpacing": 0,
+          "padding": [
+           0,
+           0,
+           0,
+           0
+          ],
+          "primaryAxisAlignItems": "MIN",
+          "counterAxisAlignItems": "MIN",
+          "sizingH": "HUG",
+          "sizingV": "HUG",
+          "positioning": "AUTO",
+          "opacity": 1,
+          "clips": false,
+          "fills": [
+           {
+            "type": "SOLID",
+            "hex": "#1d1a18",
+            "opacity": 1,
+            "var": null
+           }
+          ],
+          "strokes": [],
+          "strokeWeight": 0,
+          "radius": [
+           0,
+           0,
+           0,
+           0
+          ],
+          "effects": [],
+          "bound": {},
+          "component": null,
+          "text": {
+           "characters": "Запомнить меня",
+           "fontFamily": "Inter",
+           "fontStyle": "Regular",
+           "fontSize": 14,
+           "lineHeight": 24,
+           "styleName": null,
+           "align": "LEFT",
+           "autoResize": "WIDTH_AND_HEIGHT",
+           "ranges": []
+          },
+          "build": {},
+          "children": []
+         },
+         {
+          "id": "p13",
+          "dom": 13,
+          "name": "forgot",
+          "type": "TEXT",
+          "x": 790,
+          "y": 467,
+          "w": 107,
+          "h": 24,
+          "visible": true,
+          "layoutMode": "NONE",
+          "layoutWrap": "NO_WRAP",
+          "itemSpacing": 0,
+          "counterAxisSpacing": 0,
+          "padding": [
+           0,
+           0,
+           0,
+           0
+          ],
+          "primaryAxisAlignItems": "MIN",
+          "counterAxisAlignItems": "MIN",
+          "sizingH": "HUG",
+          "sizingV": "HUG",
+          "positioning": "AUTO",
+          "opacity": 1,
+          "clips": false,
+          "fills": [
+           {
+            "type": "SOLID",
+            "hex": "#e0603f",
+            "opacity": 1,
+            "var": null
+           }
+          ],
+          "strokes": [],
+          "strokeWeight": 0,
+          "radius": [
+           0,
+           0,
+           0,
+           0
+          ],
+          "effects": [],
+          "bound": {},
+          "component": null,
+          "text": {
+           "characters": "Забыли пароль?",
+           "fontFamily": "Inter",
+           "fontStyle": "Regular",
+           "fontSize": 14,
+           "lineHeight": 24,
+           "styleName": null,
+           "align": "LEFT",
+           "autoResize": "WIDTH_AND_HEIGHT",
+           "ranges": [
+            {
+             "start": 0,
+             "end": 14,
+             "fontStyle": null,
+             "hex": null,
+             "fontSize": null,
+             "decoration": "UNDERLINE"
+            }
+           ]
+          },
+          "build": {},
+          "children": []
+         }
+        ]
+       },
+       {
+        "id": "p16",
+        "dom": 16,
+        "name": "Button",
+        "type": "FRAME",
+        "x": 543,
+        "y": 507,
+        "w": 354,
+        "h": 48,
+        "visible": true,
+        "layoutMode": "HORIZONTAL",
+        "layoutWrap": "NO_WRAP",
+        "itemSpacing": 0,
+        "counterAxisSpacing": 0,
+        "padding": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "primaryAxisAlignItems": "CENTER",
+        "counterAxisAlignItems": "CENTER",
+        "sizingH": "FILL",
+        "sizingV": "FIXED",
+        "positioning": "AUTO",
+        "opacity": 0.9,
+        "clips": false,
+        "fills": [
+         {
+          "type": "GRADIENT_LINEAR",
+          "hex": "#ff957a",
+          "opacity": 1,
+          "var": null
+         }
+        ],
+        "strokes": [],
+        "strokeWeight": 0,
+        "radius": [
+         10,
+         10,
+         10,
+         10
+        ],
+        "effects": [],
+        "bound": {},
+        "component": null,
+        "text": null,
+        "build": {
+         "gradient": "linear-gradient(135deg, #ff957a 0%, #e0603f 100%)",
+         "componentHint": {
+          "component": "Button",
+          "variant": "Kind=Primary"
+         }
+        },
+        "children": [
+         {
+          "id": "p15",
+          "dom": 15,
+          "name": "Войти",
+          "type": "TEXT",
+          "x": 680,
+          "y": 519,
+          "w": 80,
+          "h": 24,
+          "visible": true,
+          "layoutMode": "NONE",
+          "layoutWrap": "NO_WRAP",
+          "itemSpacing": 0,
+          "counterAxisSpacing": 0,
+          "padding": [
+           0,
+           0,
+           0,
+           0
+          ],
+          "primaryAxisAlignItems": "MIN",
+          "counterAxisAlignItems": "MIN",
+          "sizingH": "HUG",
+          "sizingV": "HUG",
+          "positioning": "AUTO",
+          "opacity": 1,
+          "clips": false,
+          "fills": [
+           {
+            "type": "SOLID",
+            "hex": "#ffffff",
+            "opacity": 1,
+            "var": null
+           }
+          ],
+          "strokes": [],
+          "strokeWeight": 0,
+          "radius": [
+           0,
+           0,
+           0,
+           0
+          ],
+          "effects": [],
+          "bound": {},
+          "component": null,
+          "text": {
+           "characters": "Войти",
+           "fontFamily": "Inter",
+           "fontStyle": "Semi Bold",
+           "fontSize": 16,
+           "lineHeight": 24,
+           "styleName": null,
+           "align": "LEFT",
+           "autoResize": "WIDTH_AND_HEIGHT",
+           "ranges": []
+          },
+          "build": {},
+          "children": []
+         }
+        ]
+       },
+       {
+        "id": "p19",
+        "dom": 19,
+        "name": "avatars",
+        "type": "FRAME",
+        "x": 543,
+        "y": 571,
+        "w": 354,
+        "h": 76,
+        "visible": true,
+        "layoutMode": "HORIZONTAL",
+        "layoutWrap": "NO_WRAP",
+        "itemSpacing": 12,
+        "counterAxisSpacing": 0,
+        "padding": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "primaryAxisAlignItems": "MIN",
+        "counterAxisAlignItems": "MIN",
+        "sizingH": "FILL",
+        "sizingV": "FIXED",
+        "positioning": "AUTO",
+        "opacity": 1,
+        "clips": false,
+        "fills": [],
+        "strokes": [],
+        "strokeWeight": 0,
+        "radius": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "effects": [],
+        "bound": {},
+        "component": null,
+        "text": null,
+        "build": {},
+        "children": [
+         {
+          "id": "p17",
+          "dom": 17,
+          "name": "avatar-data",
+          "type": "IMAGE",
+          "x": 543,
+          "y": 571,
+          "w": 48,
+          "h": 48,
+          "visible": true,
+          "layoutMode": "NONE",
+          "layoutWrap": "NO_WRAP",
+          "itemSpacing": 0,
+          "counterAxisSpacing": 0,
+          "padding": [
+           0,
+           0,
+           0,
+           0
+          ],
+          "primaryAxisAlignItems": "MIN",
+          "counterAxisAlignItems": "MIN",
+          "sizingH": "FIXED",
+          "sizingV": "FIXED",
+          "positioning": "AUTO",
+          "opacity": 1,
+          "clips": false,
+          "fills": [
+           {
+            "type": "IMAGE",
+            "hex": null,
+            "opacity": 1,
+            "var": null
+           }
+          ],
+          "strokes": [],
+          "strokeWeight": 0,
+          "radius": [
+           24,
+           24,
+           24,
+           24
+          ],
+          "effects": [],
+          "bound": {},
+          "component": null,
+          "text": null,
+          "build": {
+           "img": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="
+          },
+          "children": []
+         },
+         {
+          "id": "p18",
+          "dom": 18,
+          "name": "avatar-remote",
+          "type": "IMAGE",
+          "x": 603,
+          "y": 571,
+          "w": 48,
+          "h": 48,
+          "visible": true,
+          "layoutMode": "NONE",
+          "layoutWrap": "NO_WRAP",
+          "itemSpacing": 0,
+          "counterAxisSpacing": 0,
+          "padding": [
+           0,
+           0,
+           0,
+           0
+          ],
+          "primaryAxisAlignItems": "MIN",
+          "counterAxisAlignItems": "MIN",
+          "sizingH": "FIXED",
+          "sizingV": "FIXED",
+          "positioning": "AUTO",
+          "opacity": 1,
+          "clips": false,
+          "fills": [
+           {
+            "type": "IMAGE",
+            "hex": null,
+            "opacity": 1,
+            "var": null
+           }
+          ],
+          "strokes": [],
+          "strokeWeight": 0,
+          "radius": [
+           24,
+           24,
+           24,
+           24
+          ],
+          "effects": [],
+          "bound": {},
+          "component": null,
+          "text": null,
+          "build": {
+           "img": "https://example.com/a.jpg"
+          },
+          "children": []
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "count": 22,
+ "warnings": [],
+ "stats": {
+  "frames": 11,
+  "auto_layout": 11,
+  "absolute": 0,
+  "collapsed": 0,
+  "text": 8
+ }
+}

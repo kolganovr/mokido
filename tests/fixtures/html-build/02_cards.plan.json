@@ -1,0 +1,804 @@
+{
+ "root": {
+  "id": "p13",
+  "dom": 13,
+  "name": "body",
+  "type": "FRAME",
+  "x": 0,
+  "y": 0,
+  "w": 1000,
+  "h": 600,
+  "visible": true,
+  "layoutMode": "VERTICAL",
+  "layoutWrap": "NO_WRAP",
+  "itemSpacing": 32,
+  "counterAxisSpacing": 0,
+  "padding": [
+   40,
+   40,
+   40,
+   40
+  ],
+  "primaryAxisAlignItems": "MIN",
+  "counterAxisAlignItems": "MIN",
+  "sizingH": "FIXED",
+  "sizingV": "FIXED",
+  "positioning": "AUTO",
+  "opacity": 1,
+  "clips": false,
+  "fills": [
+   {
+    "type": "SOLID",
+    "hex": "#faf8f6",
+    "opacity": 1,
+    "var": null
+   }
+  ],
+  "strokes": [],
+  "strokeWeight": 0,
+  "radius": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "effects": [],
+  "bound": {},
+  "component": null,
+  "text": null,
+  "build": {},
+  "children": [
+   {
+    "id": "p1",
+    "dom": 1,
+    "name": "Plans",
+    "type": "TEXT",
+    "x": 40,
+    "y": 40,
+    "w": 400,
+    "h": 40,
+    "visible": true,
+    "layoutMode": "NONE",
+    "layoutWrap": "NO_WRAP",
+    "itemSpacing": 0,
+    "counterAxisSpacing": 0,
+    "padding": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "primaryAxisAlignItems": "MIN",
+    "counterAxisAlignItems": "MIN",
+    "sizingH": "FILL",
+    "sizingV": "HUG",
+    "positioning": "AUTO",
+    "opacity": 1,
+    "clips": false,
+    "fills": [
+     {
+      "type": "SOLID",
+      "hex": "#1d1a18",
+      "opacity": 1,
+      "var": null
+     }
+    ],
+    "strokes": [],
+    "strokeWeight": 0,
+    "radius": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "effects": [],
+    "bound": {},
+    "component": null,
+    "text": {
+     "characters": "Pricing plans",
+     "fontFamily": "Inter",
+     "fontStyle": "Bold",
+     "fontSize": 32,
+     "lineHeight": 40,
+     "styleName": null,
+     "align": "LEFT",
+     "autoResize": "WIDTH_AND_HEIGHT",
+     "ranges": []
+    },
+    "build": {},
+    "children": []
+   },
+   {
+    "id": "p12",
+    "dom": 12,
+    "name": "row",
+    "type": "FRAME",
+    "x": 40,
+    "y": 120,
+    "w": 920,
+    "h": 480,
+    "visible": true,
+    "layoutMode": "HORIZONTAL",
+    "layoutWrap": "WRAP",
+    "itemSpacing": 24,
+    "counterAxisSpacing": 24,
+    "padding": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "primaryAxisAlignItems": "MIN",
+    "counterAxisAlignItems": "MIN",
+    "sizingH": "FILL",
+    "sizingV": "HUG",
+    "positioning": "AUTO",
+    "opacity": 1,
+    "clips": false,
+    "fills": [],
+    "strokes": [],
+    "strokeWeight": 0,
+    "radius": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "effects": [],
+    "bound": {},
+    "component": null,
+    "text": null,
+    "build": {},
+    "children": [
+     {
+      "id": "p6",
+      "dom": 6,
+      "name": "Card 1",
+      "type": "FRAME",
+      "x": 40,
+      "y": 120,
+      "w": 280,
+      "h": 220,
+      "visible": true,
+      "layoutMode": "VERTICAL",
+      "layoutWrap": "NO_WRAP",
+      "itemSpacing": 12,
+      "counterAxisSpacing": 0,
+      "padding": [
+       20,
+       20,
+       20,
+       20
+      ],
+      "primaryAxisAlignItems": "MIN",
+      "counterAxisAlignItems": "MIN",
+      "sizingH": "FIXED",
+      "sizingV": "HUG",
+      "positioning": "AUTO",
+      "opacity": 1,
+      "clips": true,
+      "fills": [
+       {
+        "type": "SOLID",
+        "hex": "#ffffff",
+        "opacity": 1,
+        "var": null
+       }
+      ],
+      "strokes": [
+       {
+        "type": "SOLID",
+        "hex": "#e8e2dc",
+        "opacity": 1,
+        "var": null
+       }
+      ],
+      "strokeWeight": 1,
+      "radius": [
+       12,
+       12,
+       0,
+       0
+      ],
+      "effects": [],
+      "bound": {},
+      "component": null,
+      "text": null,
+      "build": {
+       "strokeSides": [
+        0,
+        0,
+        0,
+        4
+       ]
+      },
+      "children": [
+       {
+        "id": "p2",
+        "dom": 2,
+        "name": "cover",
+        "type": "IMAGE",
+        "x": 60,
+        "y": 140,
+        "w": 240,
+        "h": 100,
+        "visible": true,
+        "layoutMode": "NONE",
+        "layoutWrap": "NO_WRAP",
+        "itemSpacing": 0,
+        "counterAxisSpacing": 0,
+        "padding": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "primaryAxisAlignItems": "MIN",
+        "counterAxisAlignItems": "MIN",
+        "sizingH": "FILL",
+        "sizingV": "FIXED",
+        "positioning": "AUTO",
+        "opacity": 1,
+        "clips": false,
+        "fills": [
+         {
+          "type": "IMAGE",
+          "hex": null,
+          "opacity": 1,
+          "var": null
+         }
+        ],
+        "strokes": [],
+        "strokeWeight": 0,
+        "radius": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "effects": [],
+        "bound": {},
+        "component": null,
+        "text": null,
+        "build": {
+         "img": "photos/cover.jpg"
+        },
+        "children": []
+       },
+       {
+        "id": "p3",
+        "dom": 3,
+        "name": "t1",
+        "type": "TEXT",
+        "x": 60,
+        "y": 252,
+        "w": 240,
+        "h": 28,
+        "visible": true,
+        "layoutMode": "NONE",
+        "layoutWrap": "NO_WRAP",
+        "itemSpacing": 0,
+        "counterAxisSpacing": 0,
+        "padding": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "primaryAxisAlignItems": "MIN",
+        "counterAxisAlignItems": "MIN",
+        "sizingH": "FILL",
+        "sizingV": "HUG",
+        "positioning": "AUTO",
+        "opacity": 1,
+        "clips": false,
+        "fills": [
+         {
+          "type": "SOLID",
+          "hex": "#1d1a18",
+          "opacity": 1,
+          "var": null
+         }
+        ],
+        "strokes": [],
+        "strokeWeight": 0,
+        "radius": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "effects": [],
+        "bound": {},
+        "component": null,
+        "text": {
+         "characters": "Starter",
+         "fontFamily": "Inter",
+         "fontStyle": "Semi Bold",
+         "fontSize": 20,
+         "lineHeight": 28,
+         "styleName": null,
+         "align": "LEFT",
+         "autoResize": "HEIGHT",
+         "ranges": []
+        },
+        "build": {},
+        "children": []
+       },
+       {
+        "id": "p5",
+        "dom": 5,
+        "name": "badge",
+        "type": "FRAME",
+        "x": 250,
+        "y": 128,
+        "w": 60,
+        "h": 24,
+        "visible": true,
+        "layoutMode": "HORIZONTAL",
+        "layoutWrap": "NO_WRAP",
+        "itemSpacing": 0,
+        "counterAxisSpacing": 0,
+        "padding": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "primaryAxisAlignItems": "CENTER",
+        "counterAxisAlignItems": "CENTER",
+        "sizingH": "FIXED",
+        "sizingV": "FIXED",
+        "positioning": "ABSOLUTE",
+        "opacity": 1,
+        "clips": false,
+        "fills": [
+         {
+          "type": "SOLID",
+          "hex": "#ff957a",
+          "opacity": 1,
+          "var": null
+         }
+        ],
+        "strokes": [],
+        "strokeWeight": 0,
+        "radius": [
+         12,
+         12,
+         12,
+         12
+        ],
+        "effects": [],
+        "bound": {},
+        "component": null,
+        "text": null,
+        "build": {},
+        "children": [
+         {
+          "id": "p4",
+          "dom": 4,
+          "name": "new",
+          "type": "TEXT",
+          "x": 262,
+          "y": 132,
+          "w": 36,
+          "h": 16,
+          "visible": true,
+          "layoutMode": "NONE",
+          "layoutWrap": "NO_WRAP",
+          "itemSpacing": 0,
+          "counterAxisSpacing": 0,
+          "padding": [
+           0,
+           0,
+           0,
+           0
+          ],
+          "primaryAxisAlignItems": "MIN",
+          "counterAxisAlignItems": "MIN",
+          "sizingH": "HUG",
+          "sizingV": "HUG",
+          "positioning": "AUTO",
+          "opacity": 1,
+          "clips": false,
+          "fills": [
+           {
+            "type": "SOLID",
+            "hex": "#ffffff",
+            "opacity": 1,
+            "var": null
+           }
+          ],
+          "strokes": [],
+          "strokeWeight": 0,
+          "radius": [
+           0,
+           0,
+           0,
+           0
+          ],
+          "effects": [],
+          "bound": {},
+          "component": null,
+          "text": {
+           "characters": "NEW",
+           "fontFamily": "Inter",
+           "fontStyle": "Bold",
+           "fontSize": 12,
+           "lineHeight": 16,
+           "styleName": null,
+           "align": "LEFT",
+           "autoResize": "WIDTH_AND_HEIGHT",
+           "ranges": []
+          },
+          "build": {},
+          "children": []
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "id": "p9",
+      "dom": 9,
+      "name": "Card 2",
+      "type": "FRAME",
+      "x": 344,
+      "y": 120,
+      "w": 280,
+      "h": 220,
+      "visible": true,
+      "layoutMode": "VERTICAL",
+      "layoutWrap": "NO_WRAP",
+      "itemSpacing": 12,
+      "counterAxisSpacing": 0,
+      "padding": [
+       20,
+       20,
+       20,
+       20
+      ],
+      "primaryAxisAlignItems": "MIN",
+      "counterAxisAlignItems": "MIN",
+      "sizingH": "FIXED",
+      "sizingV": "HUG",
+      "positioning": "AUTO",
+      "opacity": 1,
+      "clips": false,
+      "fills": [
+       {
+        "type": "SOLID",
+        "hex": "#ffffff",
+        "opacity": 1,
+        "var": null
+       }
+      ],
+      "strokes": [
+       {
+        "type": "SOLID",
+        "hex": "#e8e2dc",
+        "opacity": 1,
+        "var": null
+       }
+      ],
+      "strokeWeight": 1,
+      "radius": [
+       4,
+       8,
+       12,
+       16
+      ],
+      "effects": [
+       {
+        "type": "DROP_SHADOW",
+        "radius": 24,
+        "offset": [
+         0,
+         8
+        ],
+        "hex": "#1d1a18",
+        "spread": 0,
+        "opacity": 0.12
+       },
+       {
+        "type": "INNER_SHADOW",
+        "radius": 2,
+        "offset": [
+         0,
+         1
+        ],
+        "hex": "#ffffff",
+        "spread": 0,
+        "opacity": 0.5
+       }
+      ],
+      "bound": {},
+      "component": null,
+      "text": null,
+      "build": {
+       "strokeSides": [
+        1,
+        1,
+        1,
+        1
+       ]
+      },
+      "children": [
+       {
+        "id": "p7",
+        "dom": 7,
+        "name": "t2",
+        "type": "TEXT",
+        "x": 364,
+        "y": 140,
+        "w": 240,
+        "h": 28,
+        "visible": true,
+        "layoutMode": "NONE",
+        "layoutWrap": "NO_WRAP",
+        "itemSpacing": 0,
+        "counterAxisSpacing": 0,
+        "padding": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "primaryAxisAlignItems": "MIN",
+        "counterAxisAlignItems": "MIN",
+        "sizingH": "FILL",
+        "sizingV": "HUG",
+        "positioning": "AUTO",
+        "opacity": 1,
+        "clips": false,
+        "fills": [
+         {
+          "type": "SOLID",
+          "hex": "#1d1a18",
+          "opacity": 1,
+          "var": null
+         }
+        ],
+        "strokes": [],
+        "strokeWeight": 0,
+        "radius": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "effects": [],
+        "bound": {},
+        "component": null,
+        "text": {
+         "characters": "Team",
+         "fontFamily": "Inter",
+         "fontStyle": "Semi Bold",
+         "fontSize": 20,
+         "lineHeight": 28,
+         "styleName": null,
+         "align": "LEFT",
+         "autoResize": "HEIGHT",
+         "ranges": []
+        },
+        "build": {},
+        "children": []
+       },
+       {
+        "id": "p8",
+        "dom": 8,
+        "name": "d2",
+        "type": "TEXT",
+        "x": 364,
+        "y": 180,
+        "w": 240,
+        "h": 60,
+        "visible": true,
+        "layoutMode": "NONE",
+        "layoutWrap": "NO_WRAP",
+        "itemSpacing": 0,
+        "counterAxisSpacing": 0,
+        "padding": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "primaryAxisAlignItems": "MIN",
+        "counterAxisAlignItems": "MIN",
+        "sizingH": "FILL",
+        "sizingV": "HUG",
+        "positioning": "AUTO",
+        "opacity": 1,
+        "clips": false,
+        "fills": [
+         {
+          "type": "SOLID",
+          "hex": "#6f6862",
+          "opacity": 1,
+          "var": null
+         }
+        ],
+        "strokes": [],
+        "strokeWeight": 0,
+        "radius": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "effects": [],
+        "bound": {},
+        "component": null,
+        "text": {
+         "characters": "Всё из Starter, плюс общие проекты и роли.",
+         "fontFamily": "Inter",
+         "fontStyle": "Regular",
+         "fontSize": 14,
+         "lineHeight": 20,
+         "styleName": null,
+         "align": "LEFT",
+         "autoResize": "HEIGHT",
+         "ranges": [
+          {
+           "start": 0,
+           "end": 7,
+           "fontStyle": "Bold",
+           "hex": "#e0603f",
+           "fontSize": 16,
+           "decoration": null
+          },
+          {
+           "start": 20,
+           "end": 30,
+           "fontStyle": null,
+           "hex": null,
+           "fontSize": null,
+           "decoration": "STRIKETHROUGH"
+          }
+         ]
+        },
+        "build": {},
+        "children": []
+       }
+      ]
+     },
+     {
+      "id": "p11",
+      "dom": 11,
+      "name": "Card 3",
+      "type": "FRAME",
+      "x": 648,
+      "y": 120,
+      "w": 280,
+      "h": 220,
+      "visible": true,
+      "layoutMode": "VERTICAL",
+      "layoutWrap": "NO_WRAP",
+      "itemSpacing": 12,
+      "counterAxisSpacing": 0,
+      "padding": [
+       20,
+       20,
+       20,
+       20
+      ],
+      "primaryAxisAlignItems": "MIN",
+      "counterAxisAlignItems": "MIN",
+      "sizingH": "FIXED",
+      "sizingV": "HUG",
+      "positioning": "AUTO",
+      "opacity": 0.8,
+      "clips": false,
+      "fills": [
+       {
+        "type": "SOLID",
+        "hex": "#ffffff",
+        "opacity": 1,
+        "var": null
+       }
+      ],
+      "strokes": [
+       {
+        "type": "SOLID",
+        "hex": "#ff957a",
+        "opacity": 1,
+        "var": null
+       }
+      ],
+      "strokeWeight": 2,
+      "radius": [
+       12,
+       12,
+       12,
+       12
+      ],
+      "effects": [],
+      "bound": {},
+      "component": null,
+      "text": null,
+      "build": {
+       "strokeSides": [
+        2,
+        2,
+        2,
+        2
+       ]
+      },
+      "children": [
+       {
+        "id": "p10",
+        "dom": 10,
+        "name": "t3",
+        "type": "TEXT",
+        "x": 668,
+        "y": 140,
+        "w": 240,
+        "h": 28,
+        "visible": true,
+        "layoutMode": "NONE",
+        "layoutWrap": "NO_WRAP",
+        "itemSpacing": 0,
+        "counterAxisSpacing": 0,
+        "padding": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "primaryAxisAlignItems": "MIN",
+        "counterAxisAlignItems": "MIN",
+        "sizingH": "FILL",
+        "sizingV": "HUG",
+        "positioning": "AUTO",
+        "opacity": 1,
+        "clips": false,
+        "fills": [
+         {
+          "type": "SOLID",
+          "hex": "#1d1a18",
+          "opacity": 1,
+          "var": null
+         }
+        ],
+        "strokes": [],
+        "strokeWeight": 0,
+        "radius": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "effects": [],
+        "bound": {},
+        "component": null,
+        "text": {
+         "characters": "Enterprise",
+         "fontFamily": "Inter",
+         "fontStyle": "Semi Bold",
+         "fontSize": 20,
+         "lineHeight": 28,
+         "styleName": null,
+         "align": "LEFT",
+         "autoResize": "HEIGHT",
+         "ranges": []
+        },
+        "build": {},
+        "children": []
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "count": 13,
+ "warnings": [],
+ "stats": {
+  "frames": 6,
+  "auto_layout": 6,
+  "absolute": 1,
+  "collapsed": 0,
+  "text": 6
+ }
+}
