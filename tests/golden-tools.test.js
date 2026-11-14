@@ -46,6 +46,8 @@ function normString(s) {
     let i;
     while ((i = s.toLowerCase().indexOf(v.toLowerCase())) !== -1) s = s.slice(0, i) + "<root>" + s.slice(i + v.length);
   }
+  // paths under <root> read the same on every OS (Windows recorded backslashes, CI on Linux sees slashes)
+  s = s.replace(/<root>[A-Za-z0-9_.\- \\/]*/g, (m) => m.split("\\").join("/"));
   return s
     .replace(/cmd_[a-z0-9]+/g, "<cmd_id>")
     .replace(/ws_[a-z0-9]+/g, "<ws_id>")
