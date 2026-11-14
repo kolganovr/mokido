@@ -27,6 +27,11 @@ figma.ui.onmessage = async (msg) => {
     return;
   }
 
+  if (msg.type === 'HTML_TREE') {
+    htmlBridgeOnTree(msg);
+    return;
+  }
+
   if (msg.type === 'JUMP_TO_NODE') {
     try {
       const node = figma.getNodeById(msg.nodeId);

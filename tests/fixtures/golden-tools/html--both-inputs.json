@@ -1,0 +1,24 @@
+{
+  "call": {
+    "tool": "figma_html",
+    "arguments": {
+      "html": "<p>x</p>",
+      "path": "page.html"
+    }
+  },
+  "sent_to_plugin": [],
+  "reply": {
+    "isError": true,
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": false,
+          "code": null,
+          "error": "figma_html: pass either html or path, not both."
+        }
+      }
+    ]
+  }
+}

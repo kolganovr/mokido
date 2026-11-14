@@ -9,7 +9,7 @@ const { TOOLS_REST } = require("./tools-rest");
 const TOOLS = [...TOOLS_CORE, ...TOOLS_EXTENDED, ...TOOLS_REST];
 
 // ==========================================================================
-// Tool tiers — which of the 22 defined tools are actually SENT to the model.
+// Tool tiers — which of the 23 defined tools are actually SENT to the model.
 // A longer tools/list costs every single turn (every schema is re-sent) and
 // makes tool SELECTION worse, not just more expensive, so the surface is
 // trimmed by what's actually usable in this server's current configuration:
@@ -31,6 +31,7 @@ const TOOL_TIERS = {
   figma_find_components: "core",
   figma_insert_component_instance: "core",
   figma_insert_svg: "core",
+  figma_html: "core",
   figma_get_variables: "core",
   figma_rollback: "core",
 
@@ -69,6 +70,7 @@ const TOOL_ANNOTATIONS = {
   figma_find_components: READ_LIVE,
   figma_insert_component_instance: WRITE_LIVE,
   figma_insert_svg: WRITE_LIVE,
+  figma_html: WRITE_LIVE,
   figma_get_variables: READ_LIVE,
   figma_rollback: { ...WRITE_LIVE, destructiveHint: true },
 

@@ -154,6 +154,11 @@ function installBridgeMacros(api, ctx) {
     return inst;
   };
 
+  // HTML -> Auto Layout frame in one call (T-077). The window lays the HTML out, html-map/html-build make the nodes.
+  api.fromHtml = function (html, opts) {
+    return htmlBridgeFromHtml(html, opts);
+  };
+
   api.shift = function (nodesOrIds, opts) {
     const o = opts || {};
     const dx = Number(o.dx) || 0;

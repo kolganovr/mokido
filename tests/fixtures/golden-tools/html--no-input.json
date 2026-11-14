@@ -1,0 +1,21 @@
+{
+  "call": {
+    "tool": "figma_html",
+    "arguments": {}
+  },
+  "sent_to_plugin": [],
+  "reply": {
+    "isError": true,
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": false,
+          "code": null,
+          "error": "figma_html: pass html (a string) or path (a local .html file)."
+        }
+      }
+    ]
+  }
+}

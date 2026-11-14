@@ -19,7 +19,7 @@ const LATE_TOOLS = new Set([
   "figma_execute_code", "figma_inspect", "figma_job_status", "figma_read_canvas", "figma_rollback",
   "figma_screenshot", "figma_get_selection", "figma_create_ui_card", "figma_find_components",
   "figma_insert_component_instance", "figma_get_variables", "figma_set_variables_mode",
-  "figma_insert_svg", "figma_get_canvas_layout"
+  "figma_insert_svg", "figma_get_canvas_layout", "figma_html"
 ]);
 
 const oneLine = (s, max) => {

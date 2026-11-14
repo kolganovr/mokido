@@ -1,0 +1,35 @@
+{
+  "call": {
+    "tool": "figma_html",
+    "arguments": {
+      "html": "<p>x</p>"
+    }
+  },
+  "sent_to_plugin": [
+    {
+      "code": [
+        "return await bridge.fromHtml(\"<p>x</p>\", {});"
+      ],
+      "description": "HTML to Figma",
+      "capture": false,
+      "capture_node_ids": null,
+      "diff": false,
+      "scale": 1,
+      "max_px": 1024
+    }
+  ],
+  "reply": {
+    "isError": true,
+    "content": [
+      {
+        "type": "text",
+        "compact_json": true,
+        "json": {
+          "ok": false,
+          "code": "HTML_WALK_TIMEOUT",
+          "error": "HTML_WALK_TIMEOUT: the Mokido plugin window did not return the layout in 20 s.\n\nHINT: The Figma plugin did not answer. Ask the user to open Figma DESKTOP (not the browser) and launch the Mokido plugin (Ctrl+Alt+P / Cmd+Option+P) until the status shows CONNECTED, then retry."
+        }
+      }
+    ]
+  }
+}

@@ -525,6 +525,16 @@ async function groupMain() {
     await rec(g, "get_canvas_layout--defaults", "figma_get_canvas_layout", {}, { result: { free: { x: 1400, y: 0 } } });
     await rec(g, "get_canvas_layout--plugin-error", "figma_get_canvas_layout", {}, { success: false, error: "Page is empty", code: "EMPTY_PAGE" });
 
+    // ---- figma_html: a thin wrapper, the code it sends (bridge.fromHtml + JSON args) is the contract
+    const htmlReply = { result: { ok: true, roots: [{ id: "9:1", name: "Landing", w: 1440, h: 900, x: 0, y: 0 }], layers: 12, auto_layout: "80% of 5 frames", absolute_fallback: 0, boxes_within_1px: "11/12", warning_counts: {}, warnings: ["font_fallback 9:4: Inter Black missing"] }, created: ["9:1"], checkpointId: "cp_h" };
+    await rec(g, "html--inline-full-options", "figma_html",
+      { html: "<div style=\"display:flex\">Тест \"q\"</div>", widths: [1440, 390], height: 800, name: "Landing", parent: "1:1", x: 10, y: 20, capture: true, max_output_bytes: 2000 }, htmlReply);
+    await rec(g, "html--from-path", "figma_html", { path: path.join(__dirname, "fixtures", "html-page", "page.html").split(path.sep).join("/") }, htmlReply);
+    await rec(g, "html--plugin-error", "figma_html", { html: "<p>x</p>" }, { success: false, error: "HTML_WALK_TIMEOUT: the Mokido plugin window did not return the layout in 20 s.", code: "HTML_WALK_TIMEOUT" });
+    await rec(g, "html--no-input", "figma_html", {});
+    await rec(g, "html--both-inputs", "figma_html", { html: "<p>x</p>", path: "page.html" });
+    await rec(g, "html--missing-file", "figma_html", { path: path.join(__dirname, "fixtures", "html-page", "nope.html").split(path.sep).join("/") });
+
     // ---- legacy figma_create_ui_card (generated script is the contract)
     await rec(g, "create_ui_card--defaults", "figma_create_ui_card", {}, { result: "Created UI Card with ID: 7:7", screenshot: "data:image/png;base64," + png });
     await rec(g, "create_ui_card--custom-escapes", "figma_create_ui_card",

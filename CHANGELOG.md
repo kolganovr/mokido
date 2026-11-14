@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- **HTML to Figma in one call (preview, T-077).** New tool `figma_html` and macro `bridge.fromHtml(html, { width | widths, height, parent, name, x, y })`
+  build a screen from one HTML document (or a local `.html` path): the plugin window lays it out in a hidden iframe, flex becomes
+  Auto Layout, text keeps its font and mixed styles, fills, gradients, borders, radii, shadows, svg and `data:` images are kept, and
+  the reply (under 3500 bytes) reports layers, Auto Layout share, `absolute_fallback`, a 1 px box self-check and up to 10 warnings.
+  Components and variables from `data-component` / `var(--token)` arrive in the next slice. Checked on a stub and fixtures only,
+  not yet in live Figma.
 - **Internal split, no behavior change.** The server moved from one 213 KB `figma/index.js` into modules under
   `figma/lib/` (`index.js` stays the entry point and re-exports the same names for tests). The plugin is now
   edited in `figma-plugin-src/` and built into `figma-plugin/code.js` by `node scripts/build-plugin.mjs`; the

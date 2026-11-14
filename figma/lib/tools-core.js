@@ -131,6 +131,58 @@ const TOOLS_CORE = [
     }
   },
   {
+    name: "figma_html",
+    description: "WRITE tool: build a screen from ONE HTML in one call (flex -> Auto Layout, text, fills, borders, shadows, svg). Pass `html` or `path` of a local .html (no JS, <style> inside, Inter, flex+gap not margin, data-name = layer name; else warnings). Reply: root ids, layers, auto_layout share, absolute_fallback, boxes_within_1px, <=10 warnings. widths:[1440,390] = one frame per width. Plugin window must be open. Undo: figma_rollback.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        html: {
+          type: "string",
+          description: "Full HTML document or fragment. Use `path` instead for big pages."
+        },
+        path: {
+          type: "string",
+          description: "Absolute or relative path of a local .html file on this machine (read by the server, up to 2 MB). Give either html or path."
+        },
+        width: {
+          type: "number",
+          description: "Viewport width in px the HTML is laid out at (default 1440, 100..8000). Media queries use it."
+        },
+        widths: {
+          type: "array",
+          items: { type: "number" },
+          description: "Several viewport widths, e.g. [1440, 390]: one frame per width, placed side by side. Overrides width."
+        },
+        height: {
+          type: "number",
+          description: "Viewport height in px for 100vh rules (default 900). The frame is as tall as the page."
+        },
+        name: {
+          type: "string",
+          description: "Name of the root frame (default 'HTML'; with widths the width is appended)."
+        },
+        parent: {
+          type: "string",
+          description: "Id of a frame or section to build into (default: free space on the current page)."
+        },
+        x: { type: "number", description: "Canvas x of the root (default: free space)." },
+        y: { type: "number", description: "Canvas y of the root (default: free space)." },
+        capture: {
+          type: "boolean",
+          description: "Also return a PNG of the built frame."
+        },
+        max_output_bytes: {
+          type: "number",
+          description: "Cap on the text response in UTF-8 bytes (default 3500)."
+        },
+        target: {
+          type: "string",
+          description: "fileName of a specific connected Figma document when more than one is open (see figma_list_targets)."
+        }
+      }
+    }
+  },
+  {
     name: "figma_screenshot",
     description: "Capture PNG screenshots of specific nodes or the current selection in Figma, to check layout, contrast, typography and spacing. Each image costs ~1k tokens at the default max_px, and stays in context: check mechanical things through write-call `warnings` or bridge.check first, and take one screenshot per finished stage rather than after every edit. Right after a figma_execute_code edit, put capture_node_ids on that call instead — this tool is then an extra turn.",
     inputSchema: {

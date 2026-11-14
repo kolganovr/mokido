@@ -1,3 +1,5 @@
+const fs = require("fs");
+const path = require("path");
 const { optimizeFigmaData } = require("../optimizer");
 const { TIMEOUTS, ECONOMY } = require("./config");
 const { parseFigmaUrlOrKey, figmaApiRequest } = require("./rest");
@@ -84,6 +86,31 @@ async function routeTool(name, args = {}) {
           lint: [rewrite.lint, args.diff === true ? DIFF_OFF_NOTE : null, fontLoadLint(code)]
         });
         return renderPluginResponse(response, null, { ...budgetOptions(args), lead });
+      }
+
+      case "figma_html": {
+        const HTML_MAX_BYTES = 2 * 1024 * 1024;
+        let html = args.html;
+        if (typeof args.path === "string" && args.path.trim()) {
+          if (typeof html === "string" && html.trim()) throw new Error("figma_html: pass either html or path, not both.");
+          const file = path.resolve(args.path.trim());
+          let st;
+          try { st = fs.statSync(file); } catch (e) { throw new Error(`figma_html: cannot read ${path.basename(file)}: ${e.code || e.message}`); }
+          if (!st.isFile()) throw new Error(`figma_html: ${path.basename(file)} is not a file.`);
+          if (st.size > HTML_MAX_BYTES) throw new Error(`figma_html: ${path.basename(file)} is ${st.size} bytes, over the ${HTML_MAX_BYTES} limit.`);
+          html = fs.readFileSync(file, "utf8");
+        }
+        if (typeof html !== "string" || !html.trim()) throw new Error("figma_html: pass html (a string) or path (a local .html file).");
+        if (Buffer.byteLength(html) > HTML_MAX_BYTES) throw new Error(`figma_html: html is over the ${HTML_MAX_BYTES} byte limit; save it to a file and pass path.`);
+        const opts = {};
+        for (const k of ["width", "widths", "height", "name", "parent", "x", "y"]) if (args[k] !== undefined) opts[k] = args[k];
+        return routeTool("figma_execute_code", {
+          code: `return await bridge.fromHtml(${JSON.stringify(html)}, ${JSON.stringify(opts)});`,
+          description: args.name ? `HTML to Figma: ${String(args.name).slice(0, 60)}` : "HTML to Figma",
+          capture: args.capture === true,
+          max_output_bytes: args.max_output_bytes,
+          target: args.target
+        });
       }
 
       case "figma_inspect": {

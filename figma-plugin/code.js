@@ -2120,6 +2120,11 @@ function installBridgeMacros(api, ctx) {
     return inst;
   };
 
+  // HTML -> Auto Layout frame in one call (T-077). The window lays the HTML out, html-map/html-build make the nodes.
+  api.fromHtml = function (html, opts) {
+    return htmlBridgeFromHtml(html, opts);
+  };
+
   api.shift = function (nodesOrIds, opts) {
     const o = opts || {};
     const dx = Number(o.dx) || 0;
@@ -2388,6 +2393,7 @@ function installBridgeReads(api, ctx) {
         "bridge.setProps(instance, { Name: value })": "sets component properties by readable name (\"Label\" matches \"Label#12:3\", case-insensitive); INSTANCE_SWAP takes a component node or id; unknown name -> error listing the real properties and variants; returns the instance",
         "await bridge.setText(root, { layerNameOrId: \"text\" })": "loads every font of the node, sets characters on TEXT layers found by id or exact name under root; unknown layer -> error listing text layers; returns { set: [ids] }. Use it to replace text instead of `characters =`: it KEEPS font styles by words - font, size, colour, decoration, letter spacing (first word keeps its style, the tail from the first space keeps its own; with more styles word by word, extra words take the last). Also bridge.setText(textNodeOrId, \"new text\") for one TEXT node",
         "await bridge.replaceWithInstance(target, component, { props, text, keepSize: false, remove: true })": "puts an instance of COMPONENT / COMPONENT_SET (default variant) / INSTANCE / id into target's slot (same index, position or AutoLayout sizing), applies props/text, removes target; returns the instance",
+        "await bridge.fromHtml(html, { width: 1440, widths: [1440, 390], height: 900, parent, name, x, y })": "builds a screen from one HTML string (flex -> Auto Layout, text, fills, borders, shadows, svg); the plugin window must be open; returns { roots: [{ id, w, h }], layers, auto_layout, absolute_fallback, boxes_within_1px, warnings }. Prefer the figma_html tool",
         "bridge.shift(nodesOrIds, { dx: 0, dy: 0 })": "moves nodes by an offset; returns the count",
         "bridge.moveInto(nodesOrIds, container, { layout: \"none\" | \"row\" | \"column\", gap: 100, padding: 0 })": "reparents nodes; none keeps their canvas position, row/column lays them out; returns ids",
         "bridge.fitSection(section, { padding: 100 })": "resizes a SECTION/FRAME to its children's bbox + padding, children keep their canvas position; returns the section",
@@ -3380,6 +3386,926 @@ function readCanvasTree(options) {
     name: figma.root.name,
     truncatedTop: budget.count >= budget.max
   };
+}
+// html-map.js (T-077, F8.2): translator "tree -> plan". Pure function: no figma, no DOM, no import/export.
+// htmlMap(tree, opts) -> { root, count, warnings, stats }. Input: dom.json format (planning/tools/html/SPEC.md).
+// Output: node tree in figma_dump.js format (contract planning/fable/F8_контракт.md).
+// Does not read expect_sizing / significant: sizing and collapsing are derived from declared, flex, display, style, rects.
+// Optional input extensions (a walker may add them): node.position ("absolute"|"fixed"), node.svg (markup), node.src (img).
+// Without `position` an absolute child is inferred: its rect overlaps an earlier flow sibling in both axes.
+// Padding in the plan is CSS padding as is; border width goes to build.strokeSides (the builder adds it to AL padding).
+
+function htmlMapR2(v) { return Math.round(v * 100) / 100; }
+function htmlMapPx(v) {
+  if (typeof v === "number") return v;
+  const m = /^(-?\d+(?:\.\d+)?)(?:px)?$/.exec(String(v == null ? "" : v).trim());
+  return m ? parseFloat(m[1]) : null;
+}
+function htmlMapHex(h) {
+  const m = /^#([0-9a-f]{6})([0-9a-f]{2})?$/i.exec(h || "");
+  if (!m) return null;
+  const a = m[2] ? parseInt(m[2], 16) / 255 : 1;
+  if (a <= 0.004) return null;
+  return { hex: "#" + m[1].toLowerCase(), opacity: htmlMapR2(a) };
+}
+function htmlMapRgb(s) {
+  const m = /rgba?\(\s*(\d+)[ ,]+(\d+)[ ,]+(\d+)(?:[ ,/]+([\d.]+))?\s*\)/.exec(s || "");
+  if (!m) return null;
+  const x = (i) => ("0" + (+m[i]).toString(16)).slice(-2);
+  const a = m[4] === undefined ? 1 : parseFloat(m[4]);
+  return { hex: "#" + x(1) + x(2) + x(3), a: a, hexa: "#" + x(1) + x(2) + x(3) + ("0" + Math.round(a * 255).toString(16)).slice(-2) };
+}
+function htmlMapWeightName(w) {
+  const t = { 100: "Thin", 200: "Extra Light", 300: "Light", 400: "Regular", 500: "Medium", 600: "Semi Bold", 700: "Bold", 800: "Extra Bold", 900: "Black" };
+  return t[Math.round((+w || 400) / 100) * 100] || "Regular";
+}
+// declared size: {k:"px",v}|{k:"fill"}|{k:"auto"}|{k:"other"}|null
+function htmlMapDsz(v) {
+  if (v == null || v === "") return null;
+  const s = String(v).trim();
+  if (s === "100%") return { k: "fill" };
+  if (/^(auto|fit-content|max-content|min-content|normal)$/.test(s)) return { k: "auto" };
+  const p = htmlMapPx(s);
+  return p === null ? { k: "other" } : { k: "px", v: p };
+}
+function htmlMapGrow(d) {
+  if (d["flex-grow"] != null) return parseFloat(d["flex-grow"]) || 0;
+  if (d.flex != null) { const f = parseFloat(String(d.flex).trim().split(/\s+/)[0]); return isNaN(f) ? 0 : f; }
+  return 0;
+}
+function htmlMapPaint(n) {
+  const s = n.style || {};
+  return !!(htmlMapHex(s.bg) || s.bgImage || (s.borderWidth || []).some((w) => w > 0) && htmlMapHex(s.borderColor) || s.boxShadow || (s.opacity != null && s.opacity < 1));
+}
+function htmlMapCtx(n) {
+  if (n.flex) return { mode: n.flex.dir === "row" ? "row" : "col", align: n.flex.align || "normal" };
+  if (n.grid) return { mode: "grid", align: "normal" };
+  return { mode: "block", align: "normal" };
+}
+function htmlMapInline(n) { return /^inline/.test(n.display || ""); }
+
+// Sizing along one axis ("h"|"v") by declared / flex / parent kind.
+function htmlMapAxis(n, pc, axis) {
+  const d = n.declared || {};
+  const sz = htmlMapDsz(d[axis === "h" ? "width" : "height"]);
+  const fixedish = sz && (sz.k === "px" || sz.k === "other");
+  if (pc.mode === "row" || pc.mode === "col") {
+    if ((pc.mode === "row") === (axis === "h")) {
+      if (htmlMapGrow(d) > 0) return "FILL";
+      const b = htmlMapDsz(d["flex-basis"]);
+      if (fixedish || (b && b.k === "px")) return "FIXED";
+      return sz && sz.k === "fill" ? "FILL" : "HUG";
+    }
+    if (fixedish) return "FIXED";
+    if (sz && sz.k === "fill") return "FILL";
+    const as = d["align-self"];
+    const al = as && as !== "auto" ? as : pc.align;
+    return al === "normal" || al === "stretch" ? "FILL" : "HUG";
+  }
+  if (fixedish) return "FIXED";
+  if (sz && sz.k === "fill") return "FILL";
+  if (axis === "v") return "HUG";
+  if (htmlMapPx(d["max-width"]) !== null && n.rect && Math.abs(n.rect.w - htmlMapPx(d["max-width"])) < 1) return "FIXED";
+  return htmlMapInline(n) ? "HUG" : "FILL";
+}
+function htmlMapSetSize(p, n, pc) {
+  if (p.type === "TEXT") {
+    let w = htmlMapAxis(n, pc, "h");
+    if (w === "HUG" && p._m.multi) w = "FIXED";
+    p.sizingH = w;
+    p.sizingV = "HUG";
+    p.text.autoResize = w === "HUG" ? "WIDTH_AND_HEIGHT" : "HEIGHT";
+    return;
+  }
+  p.sizingH = htmlMapAxis(n, pc, "h");
+  p.sizingV = htmlMapAxis(n, pc, "v");
+}
+
+function htmlMapName(n) {
+  if (n.name) return n.name;
+  if (n.component) return n.component;
+  if (n.tag === "svg") return (n.classes && n.classes[0]) || "icon";
+  if (n.classes && n.classes[0]) return n.classes[0];
+  return n.tag === "#text" ? "text" : n.tag;
+}
+function htmlMapBase(c, n, type, rect) {
+  const r = rect || n.rect;
+  const s = n.style || {};
+  return {
+    id: "p" + n.id, dom: n.id, name: htmlMapName(n), type: type,
+    x: htmlMapR2(r.x - c.ox), y: htmlMapR2(r.y - c.oy), w: r.w, h: r.h, visible: true,
+    layoutMode: "NONE", layoutWrap: "NO_WRAP", itemSpacing: 0, counterAxisSpacing: 0, padding: [0, 0, 0, 0],
+    primaryAxisAlignItems: "MIN", counterAxisAlignItems: "MIN", sizingH: "FIXED", sizingV: "FIXED", positioning: "AUTO",
+    opacity: s.opacity == null ? 1 : s.opacity, clips: false, fills: [], strokes: [], strokeWeight: 0, radius: [0, 0, 0, 0], effects: [],
+    bound: {}, component: null, text: null,
+    build: { tokens: n.tokens || {}, componentHint: n.component ? { component: n.component, variant: n.variant || null } : null },
+    children: [], _n: n
+  };
+}
+
+// Drawing: fills / strokes / radius / effects.
+function htmlMapShadows(str) {
+  const out = [];
+  let depth = 0, cur = "";
+  const parts = [];
+  for (const ch of String(str || "")) {
+    if (ch === "(") depth++;
+    if (ch === ")") depth--;
+    if (ch === "," && depth === 0) { parts.push(cur); cur = ""; } else cur += ch;
+  }
+  if (cur) parts.push(cur);
+  for (const part of parts) {
+    const col = htmlMapRgb(part);
+    const nums = part.replace(/rgba?\([^)]*\)/, "").match(/-?\d+(?:\.\d+)?/g) || [];
+    if (!col || nums.length < 2) continue;
+    out.push({ type: /inset/.test(part) ? "INNER_SHADOW" : "DROP_SHADOW", radius: +(nums[2] || 0), offset: [+nums[0], +nums[1]], hex: col.hexa, spread: +(nums[3] || 0) });
+  }
+  return out;
+}
+function htmlMapPaintInto(p, n) {
+  const s = n.style || {};
+  const bg = htmlMapHex(s.bg);
+  if (bg) p.fills.push({ type: "SOLID", hex: bg.hex, opacity: bg.opacity, var: null });
+  const decl = (n.declared && (n.declared.background || n.declared["background-image"])) || "";
+  if (s.bgImage === "gradient") {
+    const g = /linear-gradient\((?:[^()]|\([^()]*\))*\)/.exec(decl);
+    const col = htmlMapRgb(decl);
+    p.fills.push({ type: "GRADIENT_LINEAR", hex: col ? col.hex : "#000000", opacity: 1, var: null });
+    p.build.gradient = g ? g[0] : decl || null;
+  } else if (s.bgImage === "url") {
+    const u = /url\(["']?([^"')]*)["']?\)/.exec(decl);
+    p.fills.push({ type: "IMAGE", hex: null, opacity: 1, var: null });
+    p.build.img = u ? u[1] : null;
+  }
+  const bw = s.borderWidth || [0, 0, 0, 0];
+  const bc = htmlMapHex(s.borderColor);
+  if (bc && bw.some((w) => w > 0)) {
+    p.strokes.push({ type: "SOLID", hex: bc.hex, opacity: bc.opacity, var: null });
+    p.strokeWeight = bw.every((w) => w === bw[0]) ? bw[0] : "MIXED";
+    p.build.strokeSides = bw.slice();
+  }
+  p.radius = (s.radius || [0, 0, 0, 0]).slice();
+  if (s.boxShadow) p.effects = htmlMapShadows(s.boxShadow);
+}
+
+// Text. Pieces: [{n:#text node, style}] in document order; the base style is E's style.
+function htmlMapTextual(c, n) {
+  if (n.tag === "svg" || n.tag === "img" || n.tag === "#text") return false;
+  const k = c.kids[n.id] || [];
+  if (!k.length) return false;
+  return k.every((x) => x.tag === "#text" || (x.display === "inline" && !htmlMapPaint(x) && htmlMapTextual(c, x)));
+}
+function htmlMapPieces(c, n, out) {
+  for (const k of c.kids[n.id] || []) {
+    if (k.tag === "#text") out.push(k); else htmlMapPieces(c, k, out);
+  }
+  return out;
+}
+function htmlMapTextNode(c, E, pieces, box, pc, folded) {
+  const u = pieces.reduce((a, q) => {
+    const r = q.rect;
+    return { x1: Math.min(a.x1, r.x), y1: Math.min(a.y1, r.y), x2: Math.max(a.x2, r.x + r.w), y2: Math.max(a.y2, r.y + r.h) };
+  }, { x1: 1e9, y1: 1e9, x2: -1e9, y2: -1e9 });
+  const ur = { x: u.x1, y: u.y1, w: htmlMapR2(u.x2 - u.x1), h: htmlMapR2(u.y2 - u.y1) };
+  const rect = folded ? E.rect : ur;
+  const base = folded ? E : pieces[0];
+  const s = (folded ? E : pieces[0]).style;
+  const p = htmlMapBase(c, folded ? E : pieces[0], "TEXT", rect);
+  if (!folded) p.name = "text";
+  const col = htmlMapHex(s.color) || { hex: "#000000", opacity: 1 };
+  p.fills = [{ type: "SOLID", hex: col.hex, opacity: col.opacity, var: null }];
+  p.opacity = 1;
+  // characters: join pieces; a space only where the rects have a gap or a line break between them
+  let chars = "", ranges = [];
+  pieces.forEach((q, i) => {
+    if (i) {
+      const a = pieces[i - 1].rect, b = q.rect;
+      const sameLine = Math.abs(a.y - b.y) < a.h / 2;
+      if (!sameLine || b.x - (a.x + a.w) > 1) chars += " ";
+    }
+    const st = q.style;
+    if (st.fontWeight !== s.fontWeight || st.color !== s.color || st.fontSize !== s.fontSize) {
+      const cc = htmlMapHex(st.color) || col;
+      ranges.push({ start: chars.length, end: chars.length + q.text.length, fontStyle: htmlMapWeightName(st.fontWeight), hex: cc.hex, fontSize: st.fontSize, decoration: null });
+    }
+    chars += q.text;
+  });
+  const lh = s.lineHeight || s.fontSize * 1.2;
+  const multi = ur.h > lh * 1.5;
+  // alignment: where the text sits inside its box (own box when folded, parent's content box otherwise)
+  let align = "LEFT";
+  const bx = folded ? { x: E.rect.x, w: E.rect.w } : box;
+  if (!multi && bx && ur.w < bx.w - 2) {
+    const l = ur.x - bx.x, r = bx.x + bx.w - (ur.x + ur.w);
+    if (l > 2 && Math.abs(l - r) <= 2) align = "CENTER"; else if (l > 2 && r <= 2) align = "RIGHT";
+  }
+  if (!(folded && E.name)) p.name = chars.slice(0, 40);
+  p.text = { characters: chars, fontFamily: s.fontFamily, fontStyle: htmlMapWeightName(s.fontWeight), fontSize: s.fontSize, lineHeight: lh, styleName: null, align: align, autoResize: "HEIGHT", ranges: ranges };
+  p._m = { multi: multi };
+  htmlMapSetSize(p, folded ? E : pieces[0], pc);
+  return p;
+}
+
+// Spacing mode of a gap list (most frequent rounded value), negative clamped to 0.
+function htmlMapMode(g) {
+  if (!g.length) return 0;
+  const cnt = {};
+  g.forEach((v) => { const k = Math.round(v); (cnt[k] = cnt[k] || []).push(v); });
+  let best = null;
+  Object.keys(cnt).forEach((k) => { if (!best || cnt[k].length > cnt[best].length) best = k; });
+  const arr = cnt[best];
+  return Math.max(0, htmlMapR2(arr.reduce((a, b) => a + b, 0) / arr.length));
+}
+function htmlMapAlign(v) {
+  if (v === "center") return "CENTER";
+  if (v === "flex-end" || v === "end" || v === "right") return "MAX";
+  if (v === "baseline") return "BASELINE";
+  return "MIN";
+}
+
+// Block flow (no flex) -> AL: vertical with FILL width, or a horizontal run of inline-blocks. Margins from rects.
+function htmlMapFlow(c, n, P, flow) {
+  const bw = n.style.borderWidth || [0, 0, 0, 0], pad = n.padding;
+  const cx = P.x + bw[3] + pad[3], cy = P.y + bw[0] + pad[0];
+  const cw = P.w - bw[1] - bw[3] - pad[1] - pad[3], ch = P.h - bw[0] - bw[2] - pad[0] - pad[2];
+  const warn = (code, msg) => c.warn.push({ dom: n.id, code: code, msg: msg });
+  const horiz = flow.length >= 2 && flow.every((k, i) => i === 0 || (k.x >= flow[i - 1].x + flow[i - 1].w - 1 && k.y < flow[i - 1].y + flow[i - 1].h - 1 && k.y + k.h > flow[i - 1].y + 1));
+  const pd = pad.slice();
+  if (horiz) {
+    P.layoutMode = "HORIZONTAL";
+    const gaps = flow.slice(1).map((k, i) => k.x - (flow[i].x + flow[i].w));
+    P.itemSpacing = htmlMapMode(gaps);
+    pd[3] += Math.max(0, flow[0].x - cx);
+    const t = flow[0].y - cy, b = cy + ch - (flow[0].y + flow[0].h);
+    P.counterAxisAlignItems = t > 1 && Math.abs(t - b) <= 1 ? "CENTER" : t > 1 && b <= 1 ? "MAX" : "MIN";
+    if (P.counterAxisAlignItems === "MIN") pd[0] += Math.max(0, t);
+  } else {
+    P.layoutMode = "VERTICAL";
+    const gaps = flow.slice(1).map((k, i) => k.y - (flow[i].y + flow[i].h));
+    P.itemSpacing = htmlMapMode(gaps);
+    if (gaps.length && Math.max.apply(null, gaps) - Math.min.apply(null, gaps) > 1.5) warn("uneven-margin", "block children have different margins " + gaps.map(Math.round).join(","));
+    pd[0] += Math.max(0, flow[0].y - cy);
+    const last = flow[flow.length - 1];
+    if (!htmlMapDsz(n.declared && n.declared.height) || htmlMapDsz(n.declared.height).k !== "px") pd[2] += Math.max(0, cy + ch - (last.y + last.h));
+    const fills = flow.filter((k) => k.sizingH === "FILL");
+    let el = 0, er = 0;
+    if (fills.length) {
+      el = Math.max(0, fills[0].x - cx);
+      er = Math.max(0, cx + cw - (fills[0].x + fills[0].w));
+      if (fills.some((k) => Math.abs(k.x - cx - el) > 1 || Math.abs(cx + cw - k.x - k.w - er) > 1)) warn("uneven-margin", "FILL children have different side margins");
+      pd[3] += el; pd[1] += er;
+    }
+    const votes = { MIN: 0, CENTER: 0, MAX: 0 };
+    flow.filter((k) => k.sizingH !== "FILL").forEach((k) => {
+      const l = k.x - cx - el, r = cx + cw - er - (k.x + k.w);
+      votes[l > 1 && Math.abs(l - r) <= 1 ? "CENTER" : l > 1 && r <= 1 ? "MAX" : "MIN"]++;
+    });
+    const top = Object.keys(votes).sort((a, b) => votes[b] - votes[a])[0];
+    if (votes[top]) P.counterAxisAlignItems = top;
+  }
+  P.padding = pd.map(htmlMapR2);
+}
+
+// One child laid over an empty container: alignment on both axes + padding from the nearest edge.
+function htmlMapOverlay(n, P, k) {
+  const bw = n.style.borderWidth || [0, 0, 0, 0], pad = n.padding.slice();
+  const cx = P.x + bw[3] + pad[3], cy = P.y + bw[0] + pad[0];
+  const cw = P.w - bw[1] - bw[3] - pad[1] - pad[3], ch = P.h - bw[0] - bw[2] - pad[0] - pad[2];
+  const ax = (a, b, ia, ib) => (a > 1 && Math.abs(a - b) <= 1 ? "CENTER" : a <= b ? "MIN" : "MAX");
+  const l = k.x - cx, r = cx + cw - (k.x + k.w), t = k.y - cy, b = cy + ch - (k.y + k.h);
+  const ah = ax(l, r), av = ax(t, b);
+  if (ah === "MIN") pad[3] += Math.max(0, l); else if (ah === "MAX") pad[1] += Math.max(0, r);
+  if (av === "MIN") pad[0] += Math.max(0, t); else if (av === "MAX") pad[2] += Math.max(0, b);
+  P.layoutMode = "VERTICAL"; P.primaryAxisAlignItems = av; P.counterAxisAlignItems = ah; P.padding = pad.map(htmlMapR2);
+  k.positioning = "AUTO"; k.sizingH = "HUG"; k.sizingV = "HUG";
+  if (k.type === "TEXT") k.text.autoResize = "WIDTH_AND_HEIGHT";
+}
+
+function htmlMapOverlaps(a, b) {
+  return Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x) > 1 && Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y) > 1;
+}
+function htmlMapClose(a, b) {
+  return Math.abs(a.x - b.x) <= 1 && Math.abs(a.y - b.y) <= 1 && Math.abs(a.w - b.w) <= 1 && Math.abs(a.h - b.h) <= 1;
+}
+
+// Element -> list of plan nodes (empty: nothing; one: node; collapsed wrappers give their child instead).
+function htmlMapNode(c, n, pc, isRoot) {
+  if (n.tag === "#text") return [htmlMapTextNode(c, n, [n], null, pc, false)];
+  if (n.tag === "svg" || n.tag === "img") {
+    const p = htmlMapBase(c, n, n.tag === "svg" ? "SVG" : "IMAGE");
+    if (n.tag === "svg") p.build.svg = n.svg || null; else { p.build.img = n.src || null; p.fills = [{ type: "IMAGE", hex: null, opacity: 1, var: null }]; }
+    htmlMapPaintInto(p, n);
+    if (n.tag === "svg") p.fills = [];
+    htmlMapSetSize(p, n, pc);
+    c.stats.leaf++;
+    return [p];
+  }
+  const own = htmlMapCtx(n);
+  const paint = htmlMapPaint(n);
+  const pad = n.padding || [0, 0, 0, 0];
+  const hasPad = pad.some((v) => v > 0);
+  const contentBox = { x: n.rect.x + ((n.style.borderWidth || [0, 0, 0, 0])[3] || 0) + pad[3], w: n.rect.w - pad[1] - pad[3] };
+  let kids;
+  if (htmlMapTextual(c, n)) {
+    const pieces = htmlMapPieces(c, n, []);
+    if (!paint && !hasPad && !isRoot) {
+      c.stats.collapsed++;
+      return [htmlMapTextNode(c, n, pieces, null, pc, true)];
+    }
+    kids = [htmlMapTextNode(c, n, pieces, contentBox, own, false)];
+  } else {
+    kids = [];
+    for (const k of c.kids[n.id] || []) {
+      if (k.display === "inline" && k.tag !== "svg" && k.tag !== "img" && (c.kids[k.id] || []).length === 0) continue;
+      kids.push.apply(kids, htmlMapNode(c, k, own, false));
+    }
+  }
+  const dst = (n.declared && n.declared.height) || null;
+  if (!isRoot && !paint && !hasPad) {
+    if (kids.length === 1 && kids[0].positioning !== "ABSOLUTE" && htmlMapClose(kids[0], htmlMapBase(c, n, "FRAME"))) {
+      c.stats.collapsed++;
+      htmlMapSetSize(kids[0], n, pc);
+      if (n.name && kids[0].type !== "TEXT") kids[0].name = n.name;
+      return [kids[0]];
+    }
+    if (kids.length === 0 && !(n.rect.w > 0 && n.rect.h > 0)) { c.stats.collapsed++; return []; }
+  }
+  const P = htmlMapBase(c, n, "FRAME");
+  htmlMapPaintInto(P, n);
+  P.children = kids;
+  // absolute: explicit position or overlap with an earlier flow sibling in both axes
+  let flow = [];
+  let abs = [];
+  kids.forEach((k) => {
+    const kn = k._n;
+    if (kn.position === "absolute" || kn.position === "fixed" || flow.some((f) => htmlMapOverlaps(f, k))) abs.push(k); else flow.push(k);
+  });
+  // an image covering the whole container under overlays: the container takes the image as its fill
+  if (abs.length && flow.length === 1 && flow[0].type === "IMAGE" && htmlMapClose(flow[0], P) && !P.fills.some((f) => f.type === "IMAGE")) {
+    P.fills.push(flow[0].fills[0]);
+    P.build.img = flow[0].build.img;
+    P.children = kids = abs;
+    flow = [];
+  }
+  // a single overlay in an otherwise empty container: Auto Layout with padding/alignment instead of ABSOLUTE
+  let overlay = null;
+  if (!flow.length && abs.length === 1 && !n.grid && !n.flex) {
+    overlay = abs[0];
+    abs = [];
+    flow = [overlay];
+    c.stats.overlay++;
+  }
+  abs.forEach((k) => {
+    k.positioning = "ABSOLUTE"; k.sizingH = "FIXED"; k.sizingV = "FIXED";
+    c.warn.push({ dom: k.dom, code: "absolute", msg: k._n.position ? "position " + k._n.position : "inferred from overlap with a sibling" });
+  });
+  if (n.grid) {
+    P.layoutMode = "HORIZONTAL"; P.layoutWrap = "WRAP";
+    P.itemSpacing = n.grid.colGap; P.counterAxisSpacing = n.grid.rowGap; P.padding = pad.slice();
+    P.build.grid = n.grid.cols;
+  } else if (n.flex) {
+    P.layoutMode = n.flex.dir === "row" ? "HORIZONTAL" : "VERTICAL";
+    P.itemSpacing = n.flex.gap; P.padding = pad.slice();
+    P.primaryAxisAlignItems = n.flex.justify === "space-between" || n.flex.justify === "space-around" || n.flex.justify === "space-evenly" ? "SPACE_BETWEEN" : htmlMapAlign(n.flex.justify);
+    P.counterAxisAlignItems = htmlMapAlign(n.flex.align);
+    if (n.flex.wrap) {
+      P.layoutWrap = "WRAP";
+      const rows = [];
+      flow.forEach((k) => { const r = rows[rows.length - 1]; if (r && Math.abs(r.y - k.y) < 2) r.b = Math.max(r.b, k.y + k.h); else rows.push({ y: k.y, b: k.y + k.h }); });
+      const rg = rows.slice(1).map((r, i) => r.y - rows[i].b);
+      P.counterAxisSpacing = rg.length ? htmlMapMode(rg) : n.flex.gap;
+    }
+  } else if (overlay) {
+    htmlMapOverlay(n, P, overlay);
+  } else if (flow.length) {
+    htmlMapFlow(c, n, P, flow);
+  } else P.padding = pad.slice();
+  P.clips = !!n.overflow && /hidden|clip|auto|scroll/.test(n.overflow);
+  if (P.layoutMode !== "NONE") c.stats.auto_layout++;
+  c.stats.frames++;
+  if (!isRoot) htmlMapSetSize(P, n, pc);
+  if (P.sizingH === "HUG") {
+    kids.forEach((k) => {
+      if (k.type === "TEXT" && k.sizingH === "FILL" && k.positioning !== "ABSOLUTE") {
+        k.sizingH = k._m.multi ? "FIXED" : "HUG";
+        k.text.autoResize = k.sizingH === "HUG" ? "WIDTH_AND_HEIGHT" : "HEIGHT";
+      }
+    });
+  }
+  return [P];
+}
+
+function htmlMapClean(p, c) {
+  delete p._n; delete p._m;
+  c.count++;
+  if (p.positioning === "ABSOLUTE") c.stats.absolute++;
+  if (p.type === "TEXT") c.stats.text++;
+  p.children.forEach((k) => htmlMapClean(k, c));
+}
+
+function htmlMap(tree, opts) {
+  const c = { kids: {}, warn: [], count: 0, stats: { frames: 0, auto_layout: 0, absolute: 0, collapsed: 0, text: 0, leaf: 0, overlay: 0 } };
+  const nodes = tree.nodes || [];
+  let root = null;
+  nodes.forEach((n) => { c.kids[n.id] = c.kids[n.id] || []; if (n.parent == null) root = n; else (c.kids[n.parent] = c.kids[n.parent] || []).push(n); });
+  if (!root) throw new Error("htmlMap: tree has no root node");
+  c.ox = root.rect.x; c.oy = root.rect.y;
+  const out = htmlMapNode(c, root, { mode: "none", align: "normal" }, true);
+  const r = out[0];
+  r.x = 0; r.y = 0;
+  r.w = (tree.viewport && tree.viewport.w) || root.rect.w;
+  r.h = (tree.page && tree.page.h) || root.rect.h;
+  r.sizingH = "FIXED"; r.sizingV = "FIXED"; r.positioning = "AUTO";
+  htmlMapClean(r, c);
+  return { root: r, count: c.count, warnings: c.warn, stats: c.stats };
+}
+// html-build.js (T-077, F8.3): builds Figma nodes from a plan made by htmlMap (contract: planning/fable/F8_контракт.md).
+// A part of the plugin scope (no import/export). Entry: async htmlBuild(plan, opts) -> report.
+// opts: { parent (default figma.currentPage), x, y, name }.
+// Figma order rules: create the frame, set layoutMode BEFORE children, layoutSizing FILL/HUG only AFTER appendChild into an
+// auto layout parent, fonts loaded in one batch before any text write, text: characters -> setRange* -> textAutoResize last.
+// One node failing never stops the build: it becomes a warning and the build goes on.
+
+const HTML_BUILD_FALLBACK_FONT = { family: "Inter", style: "Regular" };
+const HTML_BUILD_WEIGHTS = { 100: "Thin", 200: "Extra Light", 300: "Light", 400: "Regular", 500: "Medium", 600: "Semi Bold", 700: "Bold", 800: "Extra Bold", 900: "Black" };
+
+function htmlBuildWarn(ctx, p, code, msg) {
+  ctx.warnings.push({ id: p && p.id !== undefined ? p.id : null, dom: p && p.dom !== undefined ? p.dom : null, code, msg: String(msg).slice(0, 300) });
+}
+function htmlBuildErr(e) { return e && e.message ? e.message : String(e); }
+// Runs fn; a throw becomes a warning (code) and returns false.
+function htmlBuildTry(ctx, p, code, fn) {
+  try { fn(); return true; } catch (e) { htmlBuildWarn(ctx, p, code, htmlBuildErr(e)); return false; }
+}
+
+// ---------- colors, paints ----------
+function htmlBuildColor(str) {
+  let s = String(str || "").trim().toLowerCase();
+  if (s === "transparent") return { r: 0, g: 0, b: 0, a: 0 };
+  if (s === "white") return { r: 1, g: 1, b: 1, a: 1 };
+  if (s === "black") return { r: 0, g: 0, b: 0, a: 1 };
+  let m = /^rgba?\(\s*([\d.]+)[\s,]+([\d.]+)[\s,]+([\d.]+)(?:[\s,/]+([\d.]+)(%?))?\s*\)$/.exec(s);
+  if (m) return { r: +m[1] / 255, g: +m[2] / 255, b: +m[3] / 255, a: m[4] === undefined ? 1 : (m[5] ? +m[4] / 100 : +m[4]) };
+  s = s.replace("#", "");
+  if (s.length === 3 || s.length === 4) s = s.split("").map((c) => c + c).join("");
+  if (!/^[0-9a-f]{6}([0-9a-f]{2})?$/.test(s)) return null;
+  const h = (i) => parseInt(s.slice(i, i + 2), 16) / 255;
+  return { r: h(0), g: h(2), b: h(4), a: s.length === 8 ? h(6) : 1 };
+}
+function htmlBuildSolid(hex, opacity) {
+  const c = htmlBuildColor(hex) || { r: 0, g: 0, b: 0, a: 1 };
+  return { type: "SOLID", color: { r: c.r, g: c.g, b: c.b }, opacity: (opacity === undefined || opacity === null ? 1 : opacity) * c.a, visible: true };
+}
+function htmlBuildSplit(s) {
+  const out = []; let depth = 0, cur = "";
+  for (const ch of s) {
+    if (ch === "(") depth++; else if (ch === ")") depth--;
+    if (ch === "," && depth === 0) { out.push(cur.trim()); cur = ""; } else cur += ch;
+  }
+  if (cur.trim()) out.push(cur.trim());
+  return out;
+}
+// css linear-gradient(...) -> GRADIENT_LINEAR paint. The gradient line (CSS angle, 0deg = up, clockwise) runs through the box
+// center with length |w sin|+|h cos|; gradientTransform is the inverse of the matrix that maps the unit gradient space onto the node space
+// (x axis = along the line, y axis = perpendicular, measured in pixels and then normalized by w, h so that isolines stay perpendicular).
+function htmlBuildGradient(css, w, h, opacity) {
+  const m = /linear-gradient\((.*)\)\s*$/i.exec(String(css || "").trim());
+  if (!m || !(w > 0) || !(h > 0)) return null;
+  const parts = htmlBuildSplit(m[1]);
+  let dx = 0, dy = 1; // default: to bottom (180deg)
+  const first = parts[0] || "";
+  const ang = /^(-?[\d.]+)(deg|turn|rad|grad)$/.exec(first);
+  if (ang) {
+    const k = { deg: 1, turn: 360, rad: 180 / Math.PI, grad: 0.9 }[ang[2]];
+    const t = (+ang[1] * k * Math.PI) / 180;
+    dx = Math.sin(t); dy = -Math.cos(t); parts.shift();
+  } else if (/^to\s/.test(first)) {
+    const sx = /right/.test(first) ? 1 : /left/.test(first) ? -1 : 0, sy = /bottom/.test(first) ? 1 : /top/.test(first) ? -1 : 0;
+    if (sx && sy) { dx = sx * h; dy = sy * w; const n = Math.hypot(dx, dy); dx /= n; dy /= n; } else { dx = sx; dy = sy; }
+    parts.shift();
+  }
+  const stops = [];
+  for (const part of parts) {
+    const sm = /^(.*?)(?:\s+(-?[\d.]+)%)?$/.exec(part);
+    const c = htmlBuildColor(sm[1]);
+    if (!c) return null;
+    stops.push({ position: sm[2] === undefined ? null : Math.max(0, Math.min(1, +sm[2] / 100)), color: c });
+  }
+  if (stops.length < 2) return null;
+  if (stops[0].position === null) stops[0].position = 0;
+  if (stops[stops.length - 1].position === null) stops[stops.length - 1].position = 1;
+  for (let i = 1; i < stops.length - 1; i++) {
+    if (stops[i].position !== null) continue;
+    let j = i; while (stops[j].position === null) j++;
+    const a = stops[i - 1].position, b = stops[j].position;
+    for (let k = i; k < j; k++) stops[k].position = a + ((b - a) * (k - i + 1)) / (j - i + 1);
+  }
+  const L = Math.abs(w * dx) + Math.abs(h * dy);
+  const p0 = [(w / 2 - (dx * L) / 2) / w, (h / 2 - (dy * L) / 2) / h];
+  const p1 = [(w / 2 + (dx * L) / 2) / w, (h / 2 + (dy * L) / 2) / h];
+  const p2 = [p0[0] + (-dy * L) / w, p0[1] + (dx * L) / h];
+  const ax = p1[0] - p0[0], ay = p1[1] - p0[1], bx = p2[0] - p0[0], by = p2[1] - p0[1];
+  const det = ax * by - bx * ay;
+  if (!det) return null;
+  const i00 = by / det, i01 = -bx / det, i10 = -ay / det, i11 = ax / det;
+  return {
+    type: "GRADIENT_LINEAR", opacity: opacity === undefined || opacity === null ? 1 : opacity, visible: true,
+    gradientTransform: [[i00, i01, -(i00 * p0[0] + i01 * p0[1])], [i10, i11, -(i10 * p0[0] + i11 * p0[1])]],
+    gradientStops: stops.map((s) => ({ position: s.position, color: s.color }))
+  };
+}
+function htmlBuildPaints(list, p, ctx) {
+  const out = [];
+  const grads = [].concat((p.build && p.build.gradient) || []);
+  let gi = 0;
+  for (const f of list || []) {
+    if (f.type === "SOLID") out.push(htmlBuildSolid(f.hex, f.opacity));
+    else if (f.type === "GRADIENT_LINEAR") {
+      const g = htmlBuildGradient(grads[gi++], p.w, p.h, f.opacity);
+      if (g) out.push(g);
+      else { htmlBuildWarn(ctx, p, "gradient_parse", "cannot parse gradient, first stop color used"); out.push(htmlBuildSolid(f.hex, f.opacity)); }
+    }
+  }
+  return out;
+}
+
+// ---------- fonts ----------
+function htmlBuildStyleName(s) { return typeof s === "number" || /^\d+$/.test(String(s)) ? HTML_BUILD_WEIGHTS[s] || "Regular" : s || "Regular"; }
+function htmlBuildCollectFonts(p, keys) {
+  if (p.type === "TEXT" && p.text) {
+    const fam = p.text.fontFamily || "Inter";
+    keys.set(fam + "|" + htmlBuildStyleName(p.text.fontStyle), { family: fam, style: htmlBuildStyleName(p.text.fontStyle), dom: p });
+    for (const r of p.text.ranges || []) if (r.fontStyle) keys.set(fam + "|" + htmlBuildStyleName(r.fontStyle), { family: fam, style: htmlBuildStyleName(r.fontStyle), dom: p });
+  }
+  for (const c of p.children || []) htmlBuildCollectFonts(c, keys);
+}
+function htmlBuildLoadOne(font) {
+  return typeof loadFontOnce === "function" ? loadFontOnce(font) : figma.loadFontAsync(font);
+}
+// One batch; a font that fails to load maps to Inter Regular (warning font_fallback).
+async function htmlBuildLoadFonts(root, ctx) {
+  const keys = new Map();
+  htmlBuildCollectFonts(root, keys);
+  ctx.fonts = new Map();
+  const fb = HTML_BUILD_FALLBACK_FONT;
+  if (!keys.has(fb.family + "|" + fb.style)) keys.set(fb.family + "|" + fb.style, { family: fb.family, style: fb.style, dom: null });
+  await Promise.all([...keys.entries()].map(async ([key, f]) => {
+    try { await htmlBuildLoadOne({ family: f.family, style: f.style }); ctx.fonts.set(key, { family: f.family, style: f.style }); }
+    catch (e) {
+      ctx.fonts.set(key, HTML_BUILD_FALLBACK_FONT);
+      htmlBuildWarn(ctx, f.dom, "font_fallback", f.family + " " + f.style + " not available, Inter Regular used");
+    }
+  }));
+}
+function htmlBuildFont(ctx, family, style) {
+  return ctx.fonts.get((family || "Inter") + "|" + htmlBuildStyleName(style)) || HTML_BUILD_FALLBACK_FONT;
+}
+
+// ---------- node properties ----------
+function htmlBuildEffects(list) {
+  return (list || []).map((e) => {
+    const c = htmlBuildColor(e.hex) || { r: 0, g: 0, b: 0, a: 0.25 };
+    const off = Array.isArray(e.offset) ? { x: e.offset[0], y: e.offset[1] } : e.offset || { x: 0, y: 0 };
+    return { type: e.type, color: { r: c.r, g: c.g, b: c.b, a: c.a * (e.opacity === undefined || e.opacity === null ? 1 : e.opacity) }, offset: { x: off.x || 0, y: off.y || 0 }, radius: e.radius || 0, spread: e.spread || 0, visible: true, blendMode: "NORMAL" };
+  });
+}
+function htmlBuildStyle(n, p, ctx) {
+  const t = p.type;
+  if (p.name) n.name = String(p.name);
+  if (p.visible === false) n.visible = false;
+  if (typeof p.opacity === "number" && p.opacity !== 1) n.opacity = p.opacity;
+  if (t !== "SVG" && t !== "IMAGE") htmlBuildTry(ctx, p, "fills_error", () => { n.fills = htmlBuildPaints(p.fills, p, ctx); });
+  if (t === "SVG" || t === "TEXT") {
+    // svg keeps its own vector paints; text strokes are not modeled
+  } else if (p.strokes && p.strokes.length) {
+    htmlBuildTry(ctx, p, "stroke_error", () => {
+      n.strokes = htmlBuildPaints(p.strokes, p, ctx);
+      n.strokeAlign = "INSIDE";
+      const s = p.build && p.build.strokeSides;
+      if (s && s.length === 4 && !(s[0] === s[1] && s[1] === s[2] && s[2] === s[3])) {
+        n.strokeTopWeight = s[0]; n.strokeRightWeight = s[1]; n.strokeBottomWeight = s[2]; n.strokeLeftWeight = s[3];
+      } else n.strokeWeight = p.strokeWeight || (s && s[0]) || 1;
+      // css padding sits inside the border, so the stroke has to count in the layout
+      if (t === "FRAME" && p.layoutMode && p.layoutMode !== "NONE") n.strokesIncludedInLayout = true;
+    });
+  }
+  if ((t === "FRAME" || t === "RECTANGLE" || t === "IMAGE") && p.radius) {
+    const r = p.radius;
+    htmlBuildTry(ctx, p, "radius_error", () => {
+      if (r.every((v) => v === r[0])) { if (r[0]) n.cornerRadius = r[0]; }
+      else { n.topLeftRadius = r[0]; n.topRightRadius = r[1]; n.bottomRightRadius = r[2]; n.bottomLeftRadius = r[3]; }
+    });
+  }
+  if (p.effects && p.effects.length) htmlBuildTry(ctx, p, "effects_error", () => { n.effects = htmlBuildEffects(p.effects); });
+  if (t === "FRAME") n.clipsContent = !!p.clips;
+}
+function htmlBuildFrameLayout(n, p, ctx) {
+  const m = p.layoutMode;
+  if (m !== "HORIZONTAL" && m !== "VERTICAL") { n.layoutMode = "NONE"; return; }
+  n.layoutMode = m;
+  htmlBuildTry(ctx, p, "layout_error", () => {
+    if (p.layoutWrap === "WRAP") {
+      if (m === "HORIZONTAL") { n.layoutWrap = "WRAP"; n.counterAxisSpacing = p.counterAxisSpacing || 0; }
+      else htmlBuildWarn(ctx, p, "wrap_unsupported", "wrap is horizontal only, ignored for a vertical container");
+    }
+    n.itemSpacing = p.itemSpacing || 0;
+    const pd = p.padding || [0, 0, 0, 0];
+    n.paddingTop = pd[0]; n.paddingRight = pd[1]; n.paddingBottom = pd[2]; n.paddingLeft = pd[3];
+    n.primaryAxisAlignItems = p.primaryAxisAlignItems || "MIN";
+    let ca = p.counterAxisAlignItems || "MIN";
+    if (ca === "BASELINE" && m !== "HORIZONTAL") ca = "MIN";
+    n.counterAxisAlignItems = ca;
+  });
+}
+function htmlBuildSizeModes(n, p, ctx) {
+  if (p.layoutMode !== "HORIZONTAL" && p.layoutMode !== "VERTICAL") return;
+  const hugH = p.sizingH === "HUG", hugV = p.sizingV === "HUG";
+  const horiz = p.layoutMode === "HORIZONTAL";
+  htmlBuildTry(ctx, p, "layout_error", () => {
+    n.primaryAxisSizingMode = (horiz ? hugH : hugV) ? "AUTO" : "FIXED";
+    n.counterAxisSizingMode = (horiz ? hugV : hugH) ? "AUTO" : "FIXED";
+  });
+}
+
+function htmlBuildText(n, p, ctx) {
+  const t = p.text || {};
+  const base = htmlBuildFont(ctx, t.fontFamily, t.fontStyle);
+  n.fontName = base;
+  n.characters = String(t.characters === undefined ? "" : t.characters);
+  const len = n.characters.length;
+  if (t.fontSize) n.fontSize = t.fontSize;
+  htmlBuildTry(ctx, p, "text_error", () => {
+    n.lineHeight = typeof t.lineHeight === "number" ? { unit: "PIXELS", value: t.lineHeight } : { unit: "AUTO" };
+    if (t.align) n.textAlignHorizontal = t.align;
+  });
+  for (const r of t.ranges || []) {
+    const s = Math.max(0, r.start | 0), e = Math.min(len, r.end | 0);
+    if (!(e > s)) continue;
+    htmlBuildTry(ctx, p, "range_error", () => {
+      if (r.fontStyle) n.setRangeFontName(s, e, htmlBuildFont(ctx, t.fontFamily, r.fontStyle));
+      if (r.fontSize) n.setRangeFontSize(s, e, r.fontSize);
+      if (r.hex) n.setRangeFills(s, e, [htmlBuildSolid(r.hex, r.opacity)]);
+      if (r.decoration && r.decoration !== "NONE") n.setRangeTextDecoration(s, e, r.decoration);
+    });
+  }
+}
+function htmlBuildDecodeSvg(m) {
+  if (m[2]) { const bin = String(figma.base64Decode ? Array.from(figma.base64Decode(m[3]), (c) => String.fromCharCode(c)).join("") : ""); return decodeURIComponent(escape(bin)); }
+  return decodeURIComponent(m[3]);
+}
+// img: data: URI -> image fill; svg data URI -> vector; anything else -> grey placeholder + warning.
+function htmlBuildImage(p, ctx) {
+  const src = String((p.build && p.build.img) || "");
+  const m = /^data:([^,]*?)(;base64)?,([\s\S]*)$/i.exec(src);
+  if (m && /svg/i.test(m[1])) {
+    try { return figma.createNodeFromSvg(htmlBuildDecodeSvg(m)); } catch (e) { htmlBuildWarn(ctx, p, "img_failed", "svg data uri: " + htmlBuildErr(e)); }
+  }
+  const r = figma.createRectangle();
+  if (m && m[2]) {
+    try {
+      const img = figma.createImage(figma.base64Decode(m[3]));
+      r.fills = [{ type: "IMAGE", imageHash: img.hash, scaleMode: "FILL", visible: true }];
+      return r;
+    } catch (e) { htmlBuildWarn(ctx, p, "img_failed", "createImage: " + htmlBuildErr(e)); }
+  } else htmlBuildWarn(ctx, p, "img_placeholder", "image is not a data: URI, placeholder used: " + src.slice(0, 80));
+  r.fills = [htmlBuildSolid("#d9d9d9", 1)];
+  return r;
+}
+
+function htmlBuildCreate(p, ctx) {
+  let n;
+  if (p.type === "TEXT") { n = figma.createText(); }
+  else if (p.type === "SVG") {
+    try { n = figma.createNodeFromSvg(String((p.build && p.build.svg) || "")); }
+    catch (e) { htmlBuildWarn(ctx, p, "svg_failed", htmlBuildErr(e)); n = figma.createRectangle(); n.fills = [htmlBuildSolid("#d9d9d9", 1)]; }
+  } else if (p.type === "IMAGE") n = htmlBuildImage(p, ctx);
+  else if (p.type === "RECTANGLE") n = figma.createRectangle();
+  else n = figma.createFrame();
+  return n;
+}
+
+function htmlBuildResize(n, p) { n.resize(Math.max(p.w || 0, 0.01), Math.max(p.h || 0, 0.01)); }
+
+// Parent-dependent part: runs AFTER appendChild (FILL / HUG need the auto layout parent), before the children exist.
+function htmlBuildPlace(e, par, ctx) {
+  const p = e.p, n = e.n;
+  const parAL = par && par.p.layoutMode && par.p.layoutMode !== "NONE";
+  if (!par) return;
+  if (parAL && p.positioning !== "ABSOLUTE") {
+    let h = p.sizingH, v = p.sizingV;
+    const canHug = p.type === "TEXT" || (p.type === "FRAME" && p.layoutMode && p.layoutMode !== "NONE");
+    if (!canHug) {
+      if (h === "HUG" || v === "HUG") htmlBuildWarn(ctx, p, "sizing_coerced", "HUG not possible for " + p.type + ", FIXED used");
+      if (h === "HUG") h = "FIXED"; if (v === "HUG") v = "FIXED";
+    }
+    htmlBuildTry(ctx, p, "sizing_error", () => { if (h && h !== "FIXED") n.layoutSizingHorizontal = h; });
+    htmlBuildTry(ctx, p, "sizing_error", () => { if (v && v !== "FIXED") n.layoutSizingVertical = v; });
+  } else {
+    if (parAL) htmlBuildTry(ctx, p, "absolute_error", () => { n.layoutPositioning = "ABSOLUTE"; });
+    htmlBuildTry(ctx, p, "position_error", () => { n.x = p.x - par.p.x; n.y = p.y - par.p.y; });
+  }
+}
+
+async function htmlBuildNode(p, par, ctx, parentFigma, isRoot) {
+  let n;
+  try {
+    n = htmlBuildCreate(p, ctx);
+    if (p.type === "TEXT") htmlBuildText(n, p, ctx);
+    if (p.type === "FRAME") htmlBuildFrameLayout(n, p, ctx);
+    htmlBuildStyle(n, p, ctx);
+    htmlBuildTry(ctx, p, "resize_error", () => htmlBuildResize(n, p));
+    if (p.type === "FRAME") htmlBuildSizeModes(n, p, ctx);
+    if (p.type === "TEXT") htmlBuildTry(ctx, p, "text_error", () => { n.textAutoResize = (p.text && p.text.autoResize) || "WIDTH_AND_HEIGHT"; });
+    parentFigma.appendChild(n);
+  } catch (err) {
+    htmlBuildWarn(ctx, p, "node_error", htmlBuildErr(err));
+    try { if (n && !n.parent) n.remove(); } catch (e2) { /* nothing to clean */ }
+    return null;
+  }
+  const e = { p, n, par, kids: [] };
+  ctx.entries.push(e);
+  ctx.created++;
+  if (p.layoutMode === "HORIZONTAL" || p.layoutMode === "VERTICAL") ctx.al++;
+  if (!isRoot) htmlBuildPlace(e, par, ctx);
+  for (const c of p.children || []) {
+    const ce = await htmlBuildNode(c, e, ctx, n, false);
+    if (ce) e.kids.push(ce);
+  }
+  return e;
+}
+
+// ---------- self check ----------
+function htmlBuildDelta(e, org) {
+  let b = null;
+  try { b = e.n.absoluteBoundingBox; } catch (x) { b = null; }
+  if (!b) return null;
+  const p = e.p;
+  return Math.max(Math.abs(b.x - org.x - p.x), Math.abs(b.y - org.y - p.y), Math.abs(b.width - p.w), Math.abs(b.height - p.h));
+}
+function htmlBuildMeasure(ctx, org) {
+  for (const e of ctx.entries) { e.delta = htmlBuildDelta(e, org); e.ok = e.delta === null || e.delta <= 1; }
+}
+function htmlBuildApplyFallback(e, ctx) {
+  const p = e.p;
+  htmlBuildTry(ctx, p, "fallback_error", () => {
+    if (e.par) {
+      if (p.sizingH === "HUG") e.n.layoutSizingHorizontal = "FIXED";
+      if (p.sizingV === "HUG") e.n.layoutSizingVertical = "FIXED";
+    } else { e.n.primaryAxisSizingMode = "FIXED"; e.n.counterAxisSizingMode = "FIXED"; }
+    if (p.sizingH === "HUG" || p.sizingV === "HUG" || !e.par) htmlBuildResize(e.n, p);
+  });
+  for (const k of e.kids) {
+    htmlBuildTry(ctx, k.p, "fallback_error", () => {
+      k.n.layoutPositioning = "ABSOLUTE";
+      htmlBuildResize(k.n, k.p);
+      k.n.x = k.p.x - p.x; k.n.y = k.p.y - p.y;
+    });
+  }
+  e.fb = true;
+}
+// A container "diverged as a whole" when its own box is off, or at least half of its non-text in-flow children are off.
+function htmlBuildFindDiverged(e, out) {
+  if (e.p.type === "FRAME" && e.p.layoutMode !== "NONE" && !e.fb && e.kids.length) {
+    const flow = e.kids.filter((k) => k.p.positioning !== "ABSOLUTE" && k.p.type !== "TEXT");
+    const bad = flow.filter((k) => !k.ok).length;
+    if (!e.ok || (bad > 0 && bad * 2 >= flow.length)) { out.push(e); return; }
+  }
+  for (const k of e.kids) htmlBuildFindDiverged(k, out);
+}
+function htmlBuildSelfCheck(root, ctx, report) {
+  let org = { x: 0, y: 0 };
+  try { const b = root.n.absoluteBoundingBox; if (b) org = { x: b.x, y: b.y }; } catch (e) { /* keep 0,0 */ }
+  for (let round = 0; round < 4; round++) {
+    htmlBuildMeasure(ctx, org);
+    const bad = [];
+    htmlBuildFindDiverged(root, bad);
+    if (!bad.length) break;
+    for (const e of bad) {
+      const worst = Math.max(e.delta || 0, ...e.kids.map((k) => k.delta || 0));
+      htmlBuildWarn(ctx, e.p, "absolute_fallback", "container diverged (max " + Math.round(worst * 100) / 100 + " px), children placed ABSOLUTE by plan boxes");
+      htmlBuildApplyFallback(e, ctx);
+      report.absolute_fallback++;
+    }
+  }
+  htmlBuildMeasure(ctx, org);
+  for (const e of ctx.entries) {
+    if (e.delta === null) continue;
+    report.box_ok.den++;
+    if (e.ok) report.box_ok.num++;
+    else htmlBuildWarn(ctx, e.p, "box_mismatch", "box differs from plan by " + Math.round(e.delta * 100) / 100 + " px");
+  }
+}
+
+async function htmlBuild(plan, opts) {
+  opts = opts || {};
+  const ctx = { warnings: [], created: 0, al: 0, entries: [], fonts: new Map() };
+  const report = { root_id: null, created: 0, auto_layout: 0, absolute_fallback: 0, box_ok: { num: 0, den: 0 }, warnings: ctx.warnings };
+  if (!plan || !plan.root) { htmlBuildWarn(ctx, null, "no_plan", "plan.root is missing"); return report; }
+  await htmlBuildLoadFonts(plan.root, ctx);
+  const parent = opts.parent || figma.currentPage;
+  const root = await htmlBuildNode(plan.root, null, ctx, parent, true);
+  if (!root) return report;
+  htmlBuildTry(ctx, plan.root, "position_error", () => {
+    root.n.x = typeof opts.x === "number" ? opts.x : 0;
+    root.n.y = typeof opts.y === "number" ? opts.y : 0;
+    if (opts.name) root.n.name = String(opts.name);
+  });
+  report.root_id = root.n.id;
+  htmlBuildSelfCheck(root, ctx, report);
+  report.created = ctx.created;
+  report.auto_layout = ctx.al;
+  return report;
+}
+// html-bridge.js (T-077, F8.4): the sandbox half of bridge.fromHtml. The sandbox has no DOM, so the HTML goes to the
+// plugin window (ui.html: hidden iframe + htmlWalk), the tree comes back as an HTML_TREE message, then htmlMap -> htmlBuild.
+// Prefix: htmlBridge*. Message flow: sandbox HTML_WALK {reqId, html, width, height} -> ui; ui HTML_TREE {reqId, tree | error} -> sandbox.
+
+const HTML_BRIDGE_PENDING = new Map();
+let htmlBridgeSeq = 0;
+let HTML_BRIDGE_TIMEOUT_MS = 20000; // let: the test shortens it
+const HTML_BRIDGE_MAX_WARNINGS = 10;
+
+// Called by messages.js for every HTML_TREE message from the window.
+function htmlBridgeOnTree(msg) {
+  const p = HTML_BRIDGE_PENDING.get(msg.reqId);
+  if (!p) return;
+  HTML_BRIDGE_PENDING.delete(msg.reqId);
+  clearTimeout(p.timer);
+  if (msg.error) p.reject(new Error("HTML_WALK_FAILED: " + msg.error));
+  else p.resolve(msg.tree);
+}
+
+function htmlBridgeRequestTree(html, width, height) {
+  return new Promise((resolve, reject) => {
+    const reqId = "html_" + Date.now().toString(36) + "_" + (++htmlBridgeSeq);
+    const timer = setTimeout(() => {
+      HTML_BRIDGE_PENDING.delete(reqId);
+      reject(new Error("HTML_WALK_TIMEOUT: the Mokido plugin window did not return the layout in " + (HTML_BRIDGE_TIMEOUT_MS / 1000) +
+        " s. The plugin window must stay open (not closed); try again, or build the screen with figma_execute_code."));
+    }, HTML_BRIDGE_TIMEOUT_MS);
+    HTML_BRIDGE_PENDING.set(reqId, { resolve, reject, timer });
+    try {
+      figma.ui.postMessage({ type: "HTML_WALK", reqId, html: String(html), width, height });
+    } catch (e) {
+      HTML_BRIDGE_PENDING.delete(reqId);
+      clearTimeout(timer);
+      reject(e);
+    }
+  });
+}
+
+function htmlBridgeWarn(w) {
+  const where = w.id != null ? w.id : (w.dom != null ? "dom" + w.dom : "-");
+  return String(w.code) + " " + where + ": " + String(w.msg || "").slice(0, 110);
+}
+
+// bridge.fromHtml(html, { width | widths, height, parent, name, x, y }) -> compact report
+async function htmlBridgeFromHtml(html, opts) {
+  const o = opts || {};
+  if (typeof html !== "string" || !html.trim()) throw new Error("bridge.fromHtml: html must be a non-empty string");
+  const widths = Array.isArray(o.widths) && o.widths.length ? o.widths.map(Number) : [Number(o.width) || 1440];
+  if (widths.some((w) => !(w >= 100 && w <= 8000))) throw new Error("bridge.fromHtml: width must be 100..8000 px, got " + JSON.stringify(widths));
+  const height = Number(o.height) || 900;
+  let parent = null;
+  if (o.parent) {
+    parent = typeof o.parent === "string" ? figma.getNodeById(o.parent) : o.parent;
+    if (!parent || typeof parent.appendChild !== "function") throw new Error("bridge.fromHtml: parent " + String(o.parent) + " is not a node that can hold children");
+  }
+  const roots = [], warnings = [], codes = {};
+  let created = 0, al = 0, frames = 0, abs = 0, boxNum = 0, boxDen = 0, x = typeof o.x === "number" ? o.x : null, y = typeof o.y === "number" ? o.y : 0;
+  for (let i = 0; i < widths.length; i++) {
+    const w = widths[i];
+    const tree = await htmlBridgeRequestTree(html, w, height);
+    const plan = htmlMap(tree, {});
+    if (x === null) {
+      if (parent) x = 0;
+      else { const pos = getFreeCanvasPosition(w, plan.root.h); x = pos.x; y = typeof o.y === "number" ? o.y : pos.y; }
+    }
+    const name = o.name ? (widths.length > 1 ? o.name + " / " + w : o.name) : (widths.length > 1 ? "HTML / " + w : "HTML");
+    const report = await htmlBuild(plan, { parent: parent || figma.currentPage, x, y, name });
+    if (report.root_id) {
+      roots.push({ id: report.root_id, name, w: plan.root.w, h: plan.root.h, x, y });
+      try { if (activeCheckpoint) activeCheckpoint.created.push(report.root_id); } catch (e) { /* journal is best effort */ }
+    }
+    created += report.created; al += report.auto_layout; frames += plan.stats.frames; abs += report.absolute_fallback;
+    boxNum += report.box_ok.num; boxDen += report.box_ok.den;
+    report.warnings.concat(plan.warnings).forEach((wn) => {
+      codes[wn.code] = (codes[wn.code] || 0) + 1;
+      if (warnings.length < HTML_BRIDGE_MAX_WARNINGS && wn.code !== "absolute") warnings.push(htmlBridgeWarn(wn));
+    });
+    x += w + 80;
+  }
+  const out = {
+    ok: roots.length === widths.length,
+    roots,
+    layers: created,
+    auto_layout: frames ? Math.round((1000 * al) / frames) / 10 + "% of " + frames + " frames" : "n/a",
+    absolute_fallback: abs,
+    boxes_within_1px: boxDen ? boxNum + "/" + boxDen : "n/a",
+    warning_counts: codes
+  };
+  if (warnings.length) out.warnings = warnings;
+  return out;
 }
 async function onExecute(msg) {
   const {
@@ -4443,6 +5369,11 @@ figma.ui.onmessage = async (msg) => {
       code: 'EXECUTION_PAUSED',
       startTime: msg.startTime
     });
+    return;
+  }
+
+  if (msg.type === 'HTML_TREE') {
+    htmlBridgeOnTree(msg);
     return;
   }
 
