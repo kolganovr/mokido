@@ -171,6 +171,13 @@ return cb.map(c => c.componentProperties);`;
   check("classify: a script that created/modified nodes is a write whatever its text",
     srv.classifyScript(READ_FONT, { created: ["9:9"] }) === "write" && srv.classifyScript(READ_FONT, { modified: ["9:9"] }) === "write");
   check("classify: comparisons are not assignments", srv.classifyScript(`const n = figma.getNodeById("1:2"); return n.name === 'a' && n.x == 3 && n.y >= 0;`) === "read");
+  const REQ_W = `const p = await figma.getNodeById("1:2"); await bridge.require("trips").restyle(p); return true;`;
+  const REQ_R = `const p = await figma.getNodeById("1:2"); return bridge.require("trips").readStyle(p);`;
+  const REQ_V = `const t = bridge.require("trips"); const p = await figma.getNodeById("1:2"); t.restyle(p); return 1;`;
+  const REQ_D = `const { restyle } = bridge.require("trips"); const p = await figma.getNodeById("1:2"); restyle(p); return 1;`;
+  check("classify T-080 variants: via variable is a write too", srv.classifyScript(REQ_V) === "write", srv.classifyScript(REQ_V));
+  check("classify T-080: a method on bridge.require(...) is a write, not a read; a read-named one stays a read",
+    srv.classifyScript(REQ_W) === "write" && srv.classifyScript(REQ_R) === "read" && srv.readGuard(REQ_W) === null, [srv.classifyScript(REQ_W), srv.classifyScript(REQ_R)]);
 
   const s1 = srv.suggestInspect(READ_SECTIONS);
   check("suggest: section walk -> both ids, outline depth from the nesting", JSON.stringify(s1) === JSON.stringify({ node_ids: ["157:140133", "161:24484"], depth: 2 }), s1);

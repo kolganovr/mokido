@@ -73,12 +73,32 @@ const TABLE_HINT_RE = /\b(table|tables|row|rows|cell|cells|column|columns)\b|Ñ‚Ð
 
 const OUTLINE_COVERS =["font", "text", "layout", "fill", "stroke", "cornerRadius", "visible", "variant", "main"];
 
+// A module from bridge.require(...) can change the canvas inside its methods, which the regexes cannot see.
+// Not a read unless every method called on it (directly or via a variable) has a read name (get/read/find/...).
+const REQUIRE_RE = /bridge\s*\.\s*require\s*\(/;
+const REQUIRE_READISH_RE = /^(get|read|find|list|inspect|summari[sz]e|collect|scan|measure|count|check|is|has)(?![a-z])/;
+function requireMayWrite(code) {
+  if (!REQUIRE_RE.test(code)) return false;
+  const recv = ["bridge\s*\.\s*require\s*\([^)]*\)"];
+  let m;
+  const varRe = /(?:const|let|var)\s+(\{[^}]*\}|[\w$]+)\s*=\s*(?:await\s+)?bridge\s*\.\s*require\s*\(/g;
+  while ((m = varRe.exec(code))) {
+    if (m[1][0] === "{") m[1].slice(1, -1).split(",").forEach(n => { n = n.split(":").pop().trim(); if (n && !REQUIRE_READISH_RE.test(n)) recv.push("(?!)", "\b" + n.replace(/\$/g, "\$")); });
+    else recv.push("\b" + m[1].replace(/\$/g, "\$"));
+  }
+  const callRe = new RegExp("(?:" + recv.filter(r => r !== "(?!)").join("|") + ")\s*\)?\s*\.\s*([\w$]+)\s*\(", "g");
+  let any = false;
+  while ((m = callRe.exec(code))) { any = true; if (!REQUIRE_READISH_RE.test(m[1])) return true; }
+  return !any;
+}
+
 // -> "write" | "read" | "stash" | "cheap" | null
 function classifyScript(code, response) {
   if (typeof code !== "string") return null;
   if (response && ((Array.isArray(response.created) && response.created.length) ||
                    (Array.isArray(response.modified) && response.modified.length))) return "write";
   if (CANVAS_WRITE_RE.test(code)) return "write";
+  if (requireMayWrite(code)) return "write";
   const touchesNodes = NODE_READ_RE.test(code);
   // lastResult is plain data: `.children` on it is not a node read.
   if (STASH_RE.test(code) && !/getNodeById(Async)?\s*\(|currentPage\b/.test(code)) return "stash";
