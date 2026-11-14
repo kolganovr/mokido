@@ -7,6 +7,8 @@
 // script language in `code` ("ok", "big", "slow:<ms>", "hang") and records
 // what it was sent, so the tests can assert on both directions of the wire.
 // Needs Node >= 22 (global WebSocket).
+// Node 18 has no global WebSocket client: suites that drive the server over one are skipped there (CI runs Node 18 and 22).
+if (typeof WebSocket !== "function") { console.log("skip: needs Node >= 22 (global WebSocket), this is " + process.versions.node); process.exit(0); }
 const path = require("path");
 const { spawn } = require("child_process");
 

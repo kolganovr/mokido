@@ -161,9 +161,7 @@ async function overlayPerFile() {
 }
 
 async function main() {
-  // inspectHints and overlayPerFile drive the server with the global WebSocket client (Node 22+); Node 18 has none
-  const steps = typeof WebSocket === "function" ? [inspectHints, restSimplify, overlayPerFile] : [restSimplify];
-  if (steps.length < 3) console.log("  skip inspectHints, overlayPerFile: no global WebSocket on Node " + process.versions.node);
+  const steps = [inspectHints, restSimplify, overlayPerFile];
   for (const step of steps) {
     try { await step(); }
     catch (e) { failures++; console.log("  FAIL " + step.name + " crashed: " + (e && e.stack || e)); }

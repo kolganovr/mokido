@@ -8,7 +8,7 @@
   "sent_to_plugin": [
     {
       "code": [
-        "return await bridge.fromHtml(\"<!doctype html>\\n<html><head><style>\\nbody { margin: 0; font-family: Inter, sans-serif; }\\n.card { display: flex; flex-direction: column; gap: 12px; padding: 24px; background: #ffffff; border-radius: 12px; }\\n</style></head>\\n<body><div class=\\\"card\\\" data-name=\\\"Card\\\"><h1>Hello</h1><p>One screen, one call.</p></div></body></html>\\n\", {});"
+        "return await bridge.fromHtml(\"<!doctype html><html><head><style>body { margin: 0; font-family: Inter, sans-serif; }.card { display: flex; flex-direction: column; gap: 12px; padding: 24px; background: #ffffff; border-radius: 12px; }</style></head><body><div class=\\\"card\\\" data-name=\\\"Card\\\"><h1>Hello</h1><p>One screen, one call.</p></div></body></html>\", {});"
       ],
       "description": "HTML to Figma",
       "capture": false,

@@ -4,6 +4,8 @@
 //
 // Ports: callers pass their own (golden-tools uses 18801-18820). Never 8765,
 // a live bridge on this machine must not be touched.
+// Node 18 has no global WebSocket client: suites that drive the server over one are skipped there (CI runs Node 18 and 22).
+if (typeof WebSocket !== "function") { console.log("skip: needs Node >= 22 (global WebSocket), this is " + process.versions.node); process.exit(0); }
 const path = require("path");
 const { spawn } = require("child_process");
 
