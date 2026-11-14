@@ -15,7 +15,9 @@ const { createHtmlStub } = require("./helpers/html-build-stub");
 
 const SRC = path.join(__dirname, "..", "figma-plugin-src", "html-build.js");
 const FIX = path.join(__dirname, "fixtures", "html-build");
-const DUMP = process.env.FIGMA_DUMP_JS || path.join(__dirname, "..", "..", "..", "..", "planning", "tools", "html", "figma_dump.js");
+// planning/ is outside git: next to tests/ in the project root, or 3 levels up from a .claude/worktrees/<name> checkout
+const DUMP = process.env.FIGMA_DUMP_JS || [path.join(__dirname, "..", "planning", "tools", "html", "figma_dump.js"),
+  path.join(__dirname, "..", "..", "..", "..", "planning", "tools", "html", "figma_dump.js")].find((p) => fs.existsSync(p)) || "planning/tools/html/figma_dump.js";
 
 let failures = 0;
 let checks = 0;
