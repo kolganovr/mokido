@@ -79,17 +79,21 @@ const REQUIRE_RE = /bridge\s*\.\s*require\s*\(/;
 const REQUIRE_READISH_RE = /^(get|read|find|list|inspect|summari[sz]e|collect|scan|measure|count|check|is|has)(?![a-z])/;
 function requireMayWrite(code) {
   if (!REQUIRE_RE.test(code)) return false;
-  const recv = ["bridge\s*\.\s*require\s*\([^)]*\)"];
+  const names = []; // variables (and destructured methods) that hold the module
+  const methods = []; // method names called straight on bridge.require(...)
   let m;
+  const chainRe = /bridge\s*\.\s*require\s*\([^)]*\)\s*\.\s*([\w$]+)\s*\(/g;
+  while ((m = chainRe.exec(code))) methods.push(m[1]);
   const varRe = /(?:const|let|var)\s+(\{[^}]*\}|[\w$]+)\s*=\s*(?:await\s+)?bridge\s*\.\s*require\s*\(/g;
   while ((m = varRe.exec(code))) {
-    if (m[1][0] === "{") m[1].slice(1, -1).split(",").forEach(n => { n = n.split(":").pop().trim(); if (n && !REQUIRE_READISH_RE.test(n)) recv.push("(?!)", "\b" + n.replace(/\$/g, "\$")); });
-    else recv.push("\b" + m[1].replace(/\$/g, "\$"));
+    if (m[1][0] === "{") m[1].slice(1, -1).split(",").forEach(n => { n = n.split(":").pop().trim(); if (n) methods.push(n); });
+    else names.push(m[1]);
   }
-  const callRe = new RegExp("(?:" + recv.filter(r => r !== "(?!)").join("|") + ")\s*\)?\s*\.\s*([\w$]+)\s*\(", "g");
-  let any = false;
-  while ((m = callRe.exec(code))) { any = true; if (!REQUIRE_READISH_RE.test(m[1])) return true; }
-  return !any;
+  for (const v of names) {
+    const callRe = new RegExp("(?:^|" + /[^\w$.]/.source + ")" + v.replace(/\$/g, "[$]") + /\s*\.\s*([\w$]+)\s*\(/.source, "g");
+    while ((m = callRe.exec(code))) methods.push(m[1]);
+  }
+  return !methods.length || methods.some(n => !REQUIRE_READISH_RE.test(n));
 }
 
 // -> "write" | "read" | "stash" | "cheap" | null
