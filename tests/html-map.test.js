@@ -78,6 +78,7 @@ function measure(dom, plan) {
   const dsz = (v) => (v == null ? null : v === "100%" ? "fill" : /^-?[\d.]+(px)?$/.test(String(v)) ? "px" : /^(auto|fit-content|max-content|min-content)$/.test(v) ? null : "px");
   const expect = (n, par, axis) => {
     const dd = n.declared, sz = dsz(dd[axis === "h" ? "width" : "height"]);
+    if (n.position === "absolute" || n.position === "fixed") return sz === "fill" ? "FILL" : sz === "px" ? "FIXED" : "HUG"; // out of flow: no stretch, shrink-to-fit
     if (par.flex) {
       if ((par.flex.dir === "row") === (axis === "h")) {
         if (parseFloat(dd["flex-grow"] || String(dd.flex || "0").split(" ")[0]) > 0) return "FILL";
@@ -101,7 +102,9 @@ function measure(dom, plan) {
     const par = parentOf.get(f);
     if (!par || par.layoutMode === "NONE") return;
     sd++;
-    sb += expect(n, by[n.parent], "h") === f.sizingH && expect(n, by[n.parent], "v") === f.sizingV;
+    const okb = expect(n, by[n.parent], "h") === f.sizingH && expect(n, by[n.parent], "v") === f.sizingV;
+    if (!okb && process.env.HTML_MAP_DEBUG) console.log("  sizing miss", dom.etalon, n.id, n.tag, n.classes.join("."), "expect", expect(n, by[n.parent], "h") + "/" + expect(n, by[n.parent], "v"), "got", f.sizingH + "/" + f.sizingV);
+    sb += okb;
   });
   res.sizing = pct(sb, sd);
   res.layers_ratio = Math.round(100 * fl.length / cands.length) / 100;
@@ -133,8 +136,9 @@ files.forEach((f) => {
   check(name + " dir >= 95", m.dir >= 95, m);
   check(name + " gap >= 95", m.gap >= 95, m);
   check(name + " padding >= 95", m.padding >= 95, m);
-  // 08: three absolute tag chips; the SPEC heuristic is blind to position and expects FILL for them (see report), floor 65
-  check(name + " sizing", m.sizing >= (name.startsWith("08_") ? 65 : 90), m.sizing);
+  // 08: three absolute tag chips; the SPEC heuristic is blind to position and expects FILL for them (see T-097): now position-aware
+  // 08: 3 hero images (100% x 100% in a fixed-height box) are absorbed into the container fill (fewer layers), the measure pairs them with the container (FILL/FIXED instead of FILL/FILL): 85, floor 85, open for Fable
+  check(name + " sizing", m.sizing >= (name.startsWith("08_") ? 85 : 90), m.sizing);
   // contract wants <= 1.2 counting every layer; the SPEC counts component interiors and plain flex wrappers as extra. Floor 1.5 without interiors
   check(name + " layers_ratio (no component interiors) <= 1.5", m.layers_ratio_no_comp <= 1.5, m.layers_ratio_no_comp);
   check(name + " absolute <= 5", m.absolute <= 5, m.absolute);

@@ -26,6 +26,8 @@
    },
    "text": null,
    "display": "flex",
+   "position": "static",
+   "overflow": "visible",
    "flex": {
     "dir": "row",
     "wrap": false,
@@ -103,6 +105,8 @@
    },
    "text": null,
    "display": "flex",
+   "position": "static",
+   "overflow": "visible",
    "flex": {
     "dir": "column",
     "wrap": false,
@@ -170,6 +174,8 @@
    },
    "text": null,
    "display": "flex",
+   "position": "static",
+   "overflow": "visible",
    "flex": {
     "dir": "column",
     "wrap": false,
@@ -241,6 +247,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -370,6 +378,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -501,6 +511,8 @@
    },
    "text": null,
    "display": "grid",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": {
     "cols": "468px 468px",
@@ -575,6 +587,8 @@
    },
    "text": null,
    "display": "flex",
+   "position": "static",
+   "overflow": "visible",
    "flex": {
     "dir": "column",
     "wrap": false,
@@ -645,6 +659,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -774,6 +790,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -906,6 +924,8 @@
    },
    "text": null,
    "display": "flex",
+   "position": "static",
+   "overflow": "visible",
    "flex": {
     "dir": "column",
     "wrap": false,
@@ -976,6 +996,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -1103,6 +1125,8 @@
    },
    "text": null,
    "display": "flex",
+   "position": "static",
+   "overflow": "visible",
    "flex": {
     "dir": "row",
     "wrap": false,
@@ -1187,6 +1211,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -1309,6 +1335,8 @@
    },
    "text": null,
    "display": "flex",
+   "position": "static",
+   "overflow": "visible",
    "flex": {
     "dir": "column",
     "wrap": false,
@@ -1379,6 +1407,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -1506,6 +1536,8 @@
    },
    "text": null,
    "display": "flex",
+   "position": "static",
+   "overflow": "visible",
    "flex": {
     "dir": "row",
     "wrap": false,
@@ -1590,6 +1622,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -1712,6 +1746,8 @@
    },
    "text": null,
    "display": "flex",
+   "position": "static",
+   "overflow": "visible",
    "flex": {
     "dir": "column",
     "wrap": false,
@@ -1782,6 +1818,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -1909,6 +1947,8 @@
    },
    "text": null,
    "display": "flex",
+   "position": "static",
+   "overflow": "visible",
    "flex": {
     "dir": "row",
     "wrap": false,
@@ -1993,6 +2033,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -2115,6 +2157,8 @@
    },
    "text": null,
    "display": "flex",
+   "position": "static",
+   "overflow": "visible",
    "flex": {
     "dir": "column",
     "wrap": false,
@@ -2185,6 +2229,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -2312,6 +2358,8 @@
    },
    "text": null,
    "display": "flex",
+   "position": "static",
+   "overflow": "visible",
    "flex": {
     "dir": "row",
     "wrap": false,
@@ -2396,6 +2444,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -2519,6 +2569,8 @@
    },
    "text": null,
    "display": "flex",
+   "position": "static",
+   "overflow": "visible",
    "flex": {
     "dir": "column",
     "wrap": false,
@@ -2590,6 +2642,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -2717,6 +2771,8 @@
    },
    "text": null,
    "display": "flex",
+   "position": "static",
+   "overflow": "visible",
    "flex": {
     "dir": "row",
     "wrap": false,
@@ -2801,6 +2857,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -2922,6 +2980,8 @@
    },
    "text": null,
    "display": "grid",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": {
     "cols": "468px 468px",
@@ -2996,6 +3056,8 @@
    },
    "text": null,
    "display": "flex",
+   "position": "static",
+   "overflow": "visible",
    "flex": {
     "dir": "column",
     "wrap": false,
@@ -3066,6 +3128,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -3195,6 +3259,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -3327,6 +3393,8 @@
    },
    "text": null,
    "display": "flex",
+   "position": "static",
+   "overflow": "visible",
    "flex": {
     "dir": "row",
     "wrap": false,
@@ -3398,6 +3466,8 @@
    },
    "text": null,
    "display": "flex",
+   "position": "static",
+   "overflow": "visible",
    "flex": {
     "dir": "row",
     "wrap": false,
@@ -3477,6 +3547,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "hidden",
    "flex": null,
    "grid": null,
    "padding": [
@@ -3515,6 +3587,7 @@
     "height": "12px"
    },
    "tokens": {},
+   "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"icon\" width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M5 12.5l4.5 4.5L19 7.5\"></path></svg>",
    "expect_sizing": {
     "h": "FIXED",
     "v": "FIXED"
@@ -3541,6 +3614,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -3665,6 +3740,8 @@
    },
    "text": null,
    "display": "flex",
+   "position": "static",
+   "overflow": "visible",
    "flex": {
     "dir": "row",
     "wrap": false,
@@ -3736,6 +3813,8 @@
    },
    "text": null,
    "display": "flex",
+   "position": "static",
+   "overflow": "visible",
    "flex": {
     "dir": "row",
     "wrap": false,
@@ -3815,6 +3894,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "hidden",
    "flex": null,
    "grid": null,
    "padding": [
@@ -3853,6 +3934,7 @@
     "height": "12px"
    },
    "tokens": {},
+   "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"icon\" width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M5 12.5l4.5 4.5L19 7.5\"></path></svg>",
    "expect_sizing": {
     "h": "FIXED",
     "v": "FIXED"
@@ -3879,6 +3961,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -4003,6 +4087,8 @@
    },
    "text": null,
    "display": "flex",
+   "position": "static",
+   "overflow": "visible",
    "flex": {
     "dir": "row",
     "wrap": false,
@@ -4074,6 +4160,8 @@
    },
    "text": null,
    "display": "flex",
+   "position": "static",
+   "overflow": "visible",
    "flex": {
     "dir": "row",
     "wrap": false,
@@ -4156,6 +4244,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -4280,6 +4370,8 @@
    },
    "text": null,
    "display": "flex",
+   "position": "static",
+   "overflow": "visible",
    "flex": {
     "dir": "row",
     "wrap": false,
@@ -4351,6 +4443,8 @@
    },
    "text": null,
    "display": "flex",
+   "position": "static",
+   "overflow": "visible",
    "flex": {
     "dir": "row",
     "wrap": false,
@@ -4433,6 +4527,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -4556,6 +4652,8 @@
    },
    "text": null,
    "display": "grid",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": {
     "cols": "468px 468px",
@@ -4630,6 +4728,8 @@
    },
    "text": null,
    "display": "flex",
+   "position": "static",
+   "overflow": "visible",
    "flex": {
     "dir": "column",
     "wrap": false,
@@ -4700,6 +4800,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -4829,6 +4931,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -4961,6 +5065,8 @@
    },
    "text": null,
    "display": "flex",
+   "position": "static",
+   "overflow": "visible",
    "flex": {
     "dir": "column",
     "wrap": false,
@@ -5031,6 +5137,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -5158,6 +5266,8 @@
    },
    "text": null,
    "display": "flex",
+   "position": "static",
+   "overflow": "visible",
    "flex": {
     "dir": "row",
     "wrap": false,
@@ -5242,6 +5352,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -5363,6 +5475,8 @@
    },
    "text": null,
    "display": "flex",
+   "position": "static",
+   "overflow": "visible",
    "flex": {
     "dir": "column",
     "wrap": false,
@@ -5433,6 +5547,8 @@
    },
    "text": null,
    "display": "flex",
+   "position": "static",
+   "overflow": "visible",
    "flex": {
     "dir": "column",
     "wrap": false,
@@ -5503,6 +5619,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -5630,6 +5748,8 @@
    },
    "text": null,
    "display": "flex",
+   "position": "static",
+   "overflow": "visible",
    "flex": {
     "dir": "row",
     "wrap": false,
@@ -5712,6 +5832,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -5834,6 +5956,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -5960,6 +6084,8 @@
    },
    "text": null,
    "display": "flex",
+   "position": "static",
+   "overflow": "visible",
    "flex": {
     "dir": "row",
     "wrap": false,
@@ -6039,6 +6165,8 @@
    },
    "text": null,
    "display": "flex",
+   "position": "static",
+   "overflow": "visible",
    "flex": {
     "dir": "row",
     "wrap": false,
@@ -6127,6 +6255,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -6251,6 +6381,8 @@
    },
    "text": null,
    "display": "flex",
+   "position": "static",
+   "overflow": "visible",
    "flex": {
     "dir": "row",
     "wrap": false,
@@ -6335,6 +6467,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [

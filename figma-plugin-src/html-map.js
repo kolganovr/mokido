@@ -391,7 +391,7 @@ function htmlMapNode(c, n, pc, isRoot) {
   } else if (flow.length) {
     htmlMapFlow(c, n, P, flow);
   } else P.padding = pad.slice();
-  P.clips = false;
+  P.clips = !!n.overflow && /hidden|clip|auto|scroll/.test(n.overflow);
   if (P.layoutMode !== "NONE") c.stats.auto_layout++;
   c.stats.frames++;
   if (!isRoot) htmlMapSetSize(P, n, pc);

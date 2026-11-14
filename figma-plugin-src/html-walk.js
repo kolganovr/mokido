@@ -102,6 +102,29 @@ function htmlWalkStyle(cs, rect, isText) {
   };
 }
 
+// overflow: "visible" if neither axis clips, else the clipping value ("hidden", "auto", "scroll", "clip"); "x y" if they differ
+function htmlWalkOverflow(cs) {
+  var x = cs.overflowX, y = cs.overflowY;
+  if (x === y) return x;
+  return x + " " + y;
+}
+
+// svg markup with explicit pixel size from the rect (createNodeFromSvg needs width/height) and the xmlns attribute
+function htmlWalkSvg(el, rect) {
+  var s = el.outerHTML;
+  var head = s.match(/^<svg\b[^>]*>/i);
+  if (!head) return s;
+  var h = head[0], nh = h;
+  var setAttr = function (name, val) {
+    var re = new RegExp("\\s" + name + "\\s*=\\s*(\"[^\"]*\"|'[^']*')", "i");
+    if (re.test(nh)) nh = nh.replace(re, " " + name + '="' + val + '"'); else nh = nh.replace(/^<svg/i, "<svg " + name + '="' + val + '"');
+  };
+  if (!/\sxmlns\s*=/i.test(nh)) nh = nh.replace(/^<svg/i, '<svg xmlns="http://www.w3.org/2000/svg"');
+  setAttr("width", rect.w);
+  setAttr("height", rect.h);
+  return nh + s.slice(h.length);
+}
+
 function htmlWalkRect(c, r) {
   return { x: htmlWalkR2(r.left + c.sx), y: htmlWalkR2(r.top + c.sy), w: htmlWalkR2(r.width), h: htmlWalkR2(r.height) };
 }
@@ -143,12 +166,15 @@ function htmlWalkEl(c, el, parentId, ancDecl, ancTok) {
       variant: el.getAttribute("data-variant"),
       in_component: !!(el.parentElement && el.parentElement.closest("[data-component]")),
       rect: rect, text: null, display: disp,
+      position: cs.position, overflow: htmlWalkOverflow(cs),
       flex: isFlex ? { dir: dir, wrap: cs.flexWrap !== "nowrap", gap: dir === "row" ? gcol : grow, justify: cs.justifyContent, align: cs.alignItems } : null,
       grid: isGrid ? { cols: cs.gridTemplateColumns, rowGap: grow, colGap: gcol } : null,
       padding: [htmlWalkPx(cs.paddingTop), htmlWalkPx(cs.paddingRight), htmlWalkPx(cs.paddingBottom), htmlWalkPx(cs.paddingLeft)],
       style: htmlWalkStyle(cs, rect, false),
       declared: declared, tokens: tokens
     };
+    if (isSvg) node.svg = htmlWalkSvg(el, rect);
+    if (isImg) node.src = el.currentSrc || el.getAttribute("src") || null;
     c.nodes.push(node);
     myId = node.id;
     if (isSvg) return;
@@ -215,6 +241,7 @@ function htmlWalkSizeKind(val) {
 // flex-родитель, поперечная ось: объявлен размер -> FIXED (100% -> FILL); иначе align-self, иначе align-items родителя:
 //   stretch/normal -> FILL, остальное -> HUG.
 // не flex: по горизонтали блок без ширины -> FILL, inline-* -> HUG, объявленная ширина -> FIXED; по вертикали высота -> FIXED, иначе HUG.
+// position absolute/fixed (вне потока): объявленный размер (100% -> FILL) или HUG (shrink-to-fit); flex-родитель не растягивает.
 // svg/img: FIXED, если не объявлено 100%/flex-grow. #text: HUG/HUG.
 function htmlWalkExpectSizing(node, parent) {
   if (node.tag === "#text") return { h: "HUG", v: "HUG" };
@@ -226,6 +253,12 @@ function htmlWalkExpectSizing(node, parent) {
     return k;
   };
   var out = {};
+  // out of flow (position absolute/fixed): no flex stretch or grow; declared size (100% -> FILL) or FIXED
+  if (node.position === "absolute" || node.position === "fixed") {
+    out.h = declKind("h") || "FIXED";
+    out.v = declKind("v") || "FIXED";
+    return out;
+  }
   var pf = parent ? parent.flex : null;
   if (pf) {
     var main = pf.dir === "row" ? "h" : "v";

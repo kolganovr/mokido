@@ -26,6 +26,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -89,6 +91,8 @@
    },
    "text": null,
    "display": "flex",
+   "position": "static",
+   "overflow": "visible",
    "flex": {
     "dir": "row",
     "wrap": false,
@@ -162,6 +166,8 @@
    },
    "text": null,
    "display": "flex",
+   "position": "static",
+   "overflow": "visible",
    "flex": {
     "dir": "row",
     "wrap": false,
@@ -227,6 +233,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "hidden",
    "flex": null,
    "grid": null,
    "padding": [
@@ -264,6 +272,7 @@
     "height": "28px"
    },
    "tokens": {},
+   "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"28\" height=\"28\" viewBox=\"0 0 28 28\"><circle cx=\"14\" cy=\"14\" r=\"13\" fill=\"#ff957a\"></circle><path d=\"M9 14.5l3.5 3.5L19 10.5\" fill=\"none\" stroke=\"#1d1a18\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path></svg>",
    "expect_sizing": {
     "h": "FIXED",
     "v": "FIXED"
@@ -349,6 +358,8 @@
    },
    "text": null,
    "display": "flex",
+   "position": "static",
+   "overflow": "visible",
    "flex": {
     "dir": "row",
     "wrap": false,
@@ -412,6 +423,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -532,6 +545,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -652,6 +667,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -772,6 +789,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -894,6 +913,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -1024,6 +1045,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -1089,6 +1112,8 @@
    },
    "text": null,
    "display": "inline-block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -1217,6 +1242,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -1339,6 +1366,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -1462,6 +1491,8 @@
    },
    "text": null,
    "display": "flex",
+   "position": "static",
+   "overflow": "visible",
    "flex": {
     "dir": "row",
     "wrap": false,
@@ -1528,6 +1559,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -1659,6 +1692,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -1799,6 +1834,8 @@
    },
    "text": null,
    "display": "flex",
+   "position": "static",
+   "overflow": "hidden",
    "flex": {
     "dir": "row",
     "wrap": false,
@@ -1871,6 +1908,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -1942,6 +1981,8 @@
    },
    "text": null,
    "display": "flex",
+   "position": "static",
+   "overflow": "visible",
    "flex": {
     "dir": "row",
     "wrap": false,
@@ -2007,6 +2048,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -2075,6 +2118,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -2143,6 +2188,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -2211,6 +2258,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -2276,6 +2325,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -2341,6 +2392,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -2406,6 +2459,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -2471,6 +2526,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -2534,6 +2591,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -2656,6 +2715,8 @@
    },
    "text": null,
    "display": "flex",
+   "position": "static",
+   "overflow": "visible",
    "flex": {
     "dir": "row",
     "wrap": false,
@@ -2724,6 +2785,8 @@
    },
    "text": null,
    "display": "flex",
+   "position": "static",
+   "overflow": "visible",
    "flex": {
     "dir": "row",
     "wrap": false,
@@ -2789,6 +2852,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "hidden",
    "flex": null,
    "grid": null,
    "padding": [
@@ -2826,6 +2891,7 @@
     "height": "28px"
    },
    "tokens": {},
+   "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"28\" height=\"28\" viewBox=\"0 0 28 28\"><circle cx=\"14\" cy=\"14\" r=\"11\" fill=\"currentColor\"></circle></svg>",
    "expect_sizing": {
     "h": "FIXED",
     "v": "FIXED"
@@ -2849,6 +2915,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -2968,6 +3036,8 @@
    },
    "text": null,
    "display": "flex",
+   "position": "static",
+   "overflow": "visible",
    "flex": {
     "dir": "row",
     "wrap": false,
@@ -3033,6 +3103,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "hidden",
    "flex": null,
    "grid": null,
    "padding": [
@@ -3070,6 +3142,7 @@
     "height": "28px"
    },
    "tokens": {},
+   "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"28\" height=\"28\" viewBox=\"0 0 28 28\"><rect x=\"4\" y=\"4\" width=\"20\" height=\"20\" rx=\"4\" transform=\"rotate(45 14 14)\" fill=\"currentColor\"></rect></svg>",
    "expect_sizing": {
     "h": "FIXED",
     "v": "FIXED"
@@ -3093,6 +3166,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -3212,6 +3287,8 @@
    },
    "text": null,
    "display": "flex",
+   "position": "static",
+   "overflow": "visible",
    "flex": {
     "dir": "row",
     "wrap": false,
@@ -3277,6 +3354,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "hidden",
    "flex": null,
    "grid": null,
    "padding": [
@@ -3314,6 +3393,7 @@
     "height": "28px"
    },
    "tokens": {},
+   "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"28\" height=\"28\" viewBox=\"0 0 28 28\"><path d=\"M14 3l12 21H2z\" fill=\"currentColor\"></path></svg>",
    "expect_sizing": {
     "h": "FIXED",
     "v": "FIXED"
@@ -3337,6 +3417,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -3456,6 +3538,8 @@
    },
    "text": null,
    "display": "flex",
+   "position": "static",
+   "overflow": "visible",
    "flex": {
     "dir": "row",
     "wrap": false,
@@ -3521,6 +3605,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "hidden",
    "flex": null,
    "grid": null,
    "padding": [
@@ -3558,6 +3644,7 @@
     "height": "28px"
    },
    "tokens": {},
+   "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"28\" height=\"28\" viewBox=\"0 0 28 28\"><path d=\"M14 2l11 6.5v11L14 26 3 19.5v-11z\" fill=\"currentColor\"></path></svg>",
    "expect_sizing": {
     "h": "FIXED",
     "v": "FIXED"
@@ -3581,6 +3668,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
@@ -3700,6 +3789,8 @@
    },
    "text": null,
    "display": "flex",
+   "position": "static",
+   "overflow": "visible",
    "flex": {
     "dir": "row",
     "wrap": false,
@@ -3765,6 +3856,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "hidden",
    "flex": null,
    "grid": null,
    "padding": [
@@ -3802,6 +3895,7 @@
     "height": "28px"
    },
    "tokens": {},
+   "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"28\" height=\"28\" viewBox=\"0 0 28 28\"><rect x=\"2\" y=\"8\" width=\"24\" height=\"12\" rx=\"6\" fill=\"currentColor\"></rect></svg>",
    "expect_sizing": {
     "h": "FIXED",
     "v": "FIXED"
@@ -3825,6 +3919,8 @@
    },
    "text": null,
    "display": "block",
+   "position": "static",
+   "overflow": "visible",
    "flex": null,
    "grid": null,
    "padding": [
