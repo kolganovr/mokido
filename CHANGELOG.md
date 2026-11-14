@@ -15,6 +15,28 @@
 - **`npx mokido@latest --update` everywhere.** The plugin's "Update needed" hint and Copy command said
   `npx mokido --update`, which can rerun the version npx cached last time.
 - **README: an "Updating" section** under Quickstart; AGENTS.md says to `git pull` before `--update`.
+- **A result that arrives late is not lost.** When a job finishes after nobody is waiting (the call timed out,
+  or `figma_job_status` had already said `stalled`), the next Mokido call in the same process starts with a
+  `late_result` block (a short line, 300 bytes at most). `figma_job_status` hands the finished result out once,
+  marked `late: true`.
+- **`figma_job_status` never reports a link error as a job error.** If the bridge that ran the job restarted,
+  it answers `JOB_STATE_UNKNOWN` (outcome unknown; make one cheap read, do not rerun blind) instead of a
+  misleading failure.
+- **Clearer `stalled` and `PLUGIN_BUSY` texts.** `stalled` says STOP, names the silence in seconds, and tells
+  the model not to poll or rerun (a late finish arrives as `late_result`); a second poll says the same, short.
+  `PLUGIN_BUSY` with a silent job tells the model to ask the user to look at Figma.
+  Env: `FIGMA_MCP_STALLED_MS` (default 120000), `FIGMA_MCP_JOB_EXPIRE_MS` (default 30 min, `0` = never).
+- **Process journal `mokido-server.log`** in the OS temp folder, on by default: start, master/proxy role
+  changes, why the process exited, stack of an uncaught error. Never written: script code, Figma file
+  names, the bridge token. Capped at 256 KB. `FIGMA_MCP_LOG_FILE=<path>` moves it, `FIGMA_MCP_LOG_FILE=0`
+  turns it off.
+- **Fonts: a named timeout and one load per font.** A font load that does not finish in `FONT_LOAD_TIMEOUT_MS`
+  (4900 ms) is taken as done, and if the next write then fails on an unloaded font the error is
+  `FONT_LOAD_TIMEOUT` naming the font. `loadFontAsync` with bad arguments fails at once with `FONT_BAD_ARGS`.
+  The three Inter styles load in parallel: worst case about 5 s instead of 15. A new lint warns about a font
+  load in a script that never edits text.
+- **The plugin UI keeps results it could not send.** The last 5 (images stripped) are resent when the socket
+  reconnects.
 
 ## 4.4.0 -- new plugin window with Moki, one install folder
 

@@ -138,7 +138,7 @@ It may force `primaryAxisSizingMode` / `counterAxisSizingMode` to `"FIXED"` on t
 const comp = bridge.componentize(frame);   // records sizing modes by tree position, restores them, forces relayout
 ```
 
-**Fonts** must be loaded before any text mutation: `await ensureFont("Inter", "Bold")`.
+**Fonts** must be loaded before any text mutation: `await ensureFont("Inter", "Bold")`. A load that hangs past about 5 s is let go, and a following write that fails on the unloaded font returns `FONT_LOAD_TIMEOUT` naming it: bring Figma to the front or use another font.
 **Colors** are floats `0..1`, not `0..255`.
 
 ---
@@ -192,7 +192,7 @@ A `figma_execute_code` call still running past 45 seconds is automatically hande
 figma_job_status({ job_id: "cmd_xyz" });
 ```
 
-which returns the exact same result/screenshot a synchronous call would have returned, or — if `wait_ms` ran out first — live progress (call `progress(step, of, note)` inside your code so there's something real to report). `stalled: true` means nothing has come back for 2 minutes: the plugin is probably frozen, so ask the user instead of waiting again. If the plugin disconnects, the job fails at once with `PLUGIN_DISCONNECTED`. A call that times out while another job still occupies the single-threaded sandbox fails with `PLUGIN_BUSY` naming that job — wait for it rather than retrying. Pass `async: true` to opt into a job immediately instead of waiting out the 45s. A finished job is forgotten after being read once.
+which returns the exact same result/screenshot a synchronous call would have returned, or — if `wait_ms` ran out first — live progress (call `progress(step, of, note)` inside your code so there's something real to report). `stalled: true` means nothing has come back for 2 minutes: the plugin is probably frozen, so ask the user instead of waiting again. If the plugin disconnects, the job fails at once with `PLUGIN_DISCONNECTED`. A call that times out while another job still occupies the single-threaded sandbox fails with `PLUGIN_BUSY` naming that job — wait for it rather than retrying. Pass `async: true` to opt into a job immediately instead of waiting out the 45s. A finished job is forgotten after being read once. If the job finishes after nobody is waiting (the call timed out, or it was already reported `stalled`), the next Mokido call starts with a `late_result` block, and `figma_job_status` returns it once with `late: true`: don't rerun the script. If the bridge restarted meanwhile, `figma_job_status` answers `JOB_STATE_UNKNOWN`: make one cheap read before deciding.
 
 ---
 

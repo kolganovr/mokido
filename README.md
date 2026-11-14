@@ -280,7 +280,7 @@ for *fewer turns* and *smaller residue*:
 
 Every default is overridable per call, and per install through env: `FIGMA_MCP_SCALE`,
 `FIGMA_MCP_MAX_PX`, `FIGMA_MCP_MAX_IMAGES`, `FIGMA_MCP_MAX_OUTPUT_BYTES`, `FIGMA_MCP_MAX_OUTPUT_CEILING` (`0` = no ceiling), `FIGMA_MCP_JOB_WAIT_MS`,
-`FIGMA_MCP_ESCALATE_MS`, `FIGMA_MCP_RECONNECT_GRACE_MS`.
+`FIGMA_MCP_ESCALATE_MS`, `FIGMA_MCP_RECONNECT_GRACE_MS`, `FIGMA_MCP_STALLED_MS` (silence before a job counts as stalled, default `120000`), `FIGMA_MCP_JOB_EXPIRE_MS` (a job nobody waits for expires after this, default 30 min, `0` = never), `FIGMA_MCP_LOG_FILE` (process journal `mokido-server.log` in the temp folder is on by default; a path moves it, `0` turns it off).
 
 ---
 
