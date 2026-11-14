@@ -95,7 +95,8 @@ async function routeTool(name, args = {}) {
         }, TIMEOUTS.normal);
         // A read has nothing to roll back or lint — keep only what was read.
         const plain = !args.compare && !args.like && !args.props && !args.check && (!args.view || args.view === "outline");
-        const similar = plain && response.result ? similarHint(response.result.outline) : null;
+        const found = plain && response.result && args.find && !args.find_text ? response.result.found : null; // find hits: many alike -> like/compare
+        const similar = plain && response.result ? (found ? similarHint(found, true) : similarHint(response.result.outline)) : null;
         // a flow re-read after bridge.openOverlay: say the look is the manual step, not a miss
         if (response.result && typeof response.result.flow === "string" && OVERLAY_LINKED.size &&
             [...OVERLAY_LINKED.values()].some(v => linkedOverlay(response.__file || args.target, v.overlay) === v && response.result.flow.indexOf("#" + v.overlay + ":") !== -1)) {

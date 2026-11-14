@@ -78,7 +78,8 @@ function outlineStyle(rest, h) {
 // not grouped with the targets (h7 T1 offered the reference as a 4th copy).
 const REFERENCE_NAME_RE = /эталон|reference|\bref\b/i;
 
-function similarHint(outline) {
+// topLevel: the lines at indent 0 are the nodes themselves (a `find` reply: hits, not a tree root).
+function similarHint(outline, topLevel) {
   if (typeof outline !== "string") return null;
   const lines = outline.split(/\r?\n/);
   const nodes = [];
@@ -91,7 +92,7 @@ function similarHint(outline) {
     if (!m) { anc.push({ indent: indentNow, ref: false }); return; }
     const inRef = anc.some(a => a.ref) || REFERENCE_NAME_RE.test(m[3]);
     anc.push({ indent: indentNow, ref: inRef });
-    if (m[1].length === 0) return;
+    if (m[1].length === 0 && !topLevel) return;
     // inside an instance (#I<id>;<id>) every layer belongs to the master: not a node to align
     if (m[4].charAt(0) === "I") return;
     const indent = m[1].length;

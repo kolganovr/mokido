@@ -536,6 +536,14 @@ console.log("\n== 4.2.5: read guard, page scans, componentize, validation errors
   const sh = srv.similarHint(SIM);
   check("similar: 3 same-structure nodes with different style -> one hint naming them and compare", typeof sh === "string" && /3 nodes/.test(sh) && /#1:2 #1:3 #1:6/.test(sh) && /r, shadow, pad, h/.test(sh) && /compare:/.test(sh), sh);
   const SAME = SIM.replace(/ r4$/m, " r8 shadow:0,1/2 #101828@0.05").replace("pad8,12,8,12", "pad10,14,10,14").replace("340x40", "340x44");
+  const FIND = [
+    'FRAME "Card" #2:1 300x120 @0,0 [V gap8 pad16 fixed/fixed] fill:#FFFFFF stroke:#D0D5DD/1 r8 children:3',
+    'FRAME "Card" #2:2 300x120 @320,0 [V gap8 pad16 fixed/fixed] fill:#FFFFFF stroke:#D0D5DD/1 r4 children:3',
+    'FRAME "Card" #2:3 300x120 @640,0 [V gap12 pad16 fixed/fixed] fill:#FFFFFF stroke:#D0D5DD/1 r8 children:3'
+  ].join("\n");
+  const fh = srv.similarHint(FIND, true);
+  check("similar T-056: find hits (indent 0) -> hint naming the ids and compare; without topLevel (outline root) none",
+    typeof fh === "string" && /3 nodes/.test(fh) && /#2:1 #2:2 #2:3/.test(fh) && /r, gap/.test(fh) && srv.similarHint(FIND) === null, fh);
   check("similar: same style (only width differs) -> no hint", srv.similarHint(SAME) === null, srv.similarHint(SAME));
   // #36: fixture = outline of h7 T1 (0073d214, turn 2), a bare "Filters row" next to the real dropdowns
   const H7 = [
