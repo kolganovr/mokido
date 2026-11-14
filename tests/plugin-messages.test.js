@@ -485,6 +485,40 @@ sc("execute-font-load-never-finishing-is-taken-as-done", { timerScale: 0.004 }, 
   await c.exec("return 'ran';");
   await c.exec("return 'second';");
 });
+// T-007: a load that never finishes is taken as done, but the write error names the font.
+// timerScale 0.05: 5.5 s of plugin time = 275 ms of wall time, so `virtualS` is plugin seconds.
+const { FONT_MEMO_PRELUDE } = require("../figma/lib/script-prep.js");
+const virtualS = (t0, scale) => (Date.now() - t0) / 1000 / scale;
+sc("execute-missing-font-write-fails-with-font-load-timeout-naming-it", { timerScale: 0.05 }, async (c) => {
+  c.stub.hooks.hangFonts = (f) => f.family === "Ghost";
+  c.stub.hooks.strictFonts = true;
+  const t0 = Date.now();
+  await c.exec("await ensureFont('Ghost', 'Regular'); const t = figma.createText(); t.fontName = { family: 'Ghost', style: 'Regular' }; return t.id;");
+  c.note("within5_5s", virtualS(t0, 0.05) <= 5.5);
+});
+sc("execute-three-hung-inter-fonts-start-the-script-within-one-timeout", { timerScale: 0.05 }, async (c) => {
+  c.stub.hooks.hangFonts = (f) => f.family === "Inter";
+  const t0 = Date.now();
+  await c.exec("return 'started';");
+  c.note("startedWithin5_5s", virtualS(t0, 0.05) <= 5.5);
+});
+sc("execute-retry-after-font-load-timeout-calls-loadFontAsync-again", { timerScale: 0.05 }, async (c) => {
+  let calls = 0;
+  c.stub.hooks.hangFonts = (f) => { if (f.family === "Ghost") { calls++; return true; } return false; };
+  c.stub.hooks.strictFonts = true;
+  const code = FONT_MEMO_PRELUDE + "await ensureFont('Ghost', 'Regular'); const t = figma.createText(); t.fontName = { family: 'Ghost', style: 'Regular' }; return t.id;";
+  await c.exec(code);
+  c.note("callsAfterFirst", calls);
+  await c.exec(code);
+  c.note("callsAfterRetry", calls);
+});
+sc("execute-load-font-with-a-string-fails-at-once-with-font-bad-args", async (c) => {
+  await c.exec("await figma.loadFontAsync('Inter Regular'); return 'unreachable';");
+  await c.exec(FONT_MEMO_PRELUDE + "await figma.loadFontAsync({ family: 'Inter' }); return 'unreachable';");
+});
+sc("execute-direct-loadFontAsync-shares-the-load-once-bookkeeping", async (c) => {
+  await c.exec("await figma.loadFontAsync({ family: 'Roboto', style: 'Bold' }); await figma.loadFontAsync({ family: 'Roboto', style: 'Bold' }); return 'ok';");
+});
 sc("execute-toasts-are-batched-after-three-in-four-seconds", async (c) => {
   for (let i = 0; i < 5; i++) await c.exec("return " + i + ";", { description: "Call " + i });
   c.stub.clock.advance(4001);

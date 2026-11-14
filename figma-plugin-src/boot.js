@@ -39,14 +39,25 @@ function bytesToBase64(bytes) {
 // Figma is in the background (bench H5, T12), so a load still pending after
 // FONT_LOAD_TIMEOUT_MS is taken as done; a font that really is missing fails
 // at the write with the unloaded-font hint.
+// The loads that did not finish in time are remembered in FONT_TIMEOUTS
+// (key -> font) so a later "unloaded font" write error can name them
+// (enrichBridgeError). Slightly under the server prelude's own 5 s, so this
+// timer fires first and the record exists before the prelude lets the script go on.
 const LOADED_FONTS = new Set();
-const FONT_LOAD_TIMEOUT_MS = 5000;
+const FONT_TIMEOUTS = new Map();
+const FONT_LOAD_TIMEOUT_MS = 4900;
 async function loadFontOnce(font) {
   const key = font.family + "|" + font.style;
   if (LOADED_FONTS.has(key)) return;
   let timer;
-  const late = new Promise(resolve => { timer = setTimeout(resolve, FONT_LOAD_TIMEOUT_MS); });
-  try { await Promise.race([figma.loadFontAsync(font), late]); } finally { clearTimeout(timer); }
+  let timedOut = false;
+  const late = new Promise(resolve => { timer = setTimeout(() => { timedOut = true; resolve(); }, FONT_LOAD_TIMEOUT_MS); });
+  const load = Promise.resolve(figma.loadFontAsync(font));
+  try { await Promise.race([load, late]); } finally { clearTimeout(timer); }
+  if (timedOut) {
+    FONT_TIMEOUTS.set(key, font);
+    load.then(() => { FONT_TIMEOUTS.delete(key); }, () => {});
+  }
   LOADED_FONTS.add(key);
 }
 

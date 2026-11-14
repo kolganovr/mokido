@@ -135,9 +135,7 @@ async function onInsertComponentInstance(msg) {
   }
 
   try {
-    await ensureFont("Inter", "Regular");
-    await ensureFont("Inter", "Medium");
-    await ensureFont("Inter", "Bold");
+    await Promise.all([ensureFont("Inter", "Regular"), ensureFont("Inter", "Medium"), ensureFont("Inter", "Bold")]);
 
     // Non-fatal problems surfaced in the result instead of vanishing into an
     // empty catch: a "success" response used to look identical whether every

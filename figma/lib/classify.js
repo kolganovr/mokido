@@ -220,4 +220,14 @@ function rewriteComponentize(code) {
   };
 }
 
-module.exports = { SLOW_CALL_HINT, NODE_READ_RE, WHAT_YOU_GET, CAPS_NOTE, classifyScript, AFTER_WRITE_MAX_IDS, AFTER_WRITE_BYTES, AFTER_WRITE_DEEP_IDS, resultIds, suggestInspect, RUN_ANYWAY_RE, pageWideScan, PAGE_SCAN_NOTE, rewriteComponentize };
+// Font loads in a script that never edits text: the plugin and
+// bridge.setText / insert_component_instance load fonts themselves, and a stray
+// load can wait seconds for a canvas frame.
+const FONT_CALL_RE = /\b(loadFontAsync|ensureFont)\b/;
+const TEXT_EDIT_RE = /\b(characters|fontName|fontSize|createText|insertCharacters|deleteCharacters|setRange\w*|textStyleId|lineHeight|letterSpacing|paragraph\w*|textCase|textDecoration|textAutoResize|setText|setProps|setProperties)\b|\w*text\w*\s*\(|bridge\s*\.\s*require\b/i;
+const FONT_LOAD_NOTE = "Font load without a text edit: drop it (bridge.setText and insert_component_instance load fonts themselves).";
+function fontLoadLint(code) {
+  return typeof code === "string" && FONT_CALL_RE.test(code) && !TEXT_EDIT_RE.test(code) ? FONT_LOAD_NOTE : null;
+}
+
+module.exports = { fontLoadLint, FONT_LOAD_NOTE, SLOW_CALL_HINT, NODE_READ_RE, WHAT_YOU_GET, CAPS_NOTE, classifyScript, AFTER_WRITE_MAX_IDS, AFTER_WRITE_BYTES, AFTER_WRITE_DEEP_IDS, resultIds, suggestInspect, RUN_ANYWAY_RE, pageWideScan, PAGE_SCAN_NOTE, rewriteComponentize };

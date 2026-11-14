@@ -265,6 +265,14 @@ function createTrackingFigma() {
         };
       }
     }
+    // Direct loadFontAsync calls from the script share loadFontOnce: same
+    // timeout, same bookkeeping. A wrong argument fails at once.
+    if (typeof loadFontOnce === "function") tracking.loadFontAsync = async function (font) {
+      if (!font || typeof font.family !== "string" || typeof font.style !== "string") {
+        throw new Error("FONT_BAD_ARGS: loadFontAsync expects { family: string, style: string }");
+      }
+      await loadFontOnce(font);
+    };
     return tracking;
   } catch (e) {
     return figma;

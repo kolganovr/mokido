@@ -34,9 +34,7 @@ async function loadFontsForTextNode(textNode) {
     remember(textNode.fontName);
   }
 
-  for (const font of wanted) {
-    await ensureFont(font.family, font.style);
-  }
+  await Promise.all(wanted.map(font => ensureFont(font.family, font.style)));
 }
 
 // New text for a TEXT node without losing its styles. Plain `characters =`

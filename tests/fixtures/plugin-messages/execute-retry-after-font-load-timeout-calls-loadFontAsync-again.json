@@ -1,0 +1,149 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "EXECUTE",
+    "id": "e1",
+    "code": "(function (st) { const ms = st.__fontTimeoutMs || 5000; const done = st.__fontsLoaded || (st.__fontsLoaded = {}); const memo = (load, key) => { const m = new Map(); return function () { const k = key.apply(null, arguments); if (k === null) return load.apply(null, arguments); if (done[k]) return Promise.resolve(); if (!m.has(k)) { let tm; const late = typeof setTimeout === 'function' ? new Promise(r => { tm = setTimeout(r, ms); }) : new Promise(() => {}); m.set(k, Promise.race([Promise.resolve(load.apply(null, arguments)), late]).then(() => { if (tm) clearTimeout(tm); done[k] = 1; }, e => { if (tm) clearTimeout(tm); m.delete(k); throw e; })); } return m.get(k); }; }; ensureFont = memo(ensureFont, (f, s) => 'e|' + (f || 'Inter') + '|' + (s || 'Regular')); const lf = memo(figma.loadFontAsync.bind(figma), f => f && f.family ? f.family + '|' + f.style : null); figma = (function (real) { return new Proxy({}, { get(t, k) { if (k === 'loadFontAsync') return lf; const v = real[k]; return typeof v === 'function' ? v.bind(real) : v; }, set(t, k, v) { real[k] = v; return true; }, has(t, k) { return k in real; } }); })(figma); })(typeof bridge !== 'undefined' && bridge && bridge.state || {}); await ensureFont('Ghost', 'Regular'); const t = figma.createText(); t.fontName = { family: 'Ghost', style: 'Regular' }; return t.id;"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "e1",
+     "success": false,
+     "description": "AI Command Execution",
+     "error": "Cannot write to node with unloaded font \"Ghost Regular\". Please call figma.loadFontAsync({ family: \"Ghost\", style: \"Regular\" }) and await the returned promise first.\n  at line 1: (function (st) { const ms = st.__fontTimeoutMs || 5000; const done = st.__fontsLoaded || (st.__fontsLoaded = {}); const memo = (load, key) => { const m = new Ma\n\nHINT: Loading the font \"Ghost Regular\" did not finish in 5 s: the font is most likely not installed on this machine, or Figma is in the background. Ask the user to bring Figma to the front and run it again, or use another font.",
+     "code": "FONT_LOAD_TIMEOUT",
+     "durationMs": 0,
+     "line": 1,
+     "column": 1279,
+     "at": "(function (st) { const ms = st.__fontTimeoutMs || 5000; const done = st.__fontsLoaded || (st.__fontsLoaded = {}); const memo = (load, key) => { const m = new Ma"
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "EXECUTE",
+    "id": "e2",
+    "code": "(function (st) { const ms = st.__fontTimeoutMs || 5000; const done = st.__fontsLoaded || (st.__fontsLoaded = {}); const memo = (load, key) => { const m = new Map(); return function () { const k = key.apply(null, arguments); if (k === null) return load.apply(null, arguments); if (done[k]) return Promise.resolve(); if (!m.has(k)) { let tm; const late = typeof setTimeout === 'function' ? new Promise(r => { tm = setTimeout(r, ms); }) : new Promise(() => {}); m.set(k, Promise.race([Promise.resolve(load.apply(null, arguments)), late]).then(() => { if (tm) clearTimeout(tm); done[k] = 1; }, e => { if (tm) clearTimeout(tm); m.delete(k); throw e; })); } return m.get(k); }; }; ensureFont = memo(ensureFont, (f, s) => 'e|' + (f || 'Inter') + '|' + (s || 'Regular')); const lf = memo(figma.loadFontAsync.bind(figma), f => f && f.family ? f.family + '|' + f.style : null); figma = (function (real) { return new Proxy({}, { get(t, k) { if (k === 'loadFontAsync') return lf; const v = real[k]; return typeof v === 'function' ? v.bind(real) : v; }, set(t, k, v) { real[k] = v; return true; }, has(t, k) { return k in real; } }); })(figma); })(typeof bridge !== 'undefined' && bridge && bridge.state || {}); await ensureFont('Ghost', 'Regular'); const t = figma.createText(); t.fontName = { family: 'Ghost', style: 'Regular' }; return t.id;"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "e2",
+     "success": false,
+     "description": "AI Command Execution",
+     "error": "Cannot write to node with unloaded font \"Ghost Regular\". Please call figma.loadFontAsync({ family: \"Ghost\", style: \"Regular\" }) and await the returned promise first.\n  at line 1: (function (st) { const ms = st.__fontTimeoutMs || 5000; const done = st.__fontsLoaded || (st.__fontsLoaded = {}); const memo = (load, key) => { const m = new Ma\n\nHINT: Loading the font \"Ghost Regular\" did not finish in 5 s: the font is most likely not installed on this machine, or Figma is in the background. Ask the user to bring Figma to the front and run it again, or use another font.",
+     "code": "FONT_LOAD_TIMEOUT",
+     "durationMs": 0,
+     "line": 1,
+     "column": 1279,
+     "at": "(function (st) { const ms = st.__fontTimeoutMs || 5000; const done = st.__fontsLoaded || (st.__fontsLoaded = {}); const memo = (load, key) => { const m = new Ma"
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "children": [
+     {
+      "id": "1:13",
+      "type": "TEXT",
+      "name": "Text",
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "width": 100,
+      "height": 20,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [],
+      "strokes": [],
+      "characters": "",
+      "fontName": {
+       "family": "Inter",
+       "style": "Regular"
+      },
+      "fontSize": 14,
+      "textAutoResize": "WIDTH_AND_HEIGHT"
+     },
+     {
+      "id": "1:14",
+      "type": "TEXT",
+      "name": "Text",
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "width": 100,
+      "height": 20,
+      "constraints": {
+       "horizontal": "MIN",
+       "vertical": "MIN"
+      },
+      "fills": [],
+      "strokes": [],
+      "characters": "",
+      "fontName": {
+       "family": "Inter",
+       "style": "Regular"
+      },
+      "fontSize": 14,
+      "textAutoResize": "WIDTH_AND_HEIGHT"
+     }
+    ],
+    "selection": []
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [],
+  "notifies": [
+   {
+    "text": "AI Command Execution...",
+    "opts": {
+     "timeout": 30000
+    }
+   },
+   {
+    "text": "Error: Cannot write to node with unloaded font \"Ghost Regular\". Please call figma.loadFontAsync({ family: \"Ghost\", style: \"Regular\" }) and await the returned promise first.",
+    "opts": {
+     "error": true,
+     "timeout": 6000
+    }
+   },
+   {
+    "text": "AI Command Execution...",
+    "opts": {
+     "timeout": 30000
+    }
+   },
+   {
+    "text": "Error: Cannot write to node with unloaded font \"Ghost Regular\". Please call figma.loadFontAsync({ family: \"Ghost\", style: \"Regular\" }) and await the returned promise first.",
+    "opts": {
+     "error": true,
+     "timeout": 6000
+    }
+   }
+  ],
+  "cancels": 2,
+  "uiResizes": [],
+  "fontLoads": [
+   "Inter/Regular",
+   "Inter/Medium",
+   "Inter/Bold"
+  ],
+  "exports": [],
+  "modeSets": [],
+  "storage": {}
+ },
+ "extra": {
+  "callsAfterFirst": 1,
+  "callsAfterRetry": 2
+ }
+}

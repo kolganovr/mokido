@@ -39,14 +39,25 @@ function bytesToBase64(bytes) {
 // Figma is in the background (bench H5, T12), so a load still pending after
 // FONT_LOAD_TIMEOUT_MS is taken as done; a font that really is missing fails
 // at the write with the unloaded-font hint.
+// The loads that did not finish in time are remembered in FONT_TIMEOUTS
+// (key -> font) so a later "unloaded font" write error can name them
+// (enrichBridgeError). Slightly under the server prelude's own 5 s, so this
+// timer fires first and the record exists before the prelude lets the script go on.
 const LOADED_FONTS = new Set();
-const FONT_LOAD_TIMEOUT_MS = 5000;
+const FONT_TIMEOUTS = new Map();
+const FONT_LOAD_TIMEOUT_MS = 4900;
 async function loadFontOnce(font) {
   const key = font.family + "|" + font.style;
   if (LOADED_FONTS.has(key)) return;
   let timer;
-  const late = new Promise(resolve => { timer = setTimeout(resolve, FONT_LOAD_TIMEOUT_MS); });
-  try { await Promise.race([figma.loadFontAsync(font), late]); } finally { clearTimeout(timer); }
+  let timedOut = false;
+  const late = new Promise(resolve => { timer = setTimeout(() => { timedOut = true; resolve(); }, FONT_LOAD_TIMEOUT_MS); });
+  const load = Promise.resolve(figma.loadFontAsync(font));
+  try { await Promise.race([load, late]); } finally { clearTimeout(timer); }
+  if (timedOut) {
+    FONT_TIMEOUTS.set(key, font);
+    load.then(() => { FONT_TIMEOUTS.delete(key); }, () => {});
+  }
   LOADED_FONTS.add(key);
 }
 
@@ -474,6 +485,14 @@ function createTrackingFigma() {
         };
       }
     }
+    // Direct loadFontAsync calls from the script share loadFontOnce: same
+    // timeout, same bookkeeping. A wrong argument fails at once.
+    if (typeof loadFontOnce === "function") tracking.loadFontAsync = async function (font) {
+      if (!font || typeof font.family !== "string" || typeof font.style !== "string") {
+        throw new Error("FONT_BAD_ARGS: loadFontAsync expects { family: string, style: string }");
+      }
+      await loadFontOnce(font);
+    };
     return tracking;
   } catch (e) {
     return figma;
@@ -1650,9 +1669,7 @@ async function loadFontsForTextNode(textNode) {
     remember(textNode.fontName);
   }
 
-  for (const font of wanted) {
-    await ensureFont(font.family, font.style);
-  }
+  await Promise.all(wanted.map(font => ensureFont(font.family, font.style)));
 }
 
 // New text for a TEXT node without losing its styles. Plain `characters =`
@@ -2455,6 +2472,11 @@ const BRIDGE_ERROR_HINTS = [
           "or edit the master COMPONENT instead of the instance. bridge.setPosition(node, x, y) checks this for you."
   },
   {
+    test: /FONT_BAD_ARGS/,
+    code: "FONT_BAD_ARGS",
+    hint: "figma.loadFontAsync takes { family: string, style: string }; use await ensureFont(family, style)."
+  },
+  {
     test: /unloaded font|font.*(not loaded|must be loaded)|loadFontAsync/i,
     code: "FONT_NOT_LOADED",
     hint: "Load the font first: await ensureFont(family, style) before touching characters / fontName / fontSize."
@@ -2497,8 +2519,27 @@ const BRIDGE_ERROR_HINTS = [
   }
 ];
 
+// A write hit an unloaded font after a load timed out: say which font, and
+// forget it everywhere so a retry really calls loadFontAsync again.
+function fontTimeoutError(message) {
+  const names = [];
+  for (const [key, font] of FONT_TIMEOUTS) {
+    names.push(font.family + " " + font.style);
+    LOADED_FONTS.delete(key);
+    if (BRIDGE_STATE.__fontsLoaded) { delete BRIDGE_STATE.__fontsLoaded[key]; delete BRIDGE_STATE.__fontsLoaded["e|" + key]; }
+  }
+  FONT_TIMEOUTS.clear();
+  return {
+    message,
+    code: "FONT_LOAD_TIMEOUT",
+    hint: "Loading the font \"" + names.join("\", \"") + "\" did not finish in 5 s: the font is most likely not installed on this machine, or Figma is in the background. " +
+          "Ask the user to bring Figma to the front and run it again, or use another font."
+  };
+}
+
 function enrichBridgeError(err) {
   const message = (err && err.message) ? err.message : String(err);
+  if (typeof FONT_TIMEOUTS !== "undefined" && FONT_TIMEOUTS.size && /unloaded font|font.*(not loaded|must be loaded)/i.test(message)) return fontTimeoutError(message);
   for (const rule of BRIDGE_ERROR_HINTS) {
     if (rule.test.test(message)) return { message, hint: rule.hint, code: rule.code };
   }
@@ -3396,9 +3437,7 @@ async function onExecute(msg) {
   }
 
   try {
-    await ensureFont("Inter", "Regular");
-    await ensureFont("Inter", "Medium");
-    await ensureFont("Inter", "Bold");
+    await Promise.all([ensureFont("Inter", "Regular"), ensureFont("Inter", "Medium"), ensureFont("Inter", "Bold")]);
 
     const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
     // No wrapper newline/indent: keeps reported error line numbers aligned
@@ -3732,9 +3771,7 @@ async function onInsertComponentInstance(msg) {
   }
 
   try {
-    await ensureFont("Inter", "Regular");
-    await ensureFont("Inter", "Medium");
-    await ensureFont("Inter", "Bold");
+    await Promise.all([ensureFont("Inter", "Regular"), ensureFont("Inter", "Medium"), ensureFont("Inter", "Bold")]);
 
     // Non-fatal problems surfaced in the result instead of vanishing into an
     // empty catch: a "success" response used to look identical whether every

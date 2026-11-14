@@ -54,9 +54,7 @@ async function onExecute(msg) {
   }
 
   try {
-    await ensureFont("Inter", "Regular");
-    await ensureFont("Inter", "Medium");
-    await ensureFont("Inter", "Bold");
+    await Promise.all([ensureFont("Inter", "Regular"), ensureFont("Inter", "Medium"), ensureFont("Inter", "Bold")]);
 
     const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
     // No wrapper newline/indent: keeps reported error line numbers aligned

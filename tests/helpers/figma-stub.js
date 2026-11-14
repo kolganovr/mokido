@@ -45,12 +45,14 @@ function createFigmaStub(opts = {}) {
     failStorageSet: false,
     failFonts: null,       // (font) => boolean: loadFontAsync rejects
     hangFonts: null,       // (font) => boolean: loadFontAsync never resolves
+    strictFonts: false,    // true: TEXT nodes created afterwards throw Figma's "unloaded font" error on fontName / characters writes unless the font was loaded
     failVariables: false,
     failExports: null,     // message: every exportAsync rejects with it
     failModeSet: null,     // message: setExplicitVariableModeForCollection throws
     notifyThrows: false,   // true, or (text) => boolean
   };
 
+  const loadedFonts = new Set();
   const allMethods = {
     resize(w, h) { this.width = w; this.height = h; },
     resizeWithoutConstraints(w, h) { this.width = w; this.height = h; },
@@ -171,6 +173,15 @@ function createFigmaStub(opts = {}) {
     if (type === "LINE") node.height = 0;
     if (type === "PAGE") node.selection = [];
     Object.assign(node, props || {});
+    if (type === "TEXT" && hooks.strictFonts) {
+      const unloaded = (f) => {
+        if (!f || f === mixed || loadedFonts.has(f.family + "|" + f.style)) return;
+        throw new Error('Cannot write to node with unloaded font "' + f.family + " " + f.style + '". Please call figma.loadFontAsync({ family: "' + f.family + '", style: "' + f.style + '" }) and await the returned promise first.');
+      };
+      let chars = node.characters, font = node.fontName;
+      Object.defineProperty(node, "characters", { enumerable: true, get() { return chars; }, set(v) { unloaded(font); chars = v; } });
+      Object.defineProperty(node, "fontName", { enumerable: true, get() { return font; }, set(v) { unloaded(v); font = v; } });
+    }
     registry.set(node.id, node);
     return node;
   }
@@ -232,6 +243,7 @@ function createFigmaStub(opts = {}) {
     async loadFontAsync(font) {
       if (hooks.hangFonts && hooks.hangFonts(font)) return new Promise(() => {});
       state.fontLoads.push(font.family + "/" + font.style);
+      if (!(hooks.failFonts && hooks.failFonts(font))) loadedFonts.add(font.family + "|" + font.style);
       if (hooks.failFonts && hooks.failFonts(font)) throw new Error("stub: font not found " + font.family + "/" + font.style);
     },
     notify(text, o) {

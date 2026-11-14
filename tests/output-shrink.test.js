@@ -32,6 +32,18 @@ function outline(count, levels = [1]) {
 }
 const isNodeLine = (l) => /^ *FRAME "Node \d+" #9:\d+ 320x200 @0,\d+ \[V gap8 pad16\] fill:#FFFFFF r8\.*$/.test(l);
 
+console.log("\n== font-load lint (T-007) ==");
+{
+  const { fontLoadLint } = require("../figma/lib/classify.js");
+  check("font load alone is flagged", !!fontLoadLint("await figma.loadFontAsync({family:'Inter',style:'Bold'}); return 1;"));
+  check("ensureFont plus geometry is flagged", !!fontLoadLint("await ensureFont('Inter','Bold'); n.resize(1,2);"));
+  check("load plus characters edit is silent", fontLoadLint("await ensureFont('Inter','Bold'); t.characters = 'x';") === null);
+  check("bridge.setText is silent", fontLoadLint("await ensureFont('Inter','Bold'); await bridge.setText(t, 'x');") === null);
+  check("a text() helper call is silent", fontLoadLint("await figma.loadFontAsync(f); text(p, 'Hi', 12);") === null);
+  check("bridge.require is silent", fontLoadLint("await ensureFont('Inter'); const k = bridge.require('kit');") === null);
+  check("no font load means no lint", fontLoadLint("return figma.currentPage.name;") === null && fontLoadLint(undefined) === null);
+}
+
 console.log("\n== update check compares npm releases, not commits ==");
 {
   check("higher patch/minor/major is newer", srv.isNewerVersion("4.4.1", "4.4.0") && srv.isNewerVersion("4.5.0", "4.4.9") && srv.isNewerVersion("5.0.0", "4.9.9"));

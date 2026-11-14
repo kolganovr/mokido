@@ -12,6 +12,11 @@ const BRIDGE_ERROR_HINTS = [
           "or edit the master COMPONENT instead of the instance. bridge.setPosition(node, x, y) checks this for you."
   },
   {
+    test: /FONT_BAD_ARGS/,
+    code: "FONT_BAD_ARGS",
+    hint: "figma.loadFontAsync takes { family: string, style: string }; use await ensureFont(family, style)."
+  },
+  {
     test: /unloaded font|font.*(not loaded|must be loaded)|loadFontAsync/i,
     code: "FONT_NOT_LOADED",
     hint: "Load the font first: await ensureFont(family, style) before touching characters / fontName / fontSize."
@@ -54,8 +59,27 @@ const BRIDGE_ERROR_HINTS = [
   }
 ];
 
+// A write hit an unloaded font after a load timed out: say which font, and
+// forget it everywhere so a retry really calls loadFontAsync again.
+function fontTimeoutError(message) {
+  const names = [];
+  for (const [key, font] of FONT_TIMEOUTS) {
+    names.push(font.family + " " + font.style);
+    LOADED_FONTS.delete(key);
+    if (BRIDGE_STATE.__fontsLoaded) { delete BRIDGE_STATE.__fontsLoaded[key]; delete BRIDGE_STATE.__fontsLoaded["e|" + key]; }
+  }
+  FONT_TIMEOUTS.clear();
+  return {
+    message,
+    code: "FONT_LOAD_TIMEOUT",
+    hint: "Loading the font \"" + names.join("\", \"") + "\" did not finish in 5 s: the font is most likely not installed on this machine, or Figma is in the background. " +
+          "Ask the user to bring Figma to the front and run it again, or use another font."
+  };
+}
+
 function enrichBridgeError(err) {
   const message = (err && err.message) ? err.message : String(err);
+  if (typeof FONT_TIMEOUTS !== "undefined" && FONT_TIMEOUTS.size && /unloaded font|font.*(not loaded|must be loaded)/i.test(message)) return fontTimeoutError(message);
   for (const rule of BRIDGE_ERROR_HINTS) {
     if (rule.test.test(message)) return { message, hint: rule.hint, code: rule.code };
   }

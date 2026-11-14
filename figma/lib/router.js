@@ -10,7 +10,7 @@ const { listTargets, sendCommandToPlugin, proxyToMaster } = require("./dispatch"
 const { budgetOptions, similarHint } = require("./budget");
 const { collectImages, renderPluginResponse, captureOptions, buildErrorEnvelope, checkAgentSyntax, applyLineOffset, jsonResult, applyTokenBudget, budgetBytesFromTokens } = require("./result");
 const { buildInspectCode } = require("./inspect-code");
-const { SLOW_CALL_HINT, rewriteComponentize } = require("./classify");
+const { SLOW_CALL_HINT, rewriteComponentize, fontLoadLint } = require("./classify");
 const { OVERLAY_LINKED, linkedOverlay, unlinkCheckpoint, callFile, OVERLAY_HEADER_RE, OVERLAY_HEADER_DONE } = require("./overlay");
 const { macroGuard, readGuard, guardRefusal, resetReadStreak } = require("./guards");
 const { postWrite } = require("./post-write");
@@ -81,7 +81,7 @@ async function routeTool(name, args = {}) {
 
         const lead = await postWrite(code, response, {
           target: args.target,
-          lint: [rewrite.lint, args.diff === true ? DIFF_OFF_NOTE : null]
+          lint: [rewrite.lint, args.diff === true ? DIFF_OFF_NOTE : null, fontLoadLint(code)]
         });
         return renderPluginResponse(response, null, { ...budgetOptions(args), lead });
       }

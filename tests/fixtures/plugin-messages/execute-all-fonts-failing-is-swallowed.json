@@ -59,13 +59,13 @@
   "uiResizes": [],
   "fontLoads": [
    "Inter/Regular",
-   "Inter/Regular",
-   "Roboto/Regular",
    "Inter/Medium",
-   "Inter/Regular",
-   "Roboto/Regular",
    "Inter/Bold",
    "Inter/Regular",
+   "Inter/Regular",
+   "Inter/Regular",
+   "Roboto/Regular",
+   "Roboto/Regular",
    "Roboto/Regular"
   ],
   "exports": [],

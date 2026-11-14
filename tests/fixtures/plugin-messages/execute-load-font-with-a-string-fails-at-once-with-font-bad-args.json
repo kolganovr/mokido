@@ -1,0 +1,97 @@
+{
+ "steps": [
+  {
+   "send": {
+    "type": "EXECUTE",
+    "id": "e1",
+    "code": "await figma.loadFontAsync('Inter Regular'); return 'unreachable';"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "e1",
+     "success": false,
+     "description": "AI Command Execution",
+     "error": "FONT_BAD_ARGS: loadFontAsync expects { family: string, style: string }\n  at line 1: await figma.loadFontAsync('Inter Regular'); return 'unreachable';\n\nHINT: figma.loadFontAsync takes { family: string, style: string }; use await ensureFont(family, style).",
+     "code": "FONT_BAD_ARGS",
+     "durationMs": 0,
+     "line": 1,
+     "column": 13,
+     "at": "await figma.loadFontAsync('Inter Regular'); return 'unreachable';"
+    }
+   ]
+  },
+  {
+   "send": {
+    "type": "EXECUTE",
+    "id": "e2",
+    "code": "(function (st) { const ms = st.__fontTimeoutMs || 5000; const done = st.__fontsLoaded || (st.__fontsLoaded = {}); const memo = (load, key) => { const m = new Map(); return function () { const k = key.apply(null, arguments); if (k === null) return load.apply(null, arguments); if (done[k]) return Promise.resolve(); if (!m.has(k)) { let tm; const late = typeof setTimeout === 'function' ? new Promise(r => { tm = setTimeout(r, ms); }) : new Promise(() => {}); m.set(k, Promise.race([Promise.resolve(load.apply(null, arguments)), late]).then(() => { if (tm) clearTimeout(tm); done[k] = 1; }, e => { if (tm) clearTimeout(tm); m.delete(k); throw e; })); } return m.get(k); }; }; ensureFont = memo(ensureFont, (f, s) => 'e|' + (f || 'Inter') + '|' + (s || 'Regular')); const lf = memo(figma.loadFontAsync.bind(figma), f => f && f.family ? f.family + '|' + f.style : null); figma = (function (real) { return new Proxy({}, { get(t, k) { if (k === 'loadFontAsync') return lf; const v = real[k]; return typeof v === 'function' ? v.bind(real) : v; }, set(t, k, v) { real[k] = v; return true; }, has(t, k) { return k in real; } }); })(figma); })(typeof bridge !== 'undefined' && bridge && bridge.state || {}); await figma.loadFontAsync({ family: 'Inter' }); return 'unreachable';"
+   },
+   "posted": [
+    {
+     "type": "RESULT",
+     "id": "e2",
+     "success": false,
+     "description": "AI Command Execution",
+     "error": "FONT_BAD_ARGS: loadFontAsync expects { family: string, style: string }\n  at line 1: (function (st) { const ms = st.__fontTimeoutMs || 5000; const done = st.__fontsLoaded || (st.__fontsLoaded = {}); const memo = (load, key) => { const m = new Ma\n\nHINT: figma.loadFontAsync takes { family: string, style: string }; use await ensureFont(family, style).",
+     "code": "FONT_BAD_ARGS",
+     "durationMs": 0,
+     "line": 1,
+     "column": 504,
+     "at": "(function (st) { const ms = st.__fontTimeoutMs || 5000; const done = st.__fontsLoaded || (st.__fontsLoaded = {}); const memo = (load, key) => { const m = new Ma"
+    }
+   ]
+  }
+ ],
+ "effects": {
+  "pages": [
+   {
+    "id": "0:1",
+    "type": "PAGE",
+    "name": "Page 1",
+    "visible": true,
+    "selection": []
+   }
+  ],
+  "currentPage": "0:1",
+  "viewport": [],
+  "notifies": [
+   {
+    "text": "AI Command Execution...",
+    "opts": {
+     "timeout": 30000
+    }
+   },
+   {
+    "text": "Error: FONT_BAD_ARGS: loadFontAsync expects { family: string, style: string }",
+    "opts": {
+     "error": true,
+     "timeout": 6000
+    }
+   },
+   {
+    "text": "AI Command Execution...",
+    "opts": {
+     "timeout": 30000
+    }
+   },
+   {
+    "text": "Error: FONT_BAD_ARGS: loadFontAsync expects { family: string, style: string }",
+    "opts": {
+     "error": true,
+     "timeout": 6000
+    }
+   }
+  ],
+  "cancels": 2,
+  "uiResizes": [],
+  "fontLoads": [
+   "Inter/Regular",
+   "Inter/Medium",
+   "Inter/Bold"
+  ],
+  "exports": [],
+  "modeSets": [],
+  "storage": {}
+ }
+}
