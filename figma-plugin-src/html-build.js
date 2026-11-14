@@ -336,11 +336,75 @@ function htmlBuildApplyFallback(e, ctx) {
   for (const k of e.kids) {
     htmlBuildTry(ctx, k.p, "fallback_error", () => {
       k.n.layoutPositioning = "ABSOLUTE";
-      htmlBuildResize(k.n, k.p);
-      k.n.x = k.p.x - p.x; k.n.y = k.p.y - p.y;
+      // one-line text keeps hugging: a fixed browser width wraps it in Figma, whose Inter runs a bit wider (T-105)
+      if (k.p.type === "TEXT" && htmlBuildLines(k.p) === 1) htmlBuildHugText(k);
+      else htmlBuildResize(k.n, k.p);
+      k.n.x = k.p.x - p.x + htmlBuildAlignShift(k); k.n.y = k.p.y - p.y;
     });
   }
   e.fb = true;
+}
+
+// ---------- text wrap guard (T-105) ----------
+// Lines the text had in the browser: plan text.lines (mapper), else box height / line height.
+function htmlBuildLines(p) {
+  const t = p.text || {};
+  if (t.lines) return t.lines;
+  const lh = typeof t.lineHeight === "number" ? t.lineHeight : (t.fontSize || 12) * 1.2;
+  return Math.max(1, Math.round((p.h || lh) / lh));
+}
+function htmlBuildFigmaLines(e) {
+  const t = e.p.text || {};
+  const lh = typeof t.lineHeight === "number" ? t.lineHeight : (t.fontSize || 12) * 1.2;
+  let h = 0;
+  try { h = e.n.height; } catch (x) { return null; }
+  return Math.max(1, Math.round(h / lh));
+}
+function htmlBuildHugText(e) {
+  e.n.textAutoResize = "WIDTH_AND_HEIGHT";
+}
+// A hugging text grows from its left edge; keep the right edge (RIGHT) or the middle (CENTER) where the browser had it.
+function htmlBuildAlignShift(e) {
+  if (e.p.type !== "TEXT") return 0;
+  const a = e.p.text && e.p.text.align;
+  if (a !== "RIGHT" && a !== "CENTER") return 0;
+  let w = e.p.w;
+  try { w = e.n.width; } catch (x) { /* plan width */ }
+  return (e.p.w - w) * (a === "RIGHT" ? 1 : 0.5);
+}
+// Every text must keep the browser's line count. One-line text that wrapped goes back to hug; multi-line text that got an
+// extra line is widened by up to 4%. What still wraps is counted (report.text_wrapped) and warned, never silent.
+function htmlBuildTextGuard(ctx, report) {
+  for (const e of ctx.entries) {
+    if (e.p.type !== "TEXT") continue;
+    const want = htmlBuildLines(e.p);
+    let got = htmlBuildFigmaLines(e);
+    if (got === null || got <= want) continue;
+    htmlBuildTry(ctx, e.p, "text_error", () => {
+      const inFlow = e.par && e.par.p.layoutMode && e.par.p.layoutMode !== "NONE" && e.n.layoutPositioning !== "ABSOLUTE";
+      const align = (e.p.text && e.p.text.align) || "LEFT";
+      if (want === 1 && inFlow && e.n.layoutSizingHorizontal === "FILL" && align !== "LEFT") return; // hug would lose the alignment: counted below
+      if (want === 1) {
+        if (inFlow) e.n.layoutSizingHorizontal = "HUG";
+        htmlBuildHugText(e);
+        if (!inFlow && e.par) e.n.x = e.p.x - e.par.p.x + htmlBuildAlignShift(e);
+      } else {
+        if (inFlow && e.n.layoutSizingHorizontal === "FILL") e.n.layoutSizingHorizontal = "FIXED";
+        e.n.textAutoResize = "HEIGHT";
+        for (const k of [1.01, 1.02, 1.04]) {
+          e.n.resize(e.p.w * k, Math.max(e.n.height, 0.01));
+          e.n.textAutoResize = "HEIGHT";
+          if (htmlBuildFigmaLines(e) <= want) break;
+        }
+      }
+    });
+    got = htmlBuildFigmaLines(e);
+    if (got !== null && got <= want) report.text_fixed++;
+    else {
+      report.text_wrapped++;
+      htmlBuildWarn(ctx, e.p, "text_wrapped", "text wraps into " + got + " lines, browser had " + want + ": \"" + String((e.p.text && e.p.text.characters) || "").slice(0, 30) + "\"");
+    }
+  }
 }
 // A container "diverged as a whole" when its own box is off, or at least half of its non-text in-flow children are off.
 function htmlBuildFindDiverged(e, out) {
@@ -366,6 +430,7 @@ function htmlBuildSelfCheck(root, ctx, report) {
       report.absolute_fallback++;
     }
   }
+  htmlBuildTextGuard(ctx, report);
   htmlBuildMeasure(ctx, org);
   for (const e of ctx.entries) {
     if (e.delta === null) continue;
@@ -378,7 +443,7 @@ function htmlBuildSelfCheck(root, ctx, report) {
 async function htmlBuild(plan, opts) {
   opts = opts || {};
   const ctx = { warnings: [], created: 0, al: 0, entries: [], fonts: new Map() };
-  const report = { root_id: null, created: 0, auto_layout: 0, absolute_fallback: 0, box_ok: { num: 0, den: 0 }, warnings: ctx.warnings };
+  const report = { root_id: null, created: 0, auto_layout: 0, absolute_fallback: 0, text_fixed: 0, text_wrapped: 0, box_ok: { num: 0, den: 0 }, warnings: ctx.warnings };
   if (!plan || !plan.root) { htmlBuildWarn(ctx, null, "no_plan", "plan.root is missing"); return report; }
   await htmlBuildLoadFonts(plan.root, ctx);
   const parent = opts.parent || figma.currentPage;

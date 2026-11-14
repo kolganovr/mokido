@@ -8,6 +8,11 @@
   the reply (under 3500 bytes) reports layers, Auto Layout share, `absolute_fallback`, a 1 px box self-check and up to 10 warnings.
   Components and variables from `data-component` / `var(--token)` arrive in the next slice. Checked on a stub and fixtures only,
   not yet in live Figma.
+- **`figma_html`: text keeps the browser's line count (T-108).** When the box self-check placed a container's children
+  ABSOLUTE, one-line labels got the browser's exact width, and Inter in Figma is a little wider, so "Pricing" or
+  "Log out" broke onto a second line. One-line text now stays hug-width, and after the build every text is compared
+  with its line count in the browser: a one-line text that wrapped goes back to hug, a multi-line one is widened by
+  up to 4%, and whatever still wraps is reported as `text_wrapped` (in the reply) with a warning naming the text.
 - **Internal split, no behavior change.** The server moved from one 213 KB `figma/index.js` into modules under
   `figma/lib/` (`index.js` stays the entry point and re-exports the same names for tests). The plugin is now
   edited in `figma-plugin-src/` and built into `figma-plugin/code.js` by `node scripts/build-plugin.mjs`; the

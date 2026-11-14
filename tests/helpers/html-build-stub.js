@@ -30,7 +30,7 @@ function createHtmlStub(opts) {
   let seq = 0;
   const registry = new Map();
   const state = { fontLoads: [], images: [], svgs: [], notifies: [] };
-  const hooks = { box: null, failFont: (f) => f.family !== "Inter" && !(opts.fonts || []).includes(f.family + "|" + f.style), badSvg: (s) => /BADSVG/.test(s) };
+  const hooks = { box: null, textWidth: null, failFont: (f) => f.family !== "Inter" && !(opts.fonts || []).includes(f.family + "|" + f.style), badSvg: (s) => /BADSVG/.test(s) };
   const installed = new Set(["Inter|Thin", "Inter|Extra Light", "Inter|Light", "Inter|Regular", "Inter|Medium", "Inter|Semi Bold", "Inter|Bold", "Inter|Extra Bold", "Inter|Black"]);
   for (const f of opts.fonts || []) installed.add(f);
   const loaded = new Set();
@@ -85,6 +85,18 @@ function createHtmlStub(opts) {
     }
     d[k] = k === "fills" || k === "strokes" || k === "effects" || k === "lineHeight" || k === "fontName" ? clone(v) : v;
     if (k === "layoutSizingHorizontal" || k === "layoutSizingVertical") d.sizingSet = true;
+    if (d.type === "TEXT" && hooks.textWidth) {
+      if (k === "layoutSizingHorizontal" && v === "HUG") d.textAutoResize = "WIDTH_AND_HEIGHT";
+      if (k === "layoutSizingHorizontal" && v !== "HUG" && d.textAutoResize === "WIDTH_AND_HEIGHT") d.textAutoResize = "HEIGHT";
+      reflow(d);
+    }
+  }
+  // Opt-in text metrics (hooks.textWidth(d) = one-line width in Figma): WIDTH_AND_HEIGHT hugs it, HEIGHT wraps into ceil(natural / width) lines.
+  function reflow(d) {
+    const lh = d.lineHeight && d.lineHeight.unit === "PIXELS" ? d.lineHeight.value : d.fontSize * 1.2;
+    const nat = hooks.textWidth(d);
+    if (d.textAutoResize === "WIDTH_AND_HEIGHT") { d.width = nat; d.height = lh; }
+    else if (d.textAutoResize === "HEIGHT") d.height = Math.max(1, Math.ceil(nat / d.width - 1e-9)) * lh;
   }
 
   function naiveBox(d) {
@@ -107,7 +119,11 @@ function createHtmlStub(opts) {
         if (cd.parent) cd.parent.children = cd.parent.children.filter((x) => x !== c);
         cd.parent = d; d.children.push(c);
       },
-      resize(w, h) { if (!(w >= 0.01 && h >= 0.01)) fail("resize needs sizes >= 0.01"); d.width = w; d.height = h; },
+      resize(w, h) {
+        if (!(w >= 0.01 && h >= 0.01)) fail("resize needs sizes >= 0.01");
+        d.width = w; d.height = h;
+        if (d.type === "TEXT" && hooks.textWidth) { if (d.textAutoResize === "WIDTH_AND_HEIGHT") d.textAutoResize = "HEIGHT"; reflow(d); }
+      },
       remove() { if (d.parent) d.parent.children = d.parent.children.filter((x) => x !== node); d.removed = true; registry.delete(d.id); },
       findAll(pred) { const out = []; (function walk(n) { for (const c of n.children || []) { if (!pred || pred(c)) out.push(c); walk(c); } })(d); return out; },
       async loadAsync() {},

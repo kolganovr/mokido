@@ -211,7 +211,7 @@ function htmlMapTextNode(c, E, pieces, box, pc, folded) {
     if (l > 2 && Math.abs(l - r) <= 2) align = "CENTER"; else if (l > 2 && r <= 2) align = "RIGHT";
   }
   if (!(folded && E.name)) p.name = chars.slice(0, 40);
-  p.text = { characters: chars, fontFamily: s.fontFamily, fontStyle: htmlMapWeightName(s.fontWeight), fontSize: s.fontSize, lineHeight: lh, styleName: null, align: align, autoResize: "HEIGHT", ranges: ranges };
+  p.text = { characters: chars, fontFamily: s.fontFamily, fontStyle: htmlMapWeightName(s.fontWeight), fontSize: s.fontSize, lineHeight: lh, styleName: null, align: align, autoResize: "HEIGHT", lines: multi ? Math.max(2, Math.round(ur.h / lh)) : 1, ranges: ranges };
   p._m = { multi: multi };
   htmlMapSetSize(p, folded ? E : pieces[0], pc);
   return p;

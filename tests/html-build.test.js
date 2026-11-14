@@ -172,6 +172,7 @@ async function buildFixture(name, opts, oopts) {
   const cf = stub.figma.createFrame;
   stub.figma.createFrame = function () { if (fontLoadsAtFirstNode === null) fontLoadsAtFirstNode = stub.state.fontLoads.length; return cf.apply(this, arguments); };
   oracle(stub, plan, Object.assign({}, oopts));
+  if (oopts && oopts.textWidth) stub.hooks.textWidth = oopts.textWidth(plan);
   const report = await ctx.htmlBuild(plan, opts);
   return { plan, stub, ctx, report, fontLoadsAtFirstNode };
 }
@@ -374,6 +375,56 @@ async function buildFixture(name, opts, oopts) {
     const row3 = b.stub.registry.get(b.report.root_id).__d.children[1].__d;
     eq("fallback: row kids stay in flow", row3.children.map((c) => c.__d.layoutPositioning), ["AUTO", "AUTO", "AUTO"]);
     void planOf;
+  }
+
+  // ================= text wrap guard (T-105): Figma Inter runs wider than the browser's =================
+  {
+    const wider = (dx) => (plan) => {
+      const nat = new Map();
+      (function walk(p) { if (p.type === "TEXT") nat.set(p.text.characters, p.w + dx); (p.children || []).forEach(walk); })(plan.root);
+      return (d) => nat.get(d.characters) || d.width;
+    };
+    const texts = (stub) => [...stub.registry.values()].map((n) => n.__d).filter((d) => d.type === "TEXT" && !d.removed);
+    const lhOf = (d) => d.lineHeight.unit === "PIXELS" ? d.lineHeight.value : d.fontSize * 1.2;
+    // the fallback cascade (Card 2 off by 10 px) used to resize every child, one-line texts included, to the browser width
+    let b = await buildFixture("02_cards", {}, {
+      textWidth: wider(2),
+      perturb: (pn, box, node) => {
+        if (pn.name !== "Card 2") return null;
+        return node.__d.children.some((c) => c.__d.layoutPositioning === "ABSOLUTE") ? null : Object.assign({}, box, { width: box.width + 10 });
+      }
+    });
+    eq("wrap guard: the fallback happened", b.report.absolute_fallback, 1);
+    const planLines = new Map();
+    (function walk(p) { if (p.type === "TEXT") planLines.set(p.text.characters, Math.max(1, Math.round(p.h / (p.text.lineHeight || p.text.fontSize * 1.2)))); (p.children || []).forEach(walk); })(b.plan.root);
+    const grown = texts(b.stub).filter((d) => Math.round(d.height / lhOf(d)) > (planLines.get(d.characters) || 1)).map((d) => d.characters);
+    eq("wrap guard: no text has more lines than in the browser (fallback, +2 px)", grown, []);
+    eq("wrap guard: nothing left wrapped", b.report.text_wrapped, 0);
+    // without fallback: every text 2 px wider than the browser still keeps its lines
+    b = await buildFixture("01_login", {}, { textWidth: wider(2) });
+    const lines01 = new Map();
+    (function walk(p) { if (p.type === "TEXT") lines01.set(p.text.characters, Math.max(1, Math.round(p.h / (p.text.lineHeight || p.text.fontSize * 1.2)))); (p.children || []).forEach(walk); })(b.plan.root);
+    eq("wrap guard: 01_login +2 px, nothing wrapped", [b.report.text_wrapped, texts(b.stub).filter((d) => Math.round(d.height / lhOf(d)) > (lines01.get(d.characters) || 1)).map((d) => d.characters)], [0, []]);
+
+    // direct plan: FILL / FIXED texts in a column, known answers
+    const tpl = readPlan("01_login");
+    let tt = null;
+    (function walk(p) { if (!tt && p.type === "TEXT") tt = p; (p.children || []).forEach(walk); })(tpl.root);
+    const mk = (chars, w, h, sizingH, align, lines) => Object.assign(JSON.parse(JSON.stringify(tt)), { id: "t" + chars.length, name: chars, x: 0, y: 0, w, h, sizingH, sizingV: "HUG", positioning: "AUTO",
+      text: Object.assign({}, tt.text, { characters: chars, fontSize: 16, lineHeight: 20, align: align || "LEFT", autoResize: "HEIGHT", ranges: [] }, lines ? { lines } : {}) });
+    const root = Object.assign(JSON.parse(JSON.stringify(tpl.root)), { x: 0, y: 0, w: 400, h: 300, layoutMode: "VERTICAL", itemSpacing: 0, padding: [0, 0, 0, 0], primaryAxisAlignItems: "MIN", counterAxisAlignItems: "MIN",
+      children: [mk("One line fill", 100, 20, "FILL", "LEFT", 1), mk("Two lines fixed", 100, 40, "FIXED"), mk("Far too long text", 100, 40, "FIXED"), mk("Centered fill x", 100, 20, "FILL", "CENTER")] });
+    const nat = { "One line fill": 103, "Two lines fixed": 202, "Far too long text": 260, "Centered fill x": 103 };
+    const stub = createHtmlStub();
+    const ctx = load(stub);
+    stub.hooks.textWidth = (d) => nat[d.characters] || d.width;
+    const r = await ctx.htmlBuild({ root }, {});
+    const byChars = Object.fromEntries(texts(stub).map((d) => [d.characters, d]));
+    eq("wrap guard: one-line FILL text wrapped -> HUG, one line", [byChars["One line fill"].layoutSizingHorizontal, byChars["One line fill"].height], ["HUG", 20]);
+    eq("wrap guard: two-line text got a 3rd line -> widened, 2 lines", [byChars["Two lines fixed"].height, byChars["Two lines fixed"].width <= 104], [40, true]);
+    eq("wrap guard: counters (fixed 2, still wrapped 2)", [r.text_fixed, r.text_wrapped], [2, 2]);
+    eq("wrap guard: a text_wrapped warning per unresolved text", r.warnings.filter((w) => w.code === "text_wrapped").length, 2);
+    check("wrap guard: the warning names the text and both line counts", r.warnings.some((w) => w.code === "text_wrapped" && /3 lines, browser had 2/.test(w.msg) && /Far too long/.test(w.msg)), r.warnings);
   }
 
   // ================= one failing node does not stop the build =================
