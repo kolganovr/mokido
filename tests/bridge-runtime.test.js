@@ -1112,6 +1112,77 @@ console.log("\n== shift / moveInto / fitSection ==");
   check("fitSection: rejects non-containers", /expected SECTION or FRAME/.test(threw), threw);
 }
 
+console.log("\n== macro boundaries (T-088) ==");
+{
+  const api = createBridgeApi();
+  const page = newPage();
+  // fitSection: only ONE axis needs a shift; each axis must be handled on its own
+  const fitCase = (name, kidX, kidY, padding, wantBoxX, wantBoxY) => {
+    const sec = makeNode("SECTION", "S-" + name, { x: 500, y: 500, width: 10, height: 10 });
+    const kid = makeNode("FRAME", "K-" + name, { x: kidX, y: kidY, width: 20, height: 20 });
+    sec.appendChild(kid); page.appendChild(sec);
+    api.fitSection(sec, { padding });
+    check("fitSection: " + name + " -> section at " + wantBoxX + "," + wantBoxY + ", child padded", sec.x === wantBoxX && sec.y === wantBoxY && kid.x === padding && kid.y === padding, [sec.x, sec.y, kid.x, kid.y]);
+  };
+  fitCase("x already at padding, y not", 10, 30, 10, 500, 520);
+  fitCase("y already at padding, x not", 30, 10, 10, 520, 500);
+  // resize: SECTION-style nodes size through resizeWithoutConstraints, FRAMEs without it fall back to resize
+  {
+    const calls = [];
+    const sec = makeNode("SECTION", "SecRwc", { x: 0, y: 0 });
+    sec.resizeWithoutConstraints = (w, h) => calls.push("rwc " + w + "x" + h);
+    sec.resize = (w, h) => calls.push("resize " + w + "x" + h);
+    sec.appendChild(makeNode("FRAME", "k", { x: 0, y: 0, width: 20, height: 30 })); page.appendChild(sec);
+    api.fitSection(sec, { padding: 5 });
+    check("fitSection: uses resizeWithoutConstraints when the node has it", calls.join() === "rwc 30x40", calls);
+    const calls2 = [];
+    const fr = makeNode("FRAME", "FrNoRwc", { x: 0, y: 0 });
+    fr.resizeWithoutConstraints = undefined;
+    fr.resize = (w, h) => calls2.push("resize " + w + "x" + h);
+    fr.appendChild(makeNode("FRAME", "k", { x: 0, y: 0, width: 20, height: 30 })); page.appendChild(fr);
+    api.fitSection(fr, { padding: 5 });
+    check("fitSection: falls back to resize without resizeWithoutConstraints", calls2.join() === "resize 30x40", calls2);
+  }
+  // moveInto layout none: when the canvas transform is unreadable on either side the node is simply not corrected
+  {
+    const box = makeNode("FRAME", "BoxT", { x: 100, y: 100 });
+    page.appendChild(box);
+    const m = [[1, 0, 7], [0, 1, 9]];
+    const mk = (name, readable) => {
+      const n = makeNode("FRAME", name, { x: 5, y: 6 });
+      page.appendChild(n);
+      Object.defineProperty(n, "absoluteTransform", { get() { return readable(this) ? m : undefined; } });
+      return n;
+    };
+    const noBefore = mk("NoBefore", (n) => n.parent === box);
+    const noAfter = mk("NoAfter", (n) => n.parent !== box);
+    let err = "";
+    try { api.moveInto([noBefore, noAfter], box); } catch (e) { err = e.message; }
+    check("moveInto: an unreadable transform before or after the move is skipped, not a crash", err === "" && noBefore.x === 5 && noBefore.y === 6 && noAfter.x === 5 && noAfter.y === 6 && noBefore.parent === box, [err, noBefore.x, noAfter.x]);
+  }
+  inspectDone = inspectDone.then(async () => {
+    const { set } = makeButtonKit();
+    // replaceWithInstance: the target must have a parent that can take an instance
+    const orphan = makeNode("RECTANGLE", "Orphan");
+    const m1 = await rejects(() => api.replaceWithInstance(orphan, set, {}));
+    check("replace: a target without a parent says so", /"Orphan" has no parent that can hold an instance/.test(m1), m1);
+    const sealed = makeNode("RECTANGLE", "Sealed");
+    Object.defineProperty(sealed, "parent", { value: { type: "FRAME", name: "NoInsert", children: [sealed] } });
+    const m2 = await rejects(() => api.replaceWithInstance(sealed, set, {}));
+    check("replace: a parent without insertChild says so", /"Sealed" has no parent that can hold an instance/.test(m2), m2);
+    // setText: the 20-name list cap is exactly 20 (21 layers show "+1 more", 20 show no tail)
+    const mkFrame = (n) => {
+      const f = makeNode("FRAME", "Cap" + n);
+      for (let i = 0; i < n; i++) f.appendChild(makeNode("TEXT", "T" + i, { characters: "x", fontName: { family: "Inter", style: "Regular" } }));
+      return f;
+    };
+    const m21 = await rejects(() => api.setText(mkFrame(21), { zzz: "1" }));
+    check("setText: 21 text layers -> 20 listed and '+1 more'", (m21.match(/ #/g) || []).length === 20 && /\+1 more/.test(m21), m21);
+    const m20 = await rejects(() => api.setText(mkFrame(20), { zzz: "1" }));
+    check("setText: exactly 20 text layers -> all listed, no tail", (m20.match(/ #/g) || []).length === 20 && !/more/.test(m20), m20);
+  });
+}
+
 console.log("\n== unknown bridge helper (Proxy) ==");
 {
   const api = createBridgeApi();
