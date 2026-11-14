@@ -132,5 +132,48 @@ check("port only in defaults", (outside.match(/8765/g) || []).length <= 3, (outs
 check("no Google Fonts (U-18)", !/fonts\.googleapis/.test(html));
 check("no log tab leftovers (SPEC 7)", !/log-list|logLimit|captureScale|compactPreset/.test(outside.replace(/old compactPreset \/ captureScale \/ logLimit/, "")));
 
+// Unsent-result queue (ADR-002 p.7)
+{
+  const r = (i, extra) => Object.assign({ type: "RESULT", id: "j" + i, success: true }, extra || {});
+  let q = MK.unsentAdd([], r(1));
+  check("unsent: add", q.length === 1 && q[0].id === "j1");
+  for (let i = 2; i <= 6; i++) q = MK.unsentAdd(q, r(i));
+  check("unsent: cap 5, sixth evicts the first", q.length === 5 && q[0].id === "j2" && q[4].id === "j6", q.map(m => m.id));
+  const img = MK.unsentAdd([], r(7, { screenshot: { base64: "AAAA" }, result: { name: "n", images: [{ base64: "BBBB", label: "x" }], nested: { base64: "C", keep: 1 }, shot: "data:image/png;base64,ZZ" } }));
+  check("unsent: images stripped", !/AAAA|BBBB|base64|data:image/.test(JSON.stringify(img)) && img[0].result.name === "n" && img[0].result.nested.keep === 1, img);
+  const src = JSON.stringify(r(8, { screenshot: { base64: "A" } }));
+  MK.unsentAdd([], JSON.parse(src));
+  check("unsent: original message not mutated", /base64/.test(src));
+  const take = MK.unsentTake(q);
+  check("unsent: take returns in arrival order and empties", take.send.map(m => m.id).join() === "j2,j3,j4,j5,j6" && take.queue.length === 0);
+  const e = MK.unsentTake([]);
+  check("unsent: empty queue gives empty list", e.send.length === 0 && e.queue.length === 0 && MK.unsentTake(undefined).send.length === 0);
+
+  // Wiring: run the real returnResult/flushUnsent source with stubbed ws/fetch, then "onopen".
+  const rr = /async function returnResult\(msg\) \{[\s\S]*?function flushUnsent\(\) \{[\s\S]*?\n    \}\n/.exec(html);
+  check("unsent: wiring source found", !!rr);
+  if (rr) {
+    const sent = [];
+    const mk = new Function("MK", "WebSocket", "fetch", "withToken", "tokenHeaders", "SERVER_URL", "state",
+      "let ws = null;\n" + rr[0] + "\nreturn { returnResult, flushUnsent, setWs(w){ ws = w; }, get unsent(){ return unsent; } };");
+    const WS = { OPEN: 1 };
+    const api = mk(MK, WS, async () => { throw new Error("down"); }, u => u, h => h, "http://x", {});
+    (async () => {
+      await api.returnResult(r(1, { screenshot: "big" }));
+      await api.returnResult(r(2));
+      check("unsent wiring: closed socket + failed POST queues result", api.unsent.length === 2);
+      api.flushUnsent();
+      check("unsent wiring: no flush while socket closed", api.unsent.length === 2 && sent.length === 0);
+      api.setWs({ readyState: 1, send: m => sent.push(JSON.parse(m)) });
+      api.flushUnsent();
+      check("unsent wiring: delivered after onopen, in order, queue empty", sent.map(m => m.id).join() === "j1,j2" && api.unsent.length === 0 && !("screenshot" in sent[0]), sent);
+      await api.returnResult(r(3));
+      check("unsent wiring: open socket sends directly", sent.length === 3 && api.unsent.length === 0);
+      finish();
+    })();
+  }
+}
+function finish() {
 console.log(failures ? `\nFAILURES: ${failures} (passed ${passed})` : `\nALL PASS (${passed} checks passed)`);
 process.exit(failures ? 1 : 0);
+}

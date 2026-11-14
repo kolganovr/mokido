@@ -765,10 +765,34 @@
       }
       function isWork(state) { return WORK_STATES.indexOf(state) >= 0; }
 
+      // ADR-002 p.7: results that reached neither the socket nor POST /result wait here
+      // (last 5, images stripped so memory stays flat) and go out on the next onopen.
+      var UNSENT_MAX = 5;
+      var IMAGE_KEYS = { base64: 1, images: 1, screenshot: 1, screenshots: 1, bytes: 1, imageBase64: 1, image: 1 };
+      function stripImages(v) {
+        if (Array.isArray(v)) return v.map(stripImages);
+        if (v && typeof v === 'object') {
+          var o = {};
+          Object.keys(v).forEach(function (k) {
+            if (!IMAGE_KEYS[k]) o[k] = stripImages(v[k]);
+          });
+          return o;
+        }
+        if (typeof v === 'string' && v.indexOf('data:image') === 0) return '';
+        return v;
+      }
+      function unsentAdd(queue, msg) {
+        var q = (queue || []).concat([stripImages(msg)]);
+        return q.length > UNSENT_MAX ? q.slice(q.length - UNSENT_MAX) : q;
+      }
+      // Returns { send: [oldest first], queue: [] }.
+      function unsentTake(queue) { return { send: (queue || []).slice(), queue: [] }; }
+
       return {
         deriveState: deriveState, viewModel: viewModel, autoExpand: autoExpand, isWork: isWork,
         backoff: backoff, hostPort: hostPort, validServerUrl: validServerUrl, versionMismatch: versionMismatch,
-        ago: ago, fill: fill, texts: texts, DEFAULT_LIMITS: DEFAULT_LIMITS
+        ago: ago, fill: fill, texts: texts, DEFAULT_LIMITS: DEFAULT_LIMITS,
+        stripImages: stripImages, unsentAdd: unsentAdd, unsentTake: unsentTake, UNSENT_MAX: UNSENT_MAX
       };
     })();
   </script>
@@ -1402,6 +1426,7 @@
         model.attempts = 0;
         model.httpStatus = null;
         sendDocIdentity('CLIENT_READY');
+        flushUnsent();
         pollStatus();
         listCheckpoints();
         clearInterval(heartbeat);
@@ -1481,12 +1506,26 @@
         return;
       }
       try {
-        await fetch(withToken(`${SERVER_URL}/result`), {
+        const r = await fetch(withToken(`${SERVER_URL}/result`), {
           method: 'POST',
           headers: tokenHeaders({ 'Content-Type': 'application/json' }),
           body: JSON.stringify(msg)
         });
-      } catch (e) {}
+        if (r && r.ok === false) throw new Error('HTTP ' + r.status);
+      } catch (e) {
+        unsent = MK.unsentAdd(unsent, msg);
+      }
+    }
+
+    // Results that could not be delivered (server restarted mid-script); flushed on onopen.
+    let unsent = [];
+    function flushUnsent() {
+      if (!unsent.length || !ws || ws.readyState !== WebSocket.OPEN) return;
+      const take = MK.unsentTake(unsent);
+      unsent = take.queue;
+      take.send.forEach(m => {
+        try { ws.send(JSON.stringify(m)); } catch (e) { unsent = MK.unsentAdd(unsent, m); }
+      });
     }
 
     function handleLocalResult(msg) {
