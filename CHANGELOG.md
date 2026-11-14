@@ -37,6 +37,13 @@
   load in a script that never edits text.
 - **The plugin UI keeps results it could not send.** The last 5 (images stripped) are resent when the socket
   reconnects.
+- **A write through `bridge.require(...)` is no longer refused as a read.** A script that calls a method on a
+  saved module counts as a write unless every called method has a read name (`get`, `find`, `list`...), so it
+  runs and gets the after-write capture.
+- **Second instance without the bridge token gets a clear hint.** Instead of a bare 403 (or a misleading
+  `REST_TOKEN_MISSING`) it answers `BRIDGE_TOKEN_REQUIRED`: set the same `FIGMA_BRIDGE_TOKEN` in every MCP
+  client, or remove it everywhere.
+- **`figma_inspect` with `find` suggests `like`/`compare`** when it returns many alike hits.
 
 ## 4.4.0 -- new plugin window with Moki, one install folder
 
