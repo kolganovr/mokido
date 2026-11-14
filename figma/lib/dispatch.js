@@ -252,6 +252,12 @@ async function proxyToMaster(pathname, { method = "GET", body, timeoutMs = 45000
       } catch (e) {}
       // A 500 from /execute is the master relaying a real tool failure
       // (NO_CONNECTED_CLIENTS, a sandbox error...) — pass it through as-is.
+      if (res.status === 403 && /only accepts requests from the Mokido plugin/.test(String(detail))) {
+        const e = new Error("The main Mokido instance on :" + BRIDGE_PORT + " requires FIGMA_BRIDGE_TOKEN and this one " +
+          (BRIDGE_TOKEN ? "sent a different token" : "has none") + ". HINT: set the same FIGMA_BRIDGE_TOKEN in the env of every MCP client (or remove it everywhere), then restart them.");
+        e.code = "BRIDGE_TOKEN_REQUIRED";
+        throw e;
+      }
       const err = new Error(res.status === 500 ? detail : `Bridge proxy error (HTTP ${res.status}): ${detail}`);
       if (code) err.code = code;
       Object.assign(err, loc);

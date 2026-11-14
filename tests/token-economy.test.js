@@ -417,6 +417,17 @@ async function main() {
     } finally {
       await proxy.stop();
     }
+
+    const bare = startServer({ FIGMA_BRIDGE_TOKEN: "" });
+    await bare.call("initialize", { protocolVersion: "2024-11-05", capabilities: {}, clientInfo: { name: "bare-proxy", version: "0" } });
+    await sleep(500);
+    try {
+      const r = await bare.tool("figma_execute_code", { code: "ok" });
+      check("T-081: a proxy without FIGMA_BRIDGE_TOKEN gets a token hint, not a bare 403 or a REST token hint",
+        r.isError && /FIGMA_BRIDGE_TOKEN/.test(r.text) && /same/i.test(r.text) && !/REST|PERSONAL_ACCESS/.test(r.text), r.text);
+    } finally {
+      await bare.stop();
+    }
   } finally {
     try { plugin.close(); } catch (e) {}
     await master.stop();
