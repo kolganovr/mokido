@@ -279,7 +279,7 @@ function htmlBuildPlace(e, par, ctx) {
   if (!par) return;
   if (parAL && p.positioning !== "ABSOLUTE") {
     let h = p.sizingH, v = p.sizingV;
-    const canHug = p.type === "TEXT" || (p.type === "FRAME" && p.layoutMode && p.layoutMode !== "NONE");
+    const canHug = p.type === "TEXT" || (p.type === "FRAME" && p.layoutMode && p.layoutMode !== "NONE") || (e.inst && n.layoutMode && n.layoutMode !== "NONE");
     if (!canHug) {
       if (h === "HUG" || v === "HUG") htmlBuildWarn(ctx, p, "sizing_coerced", "HUG not possible for " + p.type + ", FIXED used");
       if (h === "HUG") h = "FIXED"; if (v === "HUG") v = "FIXED";
@@ -293,8 +293,21 @@ function htmlBuildPlace(e, par, ctx) {
   }
 }
 
+// 9.2: an element with data-component becomes an instance, its children are not built; no component found: plain frames (warning).
+async function htmlBuildInstance(p, par, ctx, parentFigma, isRoot) {
+  let n = null;
+  try { n = await htmlInstBuild(p, ctx); } catch (err) { htmlBuildWarn(ctx, p, "instance_failed", htmlBuildErr(err)); }
+  if (!n) return null;
+  try { parentFigma.appendChild(n); } catch (err) { htmlBuildWarn(ctx, p, "node_error", htmlBuildErr(err)); try { n.remove(); } catch (e2) { /* nothing to clean */ } return null; }
+  const e = { p: Object.assign({}, p, { type: "INSTANCE", children: [] }), n, par, kids: [], inst: true };
+  ctx.entries.push(e);
+  ctx.created++; ctx.instances++;
+  if (!isRoot) htmlBuildPlace(e, par, ctx);
+  return e;
+}
 async function htmlBuildNode(p, par, ctx, parentFigma, isRoot) {
   let n;
+  if (p.component && typeof htmlInstBuild === "function") { const ie = await htmlBuildInstance(p, par, ctx, parentFigma, isRoot); if (ie) return ie; }
   try {
     n = htmlBuildCreate(p, ctx);
     if (p.type === "TEXT") htmlBuildText(n, p, ctx);
@@ -389,7 +402,7 @@ function htmlBuildApplyFallback(e, ctx) {
       k.n.layoutPositioning = "ABSOLUTE";
       // one-line text keeps hugging: a fixed browser width wraps it in Figma, whose Inter runs a bit wider (T-105)
       if (k.p.type === "TEXT" && htmlBuildLines(k.p) === 1 && !(k.p.text && k.p.text.maxLines)) htmlBuildHugText(k);
-      else htmlBuildResize(k.n, k.p);
+      else if (!k.inst) htmlBuildResize(k.n, k.p);
       k.n.x = k.p.x - p.x + htmlBuildAlignShift(k); k.n.y = k.p.y - p.y;
     });
   }
@@ -458,7 +471,7 @@ function htmlBuildTextGuard(ctx, report) {
   }
 }
 // Size is fine when within 2 px, or when a fix was already tried (it must not loop).
-const htmlBuildSizeOk = (e) => e.dSize <= HTML_BUILD_TOL || !!e.fixed;
+const htmlBuildSizeOk = (e) => e.dSize <= HTML_BUILD_TOL || !!e.fixed || !!e.inst;
 function htmlBuildSelfCheck(root, ctx, report) {
   let org = { x: 0, y: 0 };
   try { const b = root.n.absoluteBoundingBox; if (b) org = { x: b.x, y: b.y }; } catch (e) { /* keep 0,0 */ }
@@ -468,7 +481,7 @@ function htmlBuildSelfCheck(root, ctx, report) {
     let changed = false;
     // 1) leaves with a wrong size are fixed in place; 2) containers whose children are right but whose own size is not;
     // 3) only then a container whose children have the right sizes but the wrong positions: its in-flow children go ABSOLUTE.
-    for (const e of rev) if (!e.kids.length && !e.fixed && e.dSize > HTML_BUILD_TOL && htmlBuildFixLeaf(e, ctx)) changed = true;
+    for (const e of rev) if (!e.kids.length && !e.fixed && !e.inst && e.dSize > HTML_BUILD_TOL && htmlBuildFixLeaf(e, ctx)) changed = true;
     if (changed) continue;
     for (const e of rev) if (e.kids.length && !e.fixed && e.dSize > HTML_BUILD_TOL && e.kids.every(htmlBuildSizeOk) && htmlBuildFixSelf(e, ctx)) changed = true;
     if (changed) continue;
@@ -488,14 +501,17 @@ function htmlBuildSelfCheck(root, ctx, report) {
   for (const e of ctx.entries) {
     if (e.delta === null) continue;
     report.box_ok.den++;
-    if (e.ok) report.box_ok.num++;
+    if (e.inst) { // rule 7: an instance is never stretched to the DOM box, a difference is only reported
+      if (e.ok) report.box_ok.num++;
+      else if (e.dSize > HTML_BUILD_TOL) { const b = htmlBuildBox(e); htmlDsWarnAdd(ctx.dsw, e.p, "instance_size_differs", e.p.component.name, "css " + e.p.w + "x" + e.p.h + " figma " + (b ? Math.round(b.width * 10) / 10 + "x" + Math.round(b.height * 10) / 10 : "?")); }
+    } else if (e.ok) report.box_ok.num++;
     else htmlBuildWarn(ctx, e.p, "box_mismatch", "box differs from plan by " + Math.round(e.delta * 100) / 100 + " px");
   }
 }
 
 async function htmlBuild(plan, opts) {
   opts = opts || {};
-  const ctx = { warnings: [], created: 0, al: 0, entries: [], fonts: new Map(), ds: null, dsw: new Map(), bound: 0 };
+  const ctx = { warnings: [], created: 0, al: 0, entries: [], fonts: new Map(), ds: null, dsw: new Map(), bound: 0, instances: 0 };
   const report = { root_id: null, created: 0, auto_layout: 0, absolute_fallback: 0, text_fixed: 0, text_wrapped: 0, box_ok: { num: 0, den: 0 }, warnings: ctx.warnings };
   if (!plan || !plan.root) { htmlBuildWarn(ctx, null, "no_plan", "plan.root is missing"); return report; }
   await htmlBuildLoadFonts(plan.root, ctx);
@@ -513,6 +529,7 @@ async function htmlBuild(plan, opts) {
   report.created = ctx.created;
   report.auto_layout = ctx.al;
   report.bound = ctx.bound;
-  if (ctx.ds) htmlDsWarnFlush(ctx.dsw, ctx.warnings);
+  report.instances = ctx.instances;
+  if (typeof htmlDsWarnFlush === "function") htmlDsWarnFlush(ctx.dsw, ctx.warnings);
   return report;
 }

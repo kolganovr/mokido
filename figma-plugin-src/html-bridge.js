@@ -54,7 +54,7 @@ async function htmlBridgeFromHtml(html, opts) {
     if (!parent || typeof parent.appendChild !== "function") throw new Error("bridge.fromHtml: parent " + String(o.parent) + " is not a node that can hold children");
   }
   const roots = [], warnings = [], codes = {};
-  let bound = 0, created = 0, al = 0, frames = 0, abs = 0, wrapped = 0, boxNum = 0, boxDen = 0, x = typeof o.x === "number" ? o.x : null, y = typeof o.y === "number" ? o.y : 0;
+  let bound = 0, inst = 0, created = 0, al = 0, frames = 0, abs = 0, wrapped = 0, boxNum = 0, boxDen = 0, x = typeof o.x === "number" ? o.x : null, y = typeof o.y === "number" ? o.y : 0;
   for (let i = 0; i < widths.length; i++) {
     const w = widths[i];
     const tree = await htmlBridgeRequestTree(html, w, height);
@@ -69,7 +69,7 @@ async function htmlBridgeFromHtml(html, opts) {
       roots.push({ id: report.root_id, name, w: plan.root.w, h: plan.root.h, x, y });
       try { if (activeCheckpoint) activeCheckpoint.created.push(report.root_id); } catch (e) { /* journal is best effort */ }
     }
-    created += report.created; bound += report.bound || 0; al += report.auto_layout; frames += plan.stats.frames; abs += report.absolute_fallback; wrapped += report.text_wrapped || 0;
+    created += report.created; bound += report.bound || 0; inst += report.instances || 0; al += report.auto_layout; frames += plan.stats.frames; abs += report.absolute_fallback; wrapped += report.text_wrapped || 0;
     boxNum += report.box_ok.num; boxDen += report.box_ok.den;
     report.warnings.concat(plan.warnings).forEach((wn) => {
       codes[wn.code] = (codes[wn.code] || 0) + 1;
@@ -84,6 +84,7 @@ async function htmlBridgeFromHtml(html, opts) {
     auto_layout: frames ? Math.round((1000 * al) / frames) / 10 + "% of " + frames + " frames" : "n/a",
     absolute_fallback: abs,
     bound,
+    instances: inst,
     text_wrapped: wrapped,
     boxes_within_1px: boxDen ? boxNum + "/" + boxDen : "n/a",
     warning_counts: codes

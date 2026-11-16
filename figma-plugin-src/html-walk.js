@@ -167,6 +167,7 @@ function htmlWalkEl(c, el, parentId, ancDecl, ancTok) {
       name: el.getAttribute("data-name"),
       component: el.getAttribute("data-component"),
       variant: el.getAttribute("data-variant"),
+      prop: el.getAttribute("data-prop"),
       in_component: !!(el.parentElement && el.parentElement.closest("[data-component]")),
       rect: rect, text: null, display: disp,
       position: cs.position, overflow: htmlWalkOverflow(cs),

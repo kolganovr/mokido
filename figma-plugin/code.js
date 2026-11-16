@@ -3780,7 +3780,7 @@ function htmlMapNode(c, n, pc, isRoot) {
     }
   }
   const dst = (n.declared && n.declared.height) || null;
-  if (!isRoot && !paint && !hasPad) {
+  if (!isRoot && !paint && !hasPad && !n.component) {
     if (kids.length === 1 && kids[0].positioning !== "ABSOLUTE" && htmlMapClose(kids[0], htmlMapBase(c, n, "FRAME"))) {
       c.stats.collapsed++;
       htmlMapSetSize(kids[0], n, pc);
@@ -3943,6 +3943,7 @@ const HTML_DS_BORDER_STYLE = /^(solid|dashed|dotted|double|groove|ridge|inset|ou
 const HTML_DS_RADIUS = ["topLeftRadius", "topRightRadius", "bottomRightRadius", "bottomLeftRadius"];
 
 function htmlDsPlan(p, c) {
+  if (typeof htmlInstPlan === "function") htmlInstPlan(p, c);
   const n = p._n;
   if (!n || p.dom == null || !n.declared) return; // wrappers made by the mapper have no DOM node of their own
   const d = n.declared;
@@ -4019,6 +4020,15 @@ async function htmlDsIndex() {
   } catch (e) { idx.error = e && e.message ? e.message : String(e); }
   return idx;
 }
+// 9.2: local component sets and single components, from the plugin's own component index (components.js, the one figma_find_components uses).
+// Called lazily, only when a plan has data-component: a cold index walks every page.
+async function htmlDsComponents() {
+  const out = [];
+  try { if (typeof figma.loadAllPagesAsync === "function") await figma.loadAllPagesAsync(); } catch (e) { /* the index still sees the loaded pages */ }
+  if (typeof ensureComponentIndex !== "function") return out;
+  for (const e of ensureComponentIndex(false).values()) out.push({ id: e.id, name: e.name, norm: htmlDsNorm(e.name), type: e.type, remote: false, node: null });
+  return out;
+}
 // Rules 1-3: { v } found, or { code } not_found | ambiguous | type_mismatch.
 function htmlDsFindVar(idx, cssName, kind) {
   const q = htmlDsNorm(cssName);
@@ -4089,6 +4099,164 @@ function htmlDsBindNode(n, p, ctx) {
     try { n.setBoundVariable(f, v); ctx.bound++; }
     catch (e) { htmlDsWarnAdd(ctx.dsw, p, "var_bind_failed", name, String(e && e.message || e).slice(0, 80)); }
   }
+}
+// html-inst.js (T-077, F9 9.2): data-component -> component instances (contract: planning/fable/F9_контракт.md, section 2).
+// A part of the plugin scope (no import/export), prefix htmlInst*. Two halves:
+//  - map side: htmlInstPlan(p, c) (called from htmlDsPlan) writes p.component = { name, variant, dataName, texts, fixW, fixH } for an element with
+//    data-component that is not itself inside a component. The plan keeps the children: they are built as plain frames only when no component is found.
+//  - build side: htmlInstFind (rule 1) and htmlInstBuild (rules 2-6, 8) make the instance; html-build.js places it and checks its box (rule 7).
+// Never detaches an instance, never touches colors / radius / padding inside it (the variant does that).
+
+// ---------- map side ----------
+function htmlInstAllText(c, n) {
+  let out = "";
+  for (const k of c.kids[n.id] || []) {
+    if (k.tag === "#text") out += (out ? " " : "") + k.text;
+    else if (k.tag !== "svg" && k.tag !== "img") { const t = htmlInstAllText(c, k); if (t) out += (out ? " " : "") + t; }
+  }
+  return out;
+}
+// Text pieces of the subtree in document order: one item per run of text (inline neighbours merge), an element with data-prop is one item.
+function htmlInstTexts(c, n) {
+  const items = [];
+  (function walk(el, prop) {
+    let run = null;
+    for (const k of c.kids[el.id] || []) {
+      if (k.tag === "#text") {
+        if (!run) { run = { prop: prop || null, text: "" }; items.push(run); }
+        run.text += (run.text ? " " : "") + k.text;
+      } else if (k.tag === "svg" || k.tag === "img") run = null;
+      else if (k.prop) { run = null; const t = htmlInstAllText(c, k); if (t) items.push({ prop: k.prop, text: t }); }
+      else if (/^inline/.test(k.display || "") && (c.kids[k.id] || []).every((x) => x.tag === "#text")) {
+        const t = htmlInstAllText(c, k);
+        if (t) { if (!run) { run = { prop: prop || null, text: "" }; items.push(run); } run.text += (run.text ? " " : "") + t; }
+      } else { run = null; walk(k, prop); }
+    }
+  })(n, n.prop || null);
+  return items;
+}
+function htmlInstPlan(p, c) {
+  const n = p._n;
+  if (!n || !n.component || n.in_component || p.dom !== n.id) return;
+  const d = n.declared || {};
+  const px = (v) => /^\d+(\.\d+)?px$/.test(String(v || "").trim());
+  p.component = { name: String(n.component), variant: n.variant || null, dataName: n.name || null, texts: htmlInstTexts(c, n), fixW: px(d.width), fixH: px(d.height) };
+}
+
+// ---------- build side ----------
+const htmlInstBase = (k) => String(k).replace(/#.*$/, "");
+// Library components that the file already uses: the main components of existing instances (nothing is imported by key).
+async function htmlInstLoadLib(idx) {
+  idx.libLoaded = true;
+  const seen = new Set(idx.components.map((e) => e.id));
+  let left = 1500;
+  for (const page of figma.root.children) {
+    let list = [];
+    try { list = page.findAllWithCriteria({ types: ["INSTANCE"] }); } catch (e) { continue; }
+    for (const inst of list) {
+      if (left-- <= 0) return;
+      let main = null;
+      try { main = await inst.getMainComponentAsync(); } catch (e) { main = null; }
+      if (!main || !main.remote || seen.has(main.id)) continue;
+      const set = main.parent && main.parent.type === "COMPONENT_SET" ? main.parent : null;
+      const node = set || main;
+      if (seen.has(node.id)) continue;
+      seen.add(main.id); seen.add(node.id);
+      idx.components.push({ id: node.id, name: node.name, norm: htmlDsNorm(node.name), type: node.type, remote: true, node });
+    }
+  }
+}
+// Rule 1: local set, local single component, then the same ignoring case and separators, then library components already in the file.
+async function htmlInstFind(ctx, name) {
+  const idx = ctx.ds;
+  if (!idx) return null;
+  if (!idx.compsLoaded) { idx.compsLoaded = true; try { idx.components = await htmlDsComponents(); } catch (e) { idx.components = []; } }
+  const q = htmlDsNorm(name);
+  let hit = null;
+  for (const exact of [true, false]) {
+    for (const type of ["COMPONENT_SET", "COMPONENT"]) {
+      hit = hit || idx.components.find((e) => !e.remote && e.type === type && (exact ? e.name === name : e.norm === q));
+    }
+  }
+  if (!hit) {
+    if (!idx.libLoaded) await htmlInstLoadLib(idx);
+    hit = idx.components.find((e) => e.remote && e.name === name) || idx.components.find((e) => e.remote && e.norm === q);
+  }
+  if (!hit) return null;
+  const node = hit.node || (await figma.getNodeByIdAsync(hit.id));
+  if (!node) return null;
+  return node.type === "COMPONENT_SET" ? { comp: node.defaultVariant, defs: node.componentPropertyDefinitions } : { comp: node, defs: node.componentPropertyDefinitions };
+}
+function htmlInstDefKey(defs, name) {
+  const lo = String(name).trim().toLowerCase(), q = htmlDsNorm(name);
+  const keys = Object.keys(defs || {});
+  return keys.find((k) => htmlInstBase(k).toLowerCase() === lo) || keys.find((k) => htmlDsNorm(htmlInstBase(k)) === q);
+}
+// Rules 2-3: "Variant=Primary, Size=M" -> { propertyKey: value }; what is unknown stays at its default (variant_unknown).
+function htmlInstVariant(ctx, p, c, defs, props) {
+  if (!c.variant) return;
+  for (const part of String(c.variant).split(",")) {
+    const i = part.indexOf("=");
+    const pn = (i < 0 ? part : part.slice(0, i)).trim(), pv = (i < 0 ? "" : part.slice(i + 1)).trim();
+    if (!pn) continue;
+    const key = htmlInstDefKey(defs, pn), d = key ? defs[key] : null;
+    let ok = false;
+    if (d && d.type === "VARIANT") { const o = (d.variantOptions || []).find((x) => String(x).toLowerCase() === pv.toLowerCase()); if (o !== undefined) { props[key] = o; ok = true; } }
+    else if (d && d.type === "BOOLEAN" && /^(true|false)$/i.test(pv)) { props[key] = pv.toLowerCase() === "true"; ok = true; }
+    else if (d && d.type === "TEXT") { props[key] = pv; ok = true; }
+    if (!ok) htmlDsWarnAdd(ctx.dsw, p, "variant_unknown", c.name, pn + "=" + pv);
+  }
+}
+// Rule 4: texts by data-prop, else in order into the free TEXT properties; returns the texts that have no property to go to.
+function htmlInstTextProps(ctx, p, c, defs, props) {
+  const free = Object.keys(defs || {}).filter((k) => defs[k].type === "TEXT" && !(k in props));
+  const rest = [];
+  for (const it of c.texts || []) {
+    if (!it.prop) continue;
+    const key = htmlInstDefKey(defs, it.prop);
+    if (key && defs[key].type === "TEXT") { props[key] = it.text; const j = free.indexOf(key); if (j >= 0) free.splice(j, 1); it.done = true; }
+    else htmlDsWarnAdd(ctx.dsw, p, "text_override_mismatch", c.name, "no text property " + it.prop);
+  }
+  for (const it of c.texts || []) {
+    if (it.done) continue;
+    if (free.length) props[free.shift()] = it.text; else rest.push(it);
+  }
+  return rest;
+}
+// No text property left: the texts go into the visible TEXT layers inside the instance, in order (font loaded first).
+async function htmlInstTextLayers(ctx, p, c, inst, rest) {
+  let places = [];
+  try { places = inst.findAll((x) => x.type === "TEXT" && x.visible !== false); } catch (e) { places = []; }
+  let used = 0;
+  for (const it of rest) {
+    const t = places[used];
+    if (!t) break;
+    used++;
+    try { await htmlBuildLoadOne(t.fontName); t.characters = it.text; } catch (e) { htmlDsWarnAdd(ctx.dsw, p, "text_override_mismatch", c.name, "text layer not writable"); }
+  }
+  if (rest.length > used) htmlDsWarnAdd(ctx.dsw, p, "text_override_mismatch", c.name, (rest.length - used) + " text without a place");
+}
+// Returns the instance (not yet in the tree), or null: the caller builds plain frames (the warning is recorded).
+async function htmlInstBuild(p, ctx) {
+  const c = p.component;
+  const hit = await htmlInstFind(ctx, c.name);
+  if (!hit || !hit.comp) { htmlDsWarnAdd(ctx.dsw, p, "component_not_found", c.name, ""); return null; }
+  let inst;
+  try { inst = hit.comp.createInstance(); } catch (e) { htmlDsWarnAdd(ctx.dsw, p, "instance_failed", c.name, htmlBuildErr(e).slice(0, 80)); return null; }
+  try {
+    const defs = hit.defs || {}, props = {};
+    htmlInstVariant(ctx, p, c, defs, props);
+    const rest = htmlInstTextProps(ctx, p, c, defs, props);
+    if (Object.keys(props).length) inst.setProperties(props);
+    if (rest.length && Object.keys(defs).some((k) => defs[k].type === "TEXT")) htmlDsWarnAdd(ctx.dsw, p, "text_override_mismatch", c.name, rest.length + " text without a place");
+    else if (rest.length) await htmlInstTextLayers(ctx, p, c, inst, rest);
+    // rule 6: only name, visibility, opacity, and a size the CSS declared in px
+    if (c.dataName) inst.name = c.dataName;
+    if (p.visible === false) inst.visible = false;
+    if (typeof p.opacity === "number" && p.opacity !== 1) inst.opacity = p.opacity;
+    if (c.fixW || c.fixH) inst.resize(Math.max(c.fixW ? p.w : inst.width, 0.01), Math.max(c.fixH ? p.h : inst.height, 0.01));
+  } catch (e) { htmlDsWarnAdd(ctx.dsw, p, "instance_failed", c.name, htmlBuildErr(e).slice(0, 80)); }
+  return inst;
 }
 // html-build.js (T-077, F8.3): builds Figma nodes from a plan made by htmlMap (contract: planning/fable/F8_контракт.md).
 // A part of the plugin scope (no import/export). Entry: async htmlBuild(plan, opts) -> report.
@@ -4371,7 +4539,7 @@ function htmlBuildPlace(e, par, ctx) {
   if (!par) return;
   if (parAL && p.positioning !== "ABSOLUTE") {
     let h = p.sizingH, v = p.sizingV;
-    const canHug = p.type === "TEXT" || (p.type === "FRAME" && p.layoutMode && p.layoutMode !== "NONE");
+    const canHug = p.type === "TEXT" || (p.type === "FRAME" && p.layoutMode && p.layoutMode !== "NONE") || (e.inst && n.layoutMode && n.layoutMode !== "NONE");
     if (!canHug) {
       if (h === "HUG" || v === "HUG") htmlBuildWarn(ctx, p, "sizing_coerced", "HUG not possible for " + p.type + ", FIXED used");
       if (h === "HUG") h = "FIXED"; if (v === "HUG") v = "FIXED";
@@ -4385,8 +4553,21 @@ function htmlBuildPlace(e, par, ctx) {
   }
 }
 
+// 9.2: an element with data-component becomes an instance, its children are not built; no component found: plain frames (warning).
+async function htmlBuildInstance(p, par, ctx, parentFigma, isRoot) {
+  let n = null;
+  try { n = await htmlInstBuild(p, ctx); } catch (err) { htmlBuildWarn(ctx, p, "instance_failed", htmlBuildErr(err)); }
+  if (!n) return null;
+  try { parentFigma.appendChild(n); } catch (err) { htmlBuildWarn(ctx, p, "node_error", htmlBuildErr(err)); try { n.remove(); } catch (e2) { /* nothing to clean */ } return null; }
+  const e = { p: Object.assign({}, p, { type: "INSTANCE", children: [] }), n, par, kids: [], inst: true };
+  ctx.entries.push(e);
+  ctx.created++; ctx.instances++;
+  if (!isRoot) htmlBuildPlace(e, par, ctx);
+  return e;
+}
 async function htmlBuildNode(p, par, ctx, parentFigma, isRoot) {
   let n;
+  if (p.component && typeof htmlInstBuild === "function") { const ie = await htmlBuildInstance(p, par, ctx, parentFigma, isRoot); if (ie) return ie; }
   try {
     n = htmlBuildCreate(p, ctx);
     if (p.type === "TEXT") htmlBuildText(n, p, ctx);
@@ -4481,7 +4662,7 @@ function htmlBuildApplyFallback(e, ctx) {
       k.n.layoutPositioning = "ABSOLUTE";
       // one-line text keeps hugging: a fixed browser width wraps it in Figma, whose Inter runs a bit wider (T-105)
       if (k.p.type === "TEXT" && htmlBuildLines(k.p) === 1 && !(k.p.text && k.p.text.maxLines)) htmlBuildHugText(k);
-      else htmlBuildResize(k.n, k.p);
+      else if (!k.inst) htmlBuildResize(k.n, k.p);
       k.n.x = k.p.x - p.x + htmlBuildAlignShift(k); k.n.y = k.p.y - p.y;
     });
   }
@@ -4550,7 +4731,7 @@ function htmlBuildTextGuard(ctx, report) {
   }
 }
 // Size is fine when within 2 px, or when a fix was already tried (it must not loop).
-const htmlBuildSizeOk = (e) => e.dSize <= HTML_BUILD_TOL || !!e.fixed;
+const htmlBuildSizeOk = (e) => e.dSize <= HTML_BUILD_TOL || !!e.fixed || !!e.inst;
 function htmlBuildSelfCheck(root, ctx, report) {
   let org = { x: 0, y: 0 };
   try { const b = root.n.absoluteBoundingBox; if (b) org = { x: b.x, y: b.y }; } catch (e) { /* keep 0,0 */ }
@@ -4560,7 +4741,7 @@ function htmlBuildSelfCheck(root, ctx, report) {
     let changed = false;
     // 1) leaves with a wrong size are fixed in place; 2) containers whose children are right but whose own size is not;
     // 3) only then a container whose children have the right sizes but the wrong positions: its in-flow children go ABSOLUTE.
-    for (const e of rev) if (!e.kids.length && !e.fixed && e.dSize > HTML_BUILD_TOL && htmlBuildFixLeaf(e, ctx)) changed = true;
+    for (const e of rev) if (!e.kids.length && !e.fixed && !e.inst && e.dSize > HTML_BUILD_TOL && htmlBuildFixLeaf(e, ctx)) changed = true;
     if (changed) continue;
     for (const e of rev) if (e.kids.length && !e.fixed && e.dSize > HTML_BUILD_TOL && e.kids.every(htmlBuildSizeOk) && htmlBuildFixSelf(e, ctx)) changed = true;
     if (changed) continue;
@@ -4580,14 +4761,17 @@ function htmlBuildSelfCheck(root, ctx, report) {
   for (const e of ctx.entries) {
     if (e.delta === null) continue;
     report.box_ok.den++;
-    if (e.ok) report.box_ok.num++;
+    if (e.inst) { // rule 7: an instance is never stretched to the DOM box, a difference is only reported
+      if (e.ok) report.box_ok.num++;
+      else if (e.dSize > HTML_BUILD_TOL) { const b = htmlBuildBox(e); htmlDsWarnAdd(ctx.dsw, e.p, "instance_size_differs", e.p.component.name, "css " + e.p.w + "x" + e.p.h + " figma " + (b ? Math.round(b.width * 10) / 10 + "x" + Math.round(b.height * 10) / 10 : "?")); }
+    } else if (e.ok) report.box_ok.num++;
     else htmlBuildWarn(ctx, e.p, "box_mismatch", "box differs from plan by " + Math.round(e.delta * 100) / 100 + " px");
   }
 }
 
 async function htmlBuild(plan, opts) {
   opts = opts || {};
-  const ctx = { warnings: [], created: 0, al: 0, entries: [], fonts: new Map(), ds: null, dsw: new Map(), bound: 0 };
+  const ctx = { warnings: [], created: 0, al: 0, entries: [], fonts: new Map(), ds: null, dsw: new Map(), bound: 0, instances: 0 };
   const report = { root_id: null, created: 0, auto_layout: 0, absolute_fallback: 0, text_fixed: 0, text_wrapped: 0, box_ok: { num: 0, den: 0 }, warnings: ctx.warnings };
   if (!plan || !plan.root) { htmlBuildWarn(ctx, null, "no_plan", "plan.root is missing"); return report; }
   await htmlBuildLoadFonts(plan.root, ctx);
@@ -4605,7 +4789,8 @@ async function htmlBuild(plan, opts) {
   report.created = ctx.created;
   report.auto_layout = ctx.al;
   report.bound = ctx.bound;
-  if (ctx.ds) htmlDsWarnFlush(ctx.dsw, ctx.warnings);
+  report.instances = ctx.instances;
+  if (typeof htmlDsWarnFlush === "function") htmlDsWarnFlush(ctx.dsw, ctx.warnings);
   return report;
 }
 // html-bridge.js (T-077, F8.4): the sandbox half of bridge.fromHtml. The sandbox has no DOM, so the HTML goes to the
@@ -4664,7 +4849,7 @@ async function htmlBridgeFromHtml(html, opts) {
     if (!parent || typeof parent.appendChild !== "function") throw new Error("bridge.fromHtml: parent " + String(o.parent) + " is not a node that can hold children");
   }
   const roots = [], warnings = [], codes = {};
-  let bound = 0, created = 0, al = 0, frames = 0, abs = 0, wrapped = 0, boxNum = 0, boxDen = 0, x = typeof o.x === "number" ? o.x : null, y = typeof o.y === "number" ? o.y : 0;
+  let bound = 0, inst = 0, created = 0, al = 0, frames = 0, abs = 0, wrapped = 0, boxNum = 0, boxDen = 0, x = typeof o.x === "number" ? o.x : null, y = typeof o.y === "number" ? o.y : 0;
   for (let i = 0; i < widths.length; i++) {
     const w = widths[i];
     const tree = await htmlBridgeRequestTree(html, w, height);
@@ -4679,7 +4864,7 @@ async function htmlBridgeFromHtml(html, opts) {
       roots.push({ id: report.root_id, name, w: plan.root.w, h: plan.root.h, x, y });
       try { if (activeCheckpoint) activeCheckpoint.created.push(report.root_id); } catch (e) { /* journal is best effort */ }
     }
-    created += report.created; bound += report.bound || 0; al += report.auto_layout; frames += plan.stats.frames; abs += report.absolute_fallback; wrapped += report.text_wrapped || 0;
+    created += report.created; bound += report.bound || 0; inst += report.instances || 0; al += report.auto_layout; frames += plan.stats.frames; abs += report.absolute_fallback; wrapped += report.text_wrapped || 0;
     boxNum += report.box_ok.num; boxDen += report.box_ok.den;
     report.warnings.concat(plan.warnings).forEach((wn) => {
       codes[wn.code] = (codes[wn.code] || 0) + 1;
@@ -4694,6 +4879,7 @@ async function htmlBridgeFromHtml(html, opts) {
     auto_layout: frames ? Math.round((1000 * al) / frames) / 10 + "% of " + frames + " frames" : "n/a",
     absolute_fallback: abs,
     bound,
+    instances: inst,
     text_wrapped: wrapped,
     boxes_within_1px: boxDen ? boxNum + "/" + boxDen : "n/a",
     warning_counts: codes

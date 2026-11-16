@@ -54,6 +54,7 @@ const HTML_DS_BORDER_STYLE = /^(solid|dashed|dotted|double|groove|ridge|inset|ou
 const HTML_DS_RADIUS = ["topLeftRadius", "topRightRadius", "bottomRightRadius", "bottomLeftRadius"];
 
 function htmlDsPlan(p, c) {
+  if (typeof htmlInstPlan === "function") htmlInstPlan(p, c);
   const n = p._n;
   if (!n || p.dom == null || !n.declared) return; // wrappers made by the mapper have no DOM node of their own
   const d = n.declared;
@@ -129,6 +130,15 @@ async function htmlDsIndex() {
     }
   } catch (e) { idx.error = e && e.message ? e.message : String(e); }
   return idx;
+}
+// 9.2: local component sets and single components, from the plugin's own component index (components.js, the one figma_find_components uses).
+// Called lazily, only when a plan has data-component: a cold index walks every page.
+async function htmlDsComponents() {
+  const out = [];
+  try { if (typeof figma.loadAllPagesAsync === "function") await figma.loadAllPagesAsync(); } catch (e) { /* the index still sees the loaded pages */ }
+  if (typeof ensureComponentIndex !== "function") return out;
+  for (const e of ensureComponentIndex(false).values()) out.push({ id: e.id, name: e.name, norm: htmlDsNorm(e.name), type: e.type, remote: false, node: null });
+  return out;
 }
 // Rules 1-3: { v } found, or { code } not_found | ambiguous | type_mismatch.
 function htmlDsFindVar(idx, cssName, kind) {

@@ -391,7 +391,7 @@ function htmlMapNode(c, n, pc, isRoot) {
     }
   }
   const dst = (n.declared && n.declared.height) || null;
-  if (!isRoot && !paint && !hasPad) {
+  if (!isRoot && !paint && !hasPad && !n.component) {
     if (kids.length === 1 && kids[0].positioning !== "ABSOLUTE" && htmlMapClose(kids[0], htmlMapBase(c, n, "FRAME"))) {
       c.stats.collapsed++;
       htmlMapSetSize(kids[0], n, pc);
