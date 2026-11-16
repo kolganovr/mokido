@@ -22,6 +22,9 @@
   that container (before, the fill came out empty and the cover vanished); if the image cannot be created (not a `data:` URI, bad bytes)
   the container gets a grey placeholder and a warning, never nothing. `white-space: nowrap` + `text-overflow: ellipsis` becomes one line with an
   ending ellipsis at the container width, `-webkit-line-clamp: N` becomes `maxLines: N` with an ending ellipsis, so headlines no longer wrap into 2-3 lines.
+- **`figma_html`: margins and absolute children (T-105).** A margin on a flex child is no longer lost: equal gaps become the container's spacing, a bigger one
+  goes into the child's padding (unpainted Auto Layout) or a wrapper layer with a warning. Absolute children get their size by the rule: declared px fixed,
+  undeclared Auto Layout frame or one-line text hug, undeclared leaf fixed, 100% or both opposite sides fixed with STRETCH constraints.
 - **Internal split, no behavior change.** The server moved from one 213 KB `figma/index.js` into modules under
   `figma/lib/` (`index.js` stays the entry point and re-exports the same names for tests). The plugin is now
   edited in `figma-plugin-src/` and built into `figma-plugin/code.js` by `node scripts/build-plugin.mjs`; the
