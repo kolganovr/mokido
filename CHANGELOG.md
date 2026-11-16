@@ -18,6 +18,10 @@
   judged apart, bottom-up, with a 2 px threshold: a leaf with a wrong size is resized on the spot (one-line text is left alone), a container
   with right children and a wrong size is fixed in place, and only the children of a container that has right sizes but wrong positions go
   ABSOLUTE. The reply still reports the share of boxes within 1 px. The converter iframe also hides its scrollbar (it ate 15 px of width on tall pages).
+- **`figma_html`: cover images and truncated text (T-103).** An `<img>` that fills its container is now really turned into an IMAGE fill of
+  that container (before, the fill came out empty and the cover vanished); if the image cannot be created (not a `data:` URI, bad bytes)
+  the container gets a grey placeholder and a warning, never nothing. `white-space: nowrap` + `text-overflow: ellipsis` becomes one line with an
+  ending ellipsis at the container width, `-webkit-line-clamp: N` becomes `maxLines: N` with an ending ellipsis, so headlines no longer wrap into 2-3 lines.
 - **Internal split, no behavior change.** The server moved from one 213 KB `figma/index.js` into modules under
   `figma/lib/` (`index.js` stays the entry point and re-exports the same names for tests). The plugin is now
   edited in `figma-plugin-src/` and built into `figma-plugin/code.js` by `node scripts/build-plugin.mjs`; the

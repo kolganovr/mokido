@@ -178,9 +178,16 @@ function htmlMapTextNode(c, E, pieces, box, pc, folded) {
     return { x1: Math.min(a.x1, r.x), y1: Math.min(a.y1, r.y), x2: Math.max(a.x2, r.x + r.w), y2: Math.max(a.y2, r.y + r.h) };
   }, { x1: 1e9, y1: 1e9, x2: -1e9, y2: -1e9 });
   const ur = { x: u.x1, y: u.y1, w: htmlMapR2(u.x2 - u.x1), h: htmlMapR2(u.y2 - u.y1) };
-  const rect = folded ? E.rect : ur;
-  const base = folded ? E : pieces[0];
   const s = (folded ? E : pieces[0]).style;
+  // T-103: truncated text (line-clamp N / nowrap + ellipsis): a range box spans the whole text, the visible box is the container's
+  // width and at most N lines high
+  const clamp = s.clamp || 0;
+  if (clamp) {
+    const cb = folded ? { x: E.rect.x, w: E.rect.w } : box;
+    if (cb) { ur.x = cb.x; ur.w = htmlMapR2(cb.w); }
+    ur.h = htmlMapR2(Math.min(ur.h, (s.lineHeight || s.fontSize * 1.2) * clamp));
+  }
+  const rect = folded ? E.rect : ur;
   const p = htmlMapBase(c, folded ? E : pieces[0], "TEXT", rect);
   if (!folded) p.name = "text";
   const col = htmlMapHex(s.color) || { hex: "#000000", opacity: 1 };
@@ -212,7 +219,8 @@ function htmlMapTextNode(c, E, pieces, box, pc, folded) {
   }
   if (!(folded && E.name)) p.name = chars.slice(0, 40);
   p.text = { characters: chars, fontFamily: s.fontFamily, fontStyle: htmlMapWeightName(s.fontWeight), fontSize: s.fontSize, lineHeight: lh, styleName: null, align: align, autoResize: "HEIGHT", lines: multi ? Math.max(2, Math.round(ur.h / lh)) : 1, ranges: ranges };
-  p._m = { multi: multi };
+  if (clamp) { p.text.maxLines = clamp; p.text.truncation = "ENDING"; }
+  p._m = { multi: multi || !!clamp };
   htmlMapSetSize(p, folded ? E : pieces[0], pc);
   return p;
 }
@@ -395,9 +403,15 @@ function htmlMapNode(c, n, pc, isRoot) {
   if (P.layoutMode !== "NONE") c.stats.auto_layout++;
   c.stats.frames++;
   if (!isRoot) htmlMapSetSize(P, n, pc);
+  // truncated text takes the container's width (it can only truncate against a width), unless the container hugs it
+  kids.forEach((k) => {
+    if (k.type === "TEXT" && k.text.maxLines && k.positioning !== "ABSOLUTE" && P.layoutMode !== "NONE") {
+      k.sizingH = P.sizingH === "HUG" ? "FIXED" : "FILL"; k.text.autoResize = "HEIGHT";
+    }
+  });
   if (P.sizingH === "HUG") {
     kids.forEach((k) => {
-      if (k.type === "TEXT" && k.sizingH === "FILL" && k.positioning !== "ABSOLUTE") {
+      if (k.type === "TEXT" && k.sizingH === "FILL" && k.positioning !== "ABSOLUTE" && !k.text.maxLines) {
         k.sizingH = k._m.multi ? "FIXED" : "HUG";
         k.text.autoResize = k.sizingH === "HUG" ? "WIDTH_AND_HEIGHT" : "HEIGHT";
       }

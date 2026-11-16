@@ -12,7 +12,7 @@ const ENUM = {
   primaryAxisAlignItems: ["MIN", "CENTER", "MAX", "SPACE_BETWEEN"], counterAxisAlignItems: ["MIN", "CENTER", "MAX", "BASELINE"],
   strokeAlign: ["INSIDE", "OUTSIDE", "CENTER"], layoutSizingHorizontal: ["FIXED", "HUG", "FILL"], layoutSizingVertical: ["FIXED", "HUG", "FILL"],
   layoutPositioning: ["AUTO", "ABSOLUTE"], textAutoResize: ["NONE", "WIDTH_AND_HEIGHT", "HEIGHT", "TRUNCATE"],
-  textAlignHorizontal: ["LEFT", "CENTER", "RIGHT", "JUSTIFIED"]
+  textAlignHorizontal: ["LEFT", "CENTER", "RIGHT", "JUSTIFIED"], textTruncation: ["DISABLED", "ENDING"]
 };
 const NUM = new Set(["x", "y", "opacity", "itemSpacing", "counterAxisSpacing", "paddingTop", "paddingRight", "paddingBottom", "paddingLeft", "strokeWeight", "strokeTopWeight", "strokeRightWeight", "strokeBottomWeight", "strokeLeftWeight", "cornerRadius", "topLeftRadius", "topRightRadius", "bottomLeftRadius", "bottomRightRadius", "fontSize"]);
 const BASE = ["name", "visible", "x", "y", "opacity", "layoutSizingHorizontal", "layoutSizingVertical", "layoutPositioning", "effects"];
@@ -21,7 +21,7 @@ const WRITABLE = {
   FRAME: [...BASE, "fills", "strokes", "strokeWeight", "strokeAlign", "strokesIncludedInLayout", "strokeTopWeight", "strokeRightWeight", "strokeBottomWeight", "strokeLeftWeight", "clipsContent", "layoutMode", "layoutWrap", "primaryAxisSizingMode", "counterAxisSizingMode", "primaryAxisAlignItems", "counterAxisAlignItems", "itemSpacing", "counterAxisSpacing", "paddingTop", "paddingRight", "paddingBottom", "paddingLeft", "cornerRadius", "topLeftRadius", "topRightRadius", "bottomLeftRadius", "bottomRightRadius"],
   RECTANGLE: [...BASE, "fills", "strokes", "strokeWeight", "strokeAlign", "strokeTopWeight", "strokeRightWeight", "strokeBottomWeight", "strokeLeftWeight", "cornerRadius", "topLeftRadius", "topRightRadius", "bottomLeftRadius", "bottomRightRadius"],
   VECTOR: [...BASE, "fills", "strokes", "strokeWeight"],
-  TEXT: [...BASE, "fills", "characters", "fontName", "fontSize", "lineHeight", "textAlignHorizontal", "textAutoResize"]
+  TEXT: [...BASE, "fills", "characters", "fontName", "fontSize", "lineHeight", "textAlignHorizontal", "textAutoResize", "textTruncation", "maxLines"]
 };
 const clone = (v) => (v === undefined ? undefined : JSON.parse(JSON.stringify(v)));
 
@@ -65,6 +65,7 @@ function createHtmlStub(opts) {
     if (!allowed.includes(k)) fail("unimplemented/readonly set " + d.type + "." + k);
     if (ENUM[k] && !ENUM[k].includes(v)) fail("bad value for " + k + ": " + String(v));
     if (NUM.has(k) && !Number.isFinite(v)) fail(k + " must be a finite number");
+    if (k === "maxLines" && !(v === null || (Number.isInteger(v) && v >= 1))) fail("maxLines must be an integer >= 1 or null");
     if (k === "opacity" && !(v >= 0 && v <= 1)) fail("opacity out of 0..1");
     if (k === "fills" || k === "strokes") checkPaints(v, k);
     if (k === "effects") checkEffects(v);
@@ -96,7 +97,7 @@ function createHtmlStub(opts) {
     const lh = d.lineHeight && d.lineHeight.unit === "PIXELS" ? d.lineHeight.value : d.fontSize * 1.2;
     const nat = hooks.textWidth(d);
     if (d.textAutoResize === "WIDTH_AND_HEIGHT") { d.width = nat; d.height = lh; }
-    else if (d.textAutoResize === "HEIGHT") d.height = Math.max(1, Math.ceil(nat / d.width - 1e-9)) * lh;
+    else if (d.textAutoResize === "HEIGHT") d.height = Math.min(Math.max(1, Math.ceil(nat / d.width - 1e-9)), d.textTruncation === "ENDING" && d.maxLines ? d.maxLines : 1e9) * lh;
   }
 
   function naiveBox(d) {

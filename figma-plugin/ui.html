@@ -887,6 +887,9 @@ function htmlWalkStyle(cs, rect, isText) {
   var lh = cs.lineHeight === "normal" ? htmlWalkR2(fs * 1.21) : htmlWalkPx(cs.lineHeight);
   var ff = (cs.fontFamily.split(",")[0] || "").trim().replace(/^["']|["']$/g, "");
   var hasBorder = bw.some(function (x) { return x > 0; });
+  // T-103: truncated text: -webkit-line-clamp N, or one line with an ellipsis (nowrap + text-overflow); 0 = not truncated
+  var lc = parseInt(cs.webkitLineClamp || cs.lineClamp, 10) || 0;
+  var clamp = lc > 0 ? lc : (cs.whiteSpace === "nowrap" && cs.textOverflow === "ellipsis" ? 1 : 0);
   // цвет рамки: первой стороны (top, right, bottom, left) с ненулевой толщиной
   var sideColors = [cs.borderTopColor, cs.borderRightColor, cs.borderBottomColor, cs.borderLeftColor];
   var bc = sideColors[Math.max(0, bw.findIndex(function (x) { return x > 0; }))];
@@ -896,7 +899,7 @@ function htmlWalkStyle(cs, rect, isText) {
     borderColor: (isText || !hasBorder) ? null : htmlWalkColor(bc).hex,
     borderWidth: isText ? [0, 0, 0, 0] : bw,
     radius: isText ? [0, 0, 0, 0] : [rad(cs.borderTopLeftRadius), rad(cs.borderTopRightRadius), rad(cs.borderBottomRightRadius), rad(cs.borderBottomLeftRadius)],
-    fontFamily: ff, fontSize: fs, fontWeight: parseInt(cs.fontWeight) || 400, lineHeight: lh,
+    fontFamily: ff, fontSize: fs, fontWeight: parseInt(cs.fontWeight) || 400, lineHeight: lh, clamp: clamp,
     opacity: parseFloat(cs.opacity),
     boxShadow: (isText || cs.boxShadow === "none") ? null : cs.boxShadow,
     bgImage: isText ? null : bgImage

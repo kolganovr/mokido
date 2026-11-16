@@ -3567,9 +3567,16 @@ function htmlMapTextNode(c, E, pieces, box, pc, folded) {
     return { x1: Math.min(a.x1, r.x), y1: Math.min(a.y1, r.y), x2: Math.max(a.x2, r.x + r.w), y2: Math.max(a.y2, r.y + r.h) };
   }, { x1: 1e9, y1: 1e9, x2: -1e9, y2: -1e9 });
   const ur = { x: u.x1, y: u.y1, w: htmlMapR2(u.x2 - u.x1), h: htmlMapR2(u.y2 - u.y1) };
-  const rect = folded ? E.rect : ur;
-  const base = folded ? E : pieces[0];
   const s = (folded ? E : pieces[0]).style;
+  // T-103: truncated text (line-clamp N / nowrap + ellipsis): a range box spans the whole text, the visible box is the container's
+  // width and at most N lines high
+  const clamp = s.clamp || 0;
+  if (clamp) {
+    const cb = folded ? { x: E.rect.x, w: E.rect.w } : box;
+    if (cb) { ur.x = cb.x; ur.w = htmlMapR2(cb.w); }
+    ur.h = htmlMapR2(Math.min(ur.h, (s.lineHeight || s.fontSize * 1.2) * clamp));
+  }
+  const rect = folded ? E.rect : ur;
   const p = htmlMapBase(c, folded ? E : pieces[0], "TEXT", rect);
   if (!folded) p.name = "text";
   const col = htmlMapHex(s.color) || { hex: "#000000", opacity: 1 };
@@ -3601,7 +3608,8 @@ function htmlMapTextNode(c, E, pieces, box, pc, folded) {
   }
   if (!(folded && E.name)) p.name = chars.slice(0, 40);
   p.text = { characters: chars, fontFamily: s.fontFamily, fontStyle: htmlMapWeightName(s.fontWeight), fontSize: s.fontSize, lineHeight: lh, styleName: null, align: align, autoResize: "HEIGHT", lines: multi ? Math.max(2, Math.round(ur.h / lh)) : 1, ranges: ranges };
-  p._m = { multi: multi };
+  if (clamp) { p.text.maxLines = clamp; p.text.truncation = "ENDING"; }
+  p._m = { multi: multi || !!clamp };
   htmlMapSetSize(p, folded ? E : pieces[0], pc);
   return p;
 }
@@ -3784,9 +3792,15 @@ function htmlMapNode(c, n, pc, isRoot) {
   if (P.layoutMode !== "NONE") c.stats.auto_layout++;
   c.stats.frames++;
   if (!isRoot) htmlMapSetSize(P, n, pc);
+  // truncated text takes the container's width (it can only truncate against a width), unless the container hugs it
+  kids.forEach((k) => {
+    if (k.type === "TEXT" && k.text.maxLines && k.positioning !== "ABSOLUTE" && P.layoutMode !== "NONE") {
+      k.sizingH = P.sizingH === "HUG" ? "FIXED" : "FILL"; k.text.autoResize = "HEIGHT";
+    }
+  });
   if (P.sizingH === "HUG") {
     kids.forEach((k) => {
-      if (k.type === "TEXT" && k.sizingH === "FILL" && k.positioning !== "ABSOLUTE") {
+      if (k.type === "TEXT" && k.sizingH === "FILL" && k.positioning !== "ABSOLUTE" && !k.text.maxLines) {
         k.sizingH = k._m.multi ? "FIXED" : "HUG";
         k.text.autoResize = k.sizingH === "HUG" ? "WIDTH_AND_HEIGHT" : "HEIGHT";
       }
@@ -3920,6 +3934,7 @@ function htmlBuildPaints(list, p, ctx) {
   let gi = 0;
   for (const f of list || []) {
     if (f.type === "SOLID") out.push(htmlBuildSolid(f.hex, f.opacity));
+    else if (f.type === "IMAGE") out.push(htmlBuildImagePaint(p, ctx));
     else if (f.type === "GRADIENT_LINEAR") {
       const g = htmlBuildGradient(grads[gi++], p.w, p.h, f.opacity);
       if (g) out.push(g);
@@ -4053,7 +4068,20 @@ function htmlBuildDecodeSvg(m) {
   if (m[2]) { const bin = String(figma.base64Decode ? Array.from(figma.base64Decode(m[3]), (c) => String.fromCharCode(c)).join("") : ""); return decodeURIComponent(escape(bin)); }
   return decodeURIComponent(m[3]);
 }
-// img: data: URI -> image fill; svg data URI -> vector; anything else -> grey placeholder + warning.
+// IMAGE paint from p.build.img. Whatever cannot become one (not a data: URI, createImage fails) is a grey solid plus a warning:
+// a container that took the image as its fill must never end up empty (T-103).
+function htmlBuildImagePaint(p, ctx) {
+  const src = String((p.build && p.build.img) || "");
+  const m = /^data:([^,]*?)(;base64)?,([\s\S]*)$/i.exec(src);
+  if (m && m[2]) {
+    try {
+      const img = figma.createImage(figma.base64Decode(m[3]));
+      return { type: "IMAGE", imageHash: img.hash, scaleMode: "FILL", visible: true };
+    } catch (e) { htmlBuildWarn(ctx, p, "img_failed", "createImage: " + htmlBuildErr(e)); }
+  } else htmlBuildWarn(ctx, p, "img_placeholder", "image is not a data: URI, placeholder used: " + src.slice(0, 80));
+  return htmlBuildSolid("#d9d9d9", 1);
+}
+// img leaf: svg data URI -> vector; anything else -> rectangle with the image paint (or the grey placeholder).
 function htmlBuildImage(p, ctx) {
   const src = String((p.build && p.build.img) || "");
   const m = /^data:([^,]*?)(;base64)?,([\s\S]*)$/i.exec(src);
@@ -4061,14 +4089,7 @@ function htmlBuildImage(p, ctx) {
     try { return figma.createNodeFromSvg(htmlBuildDecodeSvg(m)); } catch (e) { htmlBuildWarn(ctx, p, "img_failed", "svg data uri: " + htmlBuildErr(e)); }
   }
   const r = figma.createRectangle();
-  if (m && m[2]) {
-    try {
-      const img = figma.createImage(figma.base64Decode(m[3]));
-      r.fills = [{ type: "IMAGE", imageHash: img.hash, scaleMode: "FILL", visible: true }];
-      return r;
-    } catch (e) { htmlBuildWarn(ctx, p, "img_failed", "createImage: " + htmlBuildErr(e)); }
-  } else htmlBuildWarn(ctx, p, "img_placeholder", "image is not a data: URI, placeholder used: " + src.slice(0, 80));
-  r.fills = [htmlBuildSolid("#d9d9d9", 1)];
+  r.fills = [htmlBuildImagePaint(p, ctx)];
   return r;
 }
 
@@ -4116,6 +4137,8 @@ async function htmlBuildNode(p, par, ctx, parentFigma, isRoot) {
     htmlBuildTry(ctx, p, "resize_error", () => htmlBuildResize(n, p));
     if (p.type === "FRAME") htmlBuildSizeModes(n, p, ctx);
     if (p.type === "TEXT") htmlBuildTry(ctx, p, "text_error", () => { n.textAutoResize = (p.text && p.text.autoResize) || "WIDTH_AND_HEIGHT"; });
+    // T-103: truncation (Plugin API: textTruncation "DISABLED" | "ENDING", maxLines >= 1 | null; set after the auto-resize mode)
+    if (p.type === "TEXT" && p.text && p.text.maxLines) htmlBuildTry(ctx, p, "text_error", () => { n.textTruncation = "ENDING"; n.maxLines = p.text.maxLines; });
     parentFigma.appendChild(n);
   } catch (err) {
     htmlBuildWarn(ctx, p, "node_error", htmlBuildErr(err));
@@ -4198,7 +4221,7 @@ function htmlBuildApplyFallback(e, ctx) {
     htmlBuildTry(ctx, k.p, "fallback_error", () => {
       k.n.layoutPositioning = "ABSOLUTE";
       // one-line text keeps hugging: a fixed browser width wraps it in Figma, whose Inter runs a bit wider (T-105)
-      if (k.p.type === "TEXT" && htmlBuildLines(k.p) === 1) htmlBuildHugText(k);
+      if (k.p.type === "TEXT" && htmlBuildLines(k.p) === 1 && !(k.p.text && k.p.text.maxLines)) htmlBuildHugText(k);
       else htmlBuildResize(k.n, k.p);
       k.n.x = k.p.x - p.x + htmlBuildAlignShift(k); k.n.y = k.p.y - p.y;
     });

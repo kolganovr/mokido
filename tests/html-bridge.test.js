@@ -88,6 +88,7 @@ const rejects = async (p) => { try { await p; return null; } catch (e) { return 
     check("api-macros exposes bridge.fromHtml", /api\.fromHtml = function \(html, opts\)[\s\S]{0,80}htmlBridgeFromHtml\(html, opts\)/.test(fs.readFileSync(path.join(SRC, "api-macros.js"), "utf8")));
     const ui = fs.readFileSync(path.join(__dirname, "..", "figma-plugin", "ui.html"), "utf8");
     check("ui.html answers HTML_WALK with HTML_TREE and embeds the walker", /msg\.type === 'HTML_WALK'/.test(ui) && /type: 'HTML_TREE'/.test(ui) && /function htmlWalk\(doc, opts\)/.test(ui) && /sandbox', 'allow-same-origin'/.test(ui));
+    check("T-103: the walker reports line clamp / nowrap+ellipsis as style.clamp", /webkitLineClamp/.test(ui) && /textOverflow === "ellipsis"/.test(ui) && /lineHeight: lh, clamp: clamp/.test(ui));
     check("T-100: ui.html hides the iframe scrollbar and keeps the iframe height", /scrollbar-width:none/.test(ui) && /::-webkit-scrollbar\{display:none\}/.test(ui) && /height:' \+ h \+ 'px/.test(ui));
   }
   console.log(failures ? "FAILURES: " + failures + " of " + checks : "ALL PASS (" + checks + " checks passed)");

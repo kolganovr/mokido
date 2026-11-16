@@ -99,6 +99,7 @@ function htmlBuildPaints(list, p, ctx) {
   let gi = 0;
   for (const f of list || []) {
     if (f.type === "SOLID") out.push(htmlBuildSolid(f.hex, f.opacity));
+    else if (f.type === "IMAGE") out.push(htmlBuildImagePaint(p, ctx));
     else if (f.type === "GRADIENT_LINEAR") {
       const g = htmlBuildGradient(grads[gi++], p.w, p.h, f.opacity);
       if (g) out.push(g);
@@ -232,7 +233,20 @@ function htmlBuildDecodeSvg(m) {
   if (m[2]) { const bin = String(figma.base64Decode ? Array.from(figma.base64Decode(m[3]), (c) => String.fromCharCode(c)).join("") : ""); return decodeURIComponent(escape(bin)); }
   return decodeURIComponent(m[3]);
 }
-// img: data: URI -> image fill; svg data URI -> vector; anything else -> grey placeholder + warning.
+// IMAGE paint from p.build.img. Whatever cannot become one (not a data: URI, createImage fails) is a grey solid plus a warning:
+// a container that took the image as its fill must never end up empty (T-103).
+function htmlBuildImagePaint(p, ctx) {
+  const src = String((p.build && p.build.img) || "");
+  const m = /^data:([^,]*?)(;base64)?,([\s\S]*)$/i.exec(src);
+  if (m && m[2]) {
+    try {
+      const img = figma.createImage(figma.base64Decode(m[3]));
+      return { type: "IMAGE", imageHash: img.hash, scaleMode: "FILL", visible: true };
+    } catch (e) { htmlBuildWarn(ctx, p, "img_failed", "createImage: " + htmlBuildErr(e)); }
+  } else htmlBuildWarn(ctx, p, "img_placeholder", "image is not a data: URI, placeholder used: " + src.slice(0, 80));
+  return htmlBuildSolid("#d9d9d9", 1);
+}
+// img leaf: svg data URI -> vector; anything else -> rectangle with the image paint (or the grey placeholder).
 function htmlBuildImage(p, ctx) {
   const src = String((p.build && p.build.img) || "");
   const m = /^data:([^,]*?)(;base64)?,([\s\S]*)$/i.exec(src);
@@ -240,14 +254,7 @@ function htmlBuildImage(p, ctx) {
     try { return figma.createNodeFromSvg(htmlBuildDecodeSvg(m)); } catch (e) { htmlBuildWarn(ctx, p, "img_failed", "svg data uri: " + htmlBuildErr(e)); }
   }
   const r = figma.createRectangle();
-  if (m && m[2]) {
-    try {
-      const img = figma.createImage(figma.base64Decode(m[3]));
-      r.fills = [{ type: "IMAGE", imageHash: img.hash, scaleMode: "FILL", visible: true }];
-      return r;
-    } catch (e) { htmlBuildWarn(ctx, p, "img_failed", "createImage: " + htmlBuildErr(e)); }
-  } else htmlBuildWarn(ctx, p, "img_placeholder", "image is not a data: URI, placeholder used: " + src.slice(0, 80));
-  r.fills = [htmlBuildSolid("#d9d9d9", 1)];
+  r.fills = [htmlBuildImagePaint(p, ctx)];
   return r;
 }
 
@@ -295,6 +302,8 @@ async function htmlBuildNode(p, par, ctx, parentFigma, isRoot) {
     htmlBuildTry(ctx, p, "resize_error", () => htmlBuildResize(n, p));
     if (p.type === "FRAME") htmlBuildSizeModes(n, p, ctx);
     if (p.type === "TEXT") htmlBuildTry(ctx, p, "text_error", () => { n.textAutoResize = (p.text && p.text.autoResize) || "WIDTH_AND_HEIGHT"; });
+    // T-103: truncation (Plugin API: textTruncation "DISABLED" | "ENDING", maxLines >= 1 | null; set after the auto-resize mode)
+    if (p.type === "TEXT" && p.text && p.text.maxLines) htmlBuildTry(ctx, p, "text_error", () => { n.textTruncation = "ENDING"; n.maxLines = p.text.maxLines; });
     parentFigma.appendChild(n);
   } catch (err) {
     htmlBuildWarn(ctx, p, "node_error", htmlBuildErr(err));
@@ -377,7 +386,7 @@ function htmlBuildApplyFallback(e, ctx) {
     htmlBuildTry(ctx, k.p, "fallback_error", () => {
       k.n.layoutPositioning = "ABSOLUTE";
       // one-line text keeps hugging: a fixed browser width wraps it in Figma, whose Inter runs a bit wider (T-105)
-      if (k.p.type === "TEXT" && htmlBuildLines(k.p) === 1) htmlBuildHugText(k);
+      if (k.p.type === "TEXT" && htmlBuildLines(k.p) === 1 && !(k.p.text && k.p.text.maxLines)) htmlBuildHugText(k);
       else htmlBuildResize(k.n, k.p);
       k.n.x = k.p.x - p.x + htmlBuildAlignShift(k); k.n.y = k.p.y - p.y;
     });

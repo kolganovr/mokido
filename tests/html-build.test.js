@@ -444,6 +444,39 @@ async function buildFixture(name, opts, oopts) {
     check("wrap guard: the warning names the text and both line counts", r.warnings.some((w) => w.code === "text_wrapped" && /3 lines, browser had 2/.test(w.msg) && /Far too long/.test(w.msg)), r.warnings);
   }
 
+  // ================= T-103: image fill of a container, truncated text =================
+  {
+    const PNG = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==";
+    const card3 = (p) => p.root.children[1].children[2];
+    const withImg = (src) => ({ mutate: (p) => { const c = card3(p); c.fills.push({ type: "IMAGE", hex: null, opacity: 1, var: null }); c.build = Object.assign({}, c.build, { img: src }); } });
+    const fillsOf = (b) => b.stub.registry.get(b.report.root_id).__d.children[1].__d.children[2].__d.fills;
+    let b = await buildFixture("02_cards", {}, withImg(PNG));
+    let f = fillsOf(b);
+    eq("img fill: the container really got an IMAGE fill (hash, FILL) after its solid", [f.map((x) => x.type), !!f[1].imageHash, f[1].scaleMode], [["SOLID", "IMAGE"], true, "FILL"]);
+    eq("img fill: one image created; the only img_ warning is the fixture's own remote cover", [b.stub.state.images.length, codes(b.report).filter((c) => /^img_/.test(c)).length], [1, 1]);
+    b = await buildFixture("02_cards", {}, withImg("https://example.com/cover.jpg"));
+    f = fillsOf(b);
+    eq("img fill: src is not data: -> grey placeholder fill + warning, never empty", [f.map((x) => x.type), codes(b.report).filter((c) => c === "img_placeholder").length], [["SOLID", "SOLID"], 2]);
+    b = await buildFixture("02_cards", {}, withImg("data:image/png;base64,AAAA"));
+    f = fillsOf(b);
+    eq("img fill: createImage fails -> grey placeholder fill + img_failed", [f.map((x) => x.type), codes(b.report).includes("img_failed")], [["SOLID", "SOLID"], true]);
+
+    // truncation: 3 lines of 20 px at width 240 where the text would need 4: maxLines 3 + ENDING keep it at 3
+    const clampD2 = (n, lines) => ({ mutate: (p) => { const d = p.root.children[1].children[1].children[1]; d.text.maxLines = n; d.text.truncation = "ENDING"; d.text.lines = lines; d.h = lines * 20; } });
+    const natural = (plan) => (d) => (d.characters === plan.root.children[1].children[1].children[1].text.characters ? 4 * 240 - 10 : d.width);
+    const textOf = (b) => [...b.stub.registry.values()].map((n) => n.__d).find((d) => d.type === "TEXT" && d.name === "d2");
+    b = await buildFixture("02_cards", {}, Object.assign(clampD2(3, 3), { textWidth: natural }));
+    let d2 = textOf(b);
+    eq("truncation: textTruncation ENDING and maxLines 3 are set (Plugin API names)", [d2.textTruncation, d2.maxLines], ["ENDING", 3]);
+    eq("truncation: Figma lays it out in 3 lines, not 4; nothing wrapped, no warning", [d2.height, b.report.text_wrapped, codes(b.report).includes("text_wrapped")], [60, 0, false]);
+    b = await buildFixture("02_cards", {}, { textWidth: natural });
+    d2 = textOf(b);
+    eq("truncation: without maxLines the same text takes 4 lines (the stub does model it)", [d2.textTruncation === "ENDING", d2.height >= 60], [false, true]);
+    b = await buildFixture("02_cards", {}, Object.assign(clampD2(1, 1), { textWidth: natural }));
+    d2 = textOf(b);
+    eq("truncation: one-line ellipsis keeps one line at the container width", [d2.maxLines, d2.height, d2.width], [1, 20, 240]);
+  }
+
   // ================= one failing node does not stop the build =================
   {
     const stub = createHtmlStub();

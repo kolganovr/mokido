@@ -46,7 +46,9 @@ function measure(dom, plan) {
   const byDom = new Map();
   fl.forEach((f) => { if (!byDom.has(f.node.dom)) byDom.set(f.node.dom, f.node); });
   const used = new Set();
-  const cands = nodes.filter((n) => n.significant && !n.in_component && n.parent !== null);
+  // an <img> covering its whole container is merged into the container's fill (ADR-004 p. 3): not a candidate of its own (F8 decision 1)
+  const fullImg = (n) => n.tag === "img" && n.parent !== null && by[n.parent] && ["x", "y", "w", "h"].every((k) => Math.abs(by[n.parent].rect[k] - n.rect[k]) <= 1);
+  const cands = nodes.filter((n) => n.significant && !n.in_component && n.parent !== null && !fullImg(n));
   const pairOf = new Map();
   cands.forEach((n) => { const f = byDom.get(n.id); if (f && (f.type === "TEXT") === (n.tag === "#text")) { pairOf.set(n.id, f); used.add(f); } });
   cands.forEach((n) => { // no node of its own (collapsed or merged): the unused node with the best box overlap
@@ -137,8 +139,8 @@ files.forEach((f) => {
   check(name + " gap >= 95", m.gap >= 95, m);
   check(name + " padding >= 95", m.padding >= 95, m);
   // 08: three absolute tag chips; the SPEC heuristic is blind to position and expects FILL for them (see T-097): now position-aware
-  // 08: 3 hero images (100% x 100% in a fixed-height box) are absorbed into the container fill (fewer layers), the measure pairs them with the container (FILL/FIXED instead of FILL/FILL): 85, floor 85, open for Fable
-  check(name + " sizing", m.sizing >= (name.startsWith("08_") ? 85 : 90), m.sizing);
+  // 08: 3 hero images (100% x 100% in a fixed-height box) are absorbed into the container fill; the measure no longer counts them as candidates (F8 decision 1), floor 90 like the rest
+  check(name + " sizing", m.sizing >= 90, m.sizing);
   // contract wants <= 1.2 counting every layer; the SPEC counts component interiors and plain flex wrappers as extra. Floor 1.5 without interiors
   check(name + " layers_ratio (no component interiors) <= 1.5", m.layers_ratio_no_comp <= 1.5, m.layers_ratio_no_comp);
   check(name + " absolute <= 5", m.absolute <= 5, m.absolute);
@@ -313,6 +315,36 @@ const kids = (p) => p.children;
   check("draw: two shadows parsed", pa.effects.length === 2 && pa.effects[1].radius === 28 && pa.effects[1].offset[1] === 10 && pa.effects[1].spread === 2 && pa.effects[0].type === "DROP_SHADOW", pa.effects);
   check("draw: opacity", pa.opacity === 0.5, pa.opacity);
   check("draw: gradient fill + css in build", pb.fills[0].type === "GRADIENT_LINEAR" && /^linear-gradient\(135deg/.test(pb.build.gradient), [pb.fills, pb.build]);
+}
+
+{ // T-103: truncated text. nowrap + ellipsis = one line, width of the container (the range box spans the overflow); line-clamp N = N lines
+  nid = 0;
+  const body = el(null, "body", [0, 0, 400, 300], flexOf("column", 8));
+  const p1 = withStyle(el(0, "p", [0, 0, 200, 20], { display: "block" }), { clamp: 1 });
+  const t1 = withStyle(el(1, "#text", [0, 0, 520, 20], { text: "A very long headline that does not fit", display: "text" }), { clamp: 1 });
+  const p2 = withStyle(el(0, "p", [0, 28, 300, 60], { display: "block" }), { clamp: 3 });
+  const t2 = withStyle(el(3, "#text", [0, 28, 300, 80], { text: "Four lines of text where the browser shows three", display: "text" }), { clamp: 3 });
+  const p3 = el(0, "p", [0, 96, 300, 20], { display: "block" });
+  const t3 = el(5, "#text", [0, 96, 120, 20], { text: "Plain", display: "text" });
+  const plan = run([body, p1, t1, p2, t2, p3, t3]);
+  const [a, b, c] = kids(plan.root);
+  check("clamp 1: maxLines 1 + ENDING", a.text.maxLines === 1 && a.text.truncation === "ENDING", a.text);
+  check("clamp 1: width of the container, not of the overflowing text; one line high", a.w === 200 && a.h === 20 && a.text.lines === 1, [a.w, a.h, a.text.lines]);
+  check("clamp 1: FILL width, height from lines", a.sizingH === "FILL" && a.sizingV === "HUG" && a.text.autoResize === "HEIGHT", [a.sizingH, a.sizingV, a.text.autoResize]);
+  check("clamp 3: maxLines 3 + ENDING, box 3 lines high (hidden 4th line is not part of it)", b.text.maxLines === 3 && b.text.truncation === "ENDING" && b.h === 60 && b.text.lines === 3, [b.text, b.h]);
+  check("clamp 3: FILL width", b.sizingH === "FILL" && b.text.autoResize === "HEIGHT", [b.sizingH, b.text.autoResize]);
+  check("no clamp: no truncation fields", c.text.maxLines === undefined && c.text.truncation === undefined, c.text);
+}
+{ // T-103: an <img> covering the container under an overlay becomes the container's IMAGE fill and the plan keeps its source
+  nid = 0;
+  const body = el(null, "body", [0, 0, 400, 300], flexOf("column", 0));
+  const hero = withStyle(el(0, "div", [0, 0, 400, 100], { classes: ["hero"], overflow: "hidden" }), { radius: [8, 8, 8, 8] });
+  const img = el(1, "img", [0, 0, 400, 100], { src: "data:image/png;base64,AAAA", declared: { width: "100%", height: "100%" } });
+  const chip = withStyle(el(1, "div", [10, 10, 60, 20], { position: "absolute", declared: { width: "60px", height: "20px" } }), bg("#ff0000ff"));
+  const plan = run([body, hero, img, chip]);
+  const h = kids(plan.root)[0];
+  check("img merge: the container got an IMAGE fill and the source", h.fills.some((f) => f.type === "IMAGE") && h.build.img === "data:image/png;base64,AAAA", [h.fills, h.build]);
+  check("img merge: the image is not a layer of its own, only the chip (overlay) is left", kids(h).length === 1 && kids(h)[0].type === "FRAME" && kids(h)[0].dom === 3, kids(h).map((k) => k.type));
 }
 
 console.log(failures ? "FAILURES: " + failures + " of " + checks : "ALL PASS (" + checks + " checks passed)");
