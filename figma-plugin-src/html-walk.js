@@ -10,7 +10,7 @@ var HTML_WALK_WL = [
   "border-top", "border-right", "border-bottom", "border-left",
   "border-top-color", "border-right-color", "border-bottom-color", "border-left-color", "border-radius",
   "gap", "row-gap", "column-gap", "padding", "padding-top", "padding-right", "padding-bottom", "padding-left",
-  "font-size", "font", "box-shadow", "grid-column", "grid-row", "left", "right", "top", "bottom", "inset"
+  "font-size", "font", "box-shadow", "grid-column", "grid-row", "grid-template-columns", "left", "right", "top", "bottom", "inset"
 ];
 var HTML_WALK_SKIP = { HEAD: 1, STYLE: 1, SCRIPT: 1, META: 1, LINK: 1, TITLE: 1, NOSCRIPT: 1, TEMPLATE: 1 };
 

@@ -15,7 +15,7 @@ const UI = path.join(ROOT, "figma-plugin", "ui.html");
 export const PARTS = [
   "boot", "storage", "checkpoints", "node-format", "outline", "tables", "inspect",
   "compare", "find-check", "text-context", "api-store", "api-macros", "api-prototype", "api-reads", "errors", "transfer",
-  "svg-text", "placement", "components", "capture-lint", "canvas-read", "html-map", "html-ds", "html-inst", "html-build", "html-bridge",
+  "svg-text", "placement", "components", "capture-lint", "canvas-read", "html-map", "html-grid", "html-ds", "html-inst", "html-build", "html-bridge",
   "msg-execute", "msg-components", "msg-variables-svg", "msg-canvas", "messages",
 ].map((n) => n + ".js");
 
