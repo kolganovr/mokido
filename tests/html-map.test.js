@@ -17,7 +17,7 @@ function check(name, ok, detail) {
 
 const ROOT = path.join(__dirname, "..");
 const ctx = vm.createContext({});
-vm.runInContext(fs.readFileSync(path.join(ROOT, "figma-plugin-src", "html-map.js"), "utf8"), ctx);
+["html-map.js", "html-grid.js"].forEach((f) => vm.runInContext(fs.readFileSync(path.join(ROOT, "figma-plugin-src", f), "utf8"), ctx));
 const htmlMap = ctx.htmlMap;
 const j = (x) => JSON.parse(JSON.stringify(x)); // plain objects out of the vm realm
 
@@ -67,7 +67,10 @@ function measure(dom, plan) {
     if (!f || f.layoutMode === "NONE") return;
     a++;
     if (n.grid) {
-      d += f.layoutMode === "HORIZONTAL" && f.layoutWrap === "WRAP";
+      // contract F9 section 4: one row HORIZONTAL (rule 1), equal tracks without span HORIZONTAL + WRAP (rule 2), spans or unequal tracks VERTICAL of rows (rule 3)
+      const tr = String(n.grid.cols).trim().split(/\s+/).map(parseFloat), gk = nodes.filter((k) => k.parent === n.id && k.position !== "absolute" && k.position !== "fixed" && k.rect.w > 0);
+      const rows3 = gk.length > tr.length && (gk.some((k) => /span|\//.test(String((k.declared || {})["grid-column"] || "")) || /span/.test(String((k.declared || {})["grid-row"] || ""))) || Math.max(...tr) - Math.min(...tr) > 1);
+      d += rows3 ? f.layoutMode === "VERTICAL" : f.layoutMode === "HORIZONTAL" && (gk.length <= tr.length || f.layoutWrap === "WRAP");
       g += Math.abs(f.itemSpacing - n.grid.colGap) <= 1 && Math.abs(f.counterAxisSpacing - n.grid.rowGap) <= 1;
     } else {
       d += f.layoutMode === (n.flex.dir === "row" ? "HORIZONTAL" : "VERTICAL");
@@ -113,9 +116,10 @@ function measure(dom, plan) {
     sb += okb;
   });
   res.sizing = pct(sb, sd);
-  res.layers_ratio = Math.round(100 * fl.length / cands.length) / 100;
+  const gridRows = fl.filter((f) => f.node.dom == null && /^row \d+$/.test(f.node.name || "")).length; // F9 rule 3: row frames are the contracted extra layers (warning grid_rows), not counted
+  res.layers_ratio = Math.round(100 * (fl.length - gridRows) / cands.length) / 100;
   const comp = fl.filter((f) => by[f.node.dom] && by[f.node.dom].in_component).length;
-  res.layers_ratio_no_comp = Math.round(100 * (fl.length - comp) / cands.length) / 100;
+  res.layers_ratio_no_comp = Math.round(100 * (fl.length - comp - gridRows) / cands.length) / 100;
   res.absolute = pct(fl.filter((f) => f.node.positioning === "ABSOLUTE" || f.parent.layoutMode === "NONE").length, fl.length);
   const nont = fl.filter((f) => f.node.type !== "TEXT");
   res.names_default = pct(nont.filter((f) => DEFAULT_NAME.test(f.node.name || "")).length, nont.length);

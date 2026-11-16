@@ -430,9 +430,8 @@ function htmlMapNode(c, n, pc, isRoot) {
     c.warn.push({ dom: k.dom, code: "absolute", msg: k._n.position ? "position " + k._n.position : "inferred from overlap with a sibling" });
   });
   if (n.grid) {
-    P.layoutMode = "HORIZONTAL"; P.layoutWrap = "WRAP";
-    P.itemSpacing = n.grid.colGap; P.counterAxisSpacing = n.grid.rowGap; P.padding = pad.slice();
-    P.build.grid = n.grid.cols;
+    if (typeof htmlGridApply === "function") htmlGridApply(c, n, P, flow, pad); // html-grid.js (F9 9.4)
+    else { P.layoutMode = "HORIZONTAL"; P.layoutWrap = "WRAP"; P.itemSpacing = n.grid.colGap; P.counterAxisSpacing = n.grid.rowGap; P.padding = pad.slice(); }
   } else if (n.flex) {
     P.layoutMode = n.flex.dir === "row" ? "HORIZONTAL" : "VERTICAL";
     P.itemSpacing = n.flex.gap; P.padding = pad.slice();
