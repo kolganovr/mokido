@@ -339,6 +339,25 @@ function htmlMapFlexMargins(c, n, P, flow, kids) {
   });
 }
 
+// T-105 follow-up (ADR-004 p. 3): size and constraints of an ABSOLUTE child. Declared px: FIXED; 100% or both opposite sides: FIXED +
+// STRETCH (FILL does not exist for an ABSOLUTE child); undeclared: HUG for an Auto Layout frame or a one-line text, FIXED for a leaf.
+function htmlMapAbsSize(k) {
+  const d = (k._n && k._n.declared) || {};
+  const set = (a) => d[a] !== undefined || d.inset !== undefined;
+  const axis = (dim, lo, hi) => {
+    const sz = htmlMapDsz(d[dim]);
+    const px = sz && (sz.k === "px" || sz.k === "other");
+    const l = set(lo), r = set(hi);
+    if (px) return { s: "FIXED", c: r && !l ? "MAX" : "MIN" };
+    if ((sz && sz.k === "fill") || (l && r)) return { s: "FIXED", c: "STRETCH" };
+    const hug = (k.type === "FRAME" && k.layoutMode !== "NONE") || (k.type === "TEXT" && !(k._m && k._m.multi));
+    return { s: hug ? "HUG" : "FIXED", c: r && !l ? "MAX" : "MIN" };
+  };
+  const h = axis("width", "left", "right"), v = axis("height", "top", "bottom");
+  k.sizingH = h.s; k.sizingV = v.s; k.constraints = { h: h.c, v: v.c };
+  if (k.type === "TEXT") k.text.autoResize = h.s === "HUG" ? "WIDTH_AND_HEIGHT" : "HEIGHT";
+}
+
 // Element -> list of plan nodes (empty: nothing; one: node; collapsed wrappers give their child instead).
 function htmlMapNode(c, n, pc, isRoot) {
   if (n.tag === "#text") return [htmlMapTextNode(c, n, [n], null, pc, false)];
@@ -407,7 +426,7 @@ function htmlMapNode(c, n, pc, isRoot) {
     c.stats.overlay++;
   }
   abs.forEach((k) => {
-    k.positioning = "ABSOLUTE"; k.sizingH = "FIXED"; k.sizingV = "FIXED";
+    k.positioning = "ABSOLUTE"; htmlMapAbsSize(k);
     c.warn.push({ dom: k.dom, code: "absolute", msg: k._n.position ? "position " + k._n.position : "inferred from overlap with a sibling" });
   });
   if (n.grid) {

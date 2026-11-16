@@ -288,6 +288,7 @@ function htmlBuildPlace(e, par, ctx) {
     htmlBuildTry(ctx, p, "sizing_error", () => { if (v && v !== "FIXED") n.layoutSizingVertical = v; });
   } else {
     if (parAL) htmlBuildTry(ctx, p, "absolute_error", () => { n.layoutPositioning = "ABSOLUTE"; });
+    if (parAL && p.constraints) htmlBuildTry(ctx, p, "constraints_error", () => { n.constraints = { horizontal: p.constraints.h, vertical: p.constraints.v }; });
     htmlBuildTry(ctx, p, "position_error", () => { n.x = p.x - par.p.x; n.y = p.y - par.p.y; });
   }
 }

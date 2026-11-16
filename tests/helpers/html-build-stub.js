@@ -15,7 +15,7 @@ const ENUM = {
   textAlignHorizontal: ["LEFT", "CENTER", "RIGHT", "JUSTIFIED"], textTruncation: ["DISABLED", "ENDING"]
 };
 const NUM = new Set(["x", "y", "opacity", "itemSpacing", "counterAxisSpacing", "paddingTop", "paddingRight", "paddingBottom", "paddingLeft", "strokeWeight", "strokeTopWeight", "strokeRightWeight", "strokeBottomWeight", "strokeLeftWeight", "cornerRadius", "topLeftRadius", "topRightRadius", "bottomLeftRadius", "bottomRightRadius", "fontSize"]);
-const BASE = ["name", "visible", "x", "y", "opacity", "layoutSizingHorizontal", "layoutSizingVertical", "layoutPositioning", "effects"];
+const BASE = ["constraints", "name", "visible", "x", "y", "opacity", "layoutSizingHorizontal", "layoutSizingVertical", "layoutPositioning", "effects"];
 const WRITABLE = {
   PAGE: [],
   FRAME: [...BASE, "fills", "strokes", "strokeWeight", "strokeAlign", "strokesIncludedInLayout", "strokeTopWeight", "strokeRightWeight", "strokeBottomWeight", "strokeLeftWeight", "clipsContent", "layoutMode", "layoutWrap", "primaryAxisSizingMode", "counterAxisSizingMode", "primaryAxisAlignItems", "counterAxisAlignItems", "itemSpacing", "counterAxisSpacing", "paddingTop", "paddingRight", "paddingBottom", "paddingLeft", "cornerRadius", "topLeftRadius", "topRightRadius", "bottomLeftRadius", "bottomRightRadius"],

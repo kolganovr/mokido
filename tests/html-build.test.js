@@ -477,6 +477,13 @@ async function buildFixture(name, opts, oopts) {
     eq("truncation: one-line ellipsis keeps one line at the container width", [d2.maxLines, d2.height, d2.width], [1, 20, 240]);
   }
 
+  // ================= ABSOLUTE child constraints (ADR-004 p. 3) =================
+  {
+    const b = await buildFixture("02_cards", {}, { mutate: (p) => { p.root.children[1].children[0].children[2].constraints = { h: "STRETCH", v: "MAX" }; } });
+    const badge = b.stub.registry.get(b.report.root_id).__d.children[1].__d.children[0].__d.children[2].__d;
+    eq("absolute child: constraints are written (Plugin API horizontal/vertical)", [badge.layoutPositioning, badge.constraints], ["ABSOLUTE", { horizontal: "STRETCH", vertical: "MAX" }]);
+  }
+
   // ================= one failing node does not stop the build =================
   {
     const stub = createHtmlStub();

@@ -374,5 +374,22 @@ const kids = (p) => p.children;
   check("margin: gaps 40 and 10 with an unpainted container -> its own padding-left 30, no wrapper, spacing 10", plan.root.itemSpacing === 10 && k2.length === 3 && k2[1].padding[3] === 30 && k2[1].x === 30 && k2[1].w === 70 && !plan.warnings.some((w) => w.code === "margin-wrapper"), [plan.root.itemSpacing, k2.map((k) => [k.type, k.padding, k.x, k.w])]);
 }
 
+{ // ADR-004 p. 3: size and constraints of ABSOLUTE children
+  nid = 0;
+  const body = el(null, "body", [0, 0, 400, 300], flexOf("column", 0));
+  const card = withStyle(el(0, "div", [0, 0, 400, 200], flexOf("column", 0)), bg("#eeeeeeff"));
+  const flowc = withStyle(el(1, "div", [0, 0, 400, 40], { declared: { height: "40px" } }), bg("#cccccc ff".replace(" ", "")));
+  const A = withStyle(el(1, "div", [10, 50, 60, 20], { position: "absolute", declared: { width: "60px", height: "20px", left: "10px" } }), bg("#ff0000ff"));
+  const B = withStyle(el(1, "div", [20, 80, 50, 20], Object.assign({ position: "absolute", declared: {} }, flexOf("row", 0))), bg("#00ff00ff"));
+  const Bt = el(4, "#text", [20, 80, 50, 20], { text: "New", display: "text" });
+  const C = withStyle(el(1, "div", [0, 110, 30, 30], { position: "absolute", declared: {} }), bg("#0000ffff"));
+  const D = withStyle(el(1, "div", [0, 150, 400, 10], { position: "absolute", declared: { width: "100%", height: "10px", left: "0px" } }), bg("#111111ff"));
+  const E = withStyle(el(1, "div", [5, 170, 390, 10], { position: "absolute", declared: { left: "5px", right: "5px" } }), bg("#222222ff"));
+  const plan = run([body, card, flowc, A, B, Bt, C, D, E]);
+  const ks = kids(kids(plan.root)[0]).filter((k) => k.positioning === "ABSOLUTE");
+  const got = ks.map((k) => [k.sizingH, k.sizingV, k.constraints && k.constraints.h, k.constraints && k.constraints.v]);
+  check("absolute sizes: px FIXED; undeclared AL container HUG; undeclared leaf FIXED; 100% / both sides FIXED + STRETCH", JSON.stringify(got) === JSON.stringify([["FIXED", "FIXED", "MIN", "MIN"], ["HUG", "HUG", "MIN", "MIN"], ["FIXED", "FIXED", "MIN", "MIN"], ["FIXED", "FIXED", "STRETCH", "MIN"], ["FIXED", "HUG", "STRETCH", "MIN"].map((v, i) => (i === 1 ? "FIXED" : v))]), got);
+}
+
 console.log(failures ? "FAILURES: " + failures + " of " + checks : "ALL PASS (" + checks + " checks passed)");
 process.exit(failures ? 1 : 0);
