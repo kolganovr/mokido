@@ -1,0 +1,436 @@
+{
+  "name": "Etalon UI",
+  "notes": [
+    "css_var: slash becomes hyphen, prefixed by --.",
+    "sizes also holds border/1 (stroke weight) so that DS etalons need no raw px for borders.",
+    "Strokes are drawn INSIDE and counted in layout size (Figma: strokesIncludedInLayout = true), like CSS border-box.",
+    "Text style CSS classes (css_class) carry the only px values: font-size and line-height."
+  ],
+  "colors": [
+    {
+      "name": "bg",
+      "value": "#ffffff",
+      "css_var": "--bg"
+    },
+    {
+      "name": "surface",
+      "value": "#faf8f6",
+      "css_var": "--surface"
+    },
+    {
+      "name": "border",
+      "value": "#e7e2dd",
+      "css_var": "--border"
+    },
+    {
+      "name": "border-strong",
+      "value": "#cfc8c1",
+      "css_var": "--border-strong"
+    },
+    {
+      "name": "text",
+      "value": "#1d1a18",
+      "css_var": "--text"
+    },
+    {
+      "name": "text-muted",
+      "value": "#6f6862",
+      "css_var": "--text-muted"
+    },
+    {
+      "name": "accent",
+      "value": "#ff957a",
+      "css_var": "--accent"
+    },
+    {
+      "name": "accent-hover",
+      "value": "#f07a5c",
+      "css_var": "--accent-hover"
+    },
+    {
+      "name": "accent-text",
+      "value": "#1d1a18",
+      "css_var": "--accent-text"
+    },
+    {
+      "name": "accent-subtle",
+      "value": "#fff0eb",
+      "css_var": "--accent-subtle"
+    },
+    {
+      "name": "status/ok",
+      "value": "#1f8a4c",
+      "css_var": "--status-ok"
+    },
+    {
+      "name": "status/ok-bg",
+      "value": "#e6f5ec",
+      "css_var": "--status-ok-bg"
+    },
+    {
+      "name": "status/warn",
+      "value": "#a8650a",
+      "css_var": "--status-warn"
+    },
+    {
+      "name": "status/warn-bg",
+      "value": "#fdf1dc",
+      "css_var": "--status-warn-bg"
+    },
+    {
+      "name": "status/error",
+      "value": "#c93b2b",
+      "css_var": "--status-error"
+    },
+    {
+      "name": "status/error-bg",
+      "value": "#fdeae7",
+      "css_var": "--status-error-bg"
+    }
+  ],
+  "sizes": [
+    {
+      "name": "space/4",
+      "value": 4,
+      "css_var": "--space-4"
+    },
+    {
+      "name": "space/8",
+      "value": 8,
+      "css_var": "--space-8"
+    },
+    {
+      "name": "space/12",
+      "value": 12,
+      "css_var": "--space-12"
+    },
+    {
+      "name": "space/16",
+      "value": 16,
+      "css_var": "--space-16"
+    },
+    {
+      "name": "space/24",
+      "value": 24,
+      "css_var": "--space-24"
+    },
+    {
+      "name": "space/32",
+      "value": 32,
+      "css_var": "--space-32"
+    },
+    {
+      "name": "space/48",
+      "value": 48,
+      "css_var": "--space-48"
+    },
+    {
+      "name": "radius/sm",
+      "value": 6,
+      "css_var": "--radius-sm"
+    },
+    {
+      "name": "radius/md",
+      "value": 10,
+      "css_var": "--radius-md"
+    },
+    {
+      "name": "radius/lg",
+      "value": 16,
+      "css_var": "--radius-lg"
+    },
+    {
+      "name": "radius/full",
+      "value": 999,
+      "css_var": "--radius-full"
+    },
+    {
+      "name": "border/1",
+      "value": 1,
+      "css_var": "--border-1"
+    }
+  ],
+  "text_styles": [
+    {
+      "name": "Heading/L",
+      "family": "Inter",
+      "weight": 700,
+      "size": 28,
+      "lineHeight": 36,
+      "css_class": "t-heading-l"
+    },
+    {
+      "name": "Heading/M",
+      "family": "Inter",
+      "weight": 600,
+      "size": 20,
+      "lineHeight": 28,
+      "css_class": "t-heading-m"
+    },
+    {
+      "name": "Body/M",
+      "family": "Inter",
+      "weight": 400,
+      "size": 16,
+      "lineHeight": 24,
+      "css_class": "t-body-m"
+    },
+    {
+      "name": "Body/S",
+      "family": "Inter",
+      "weight": 400,
+      "size": 14,
+      "lineHeight": 20,
+      "css_class": "t-body-s"
+    },
+    {
+      "name": "Label/M",
+      "family": "Inter",
+      "weight": 500,
+      "size": 14,
+      "lineHeight": 20,
+      "css_class": "t-label-m"
+    },
+    {
+      "name": "Label/S",
+      "family": "Inter",
+      "weight": 500,
+      "size": 12,
+      "lineHeight": 16,
+      "css_class": "t-label-s"
+    },
+    {
+      "name": "Caption",
+      "family": "Inter",
+      "weight": 400,
+      "size": 12,
+      "lineHeight": 16,
+      "css_class": "t-caption"
+    }
+  ],
+  "components": {
+    "Button": {
+      "properties": {
+        "Variant": [
+          "Primary",
+          "Secondary",
+          "Ghost"
+        ],
+        "Size": [
+          "M",
+          "S"
+        ]
+      },
+      "text_props": [
+        "Label"
+      ],
+      "anatomy": {
+        "root": {
+          "layout": "HORIZONTAL auto layout, hug width and height, center/center",
+          "gap": "space/8",
+          "radius": "radius/md",
+          "stroke": "weight border/1, INSIDE, included in layout size"
+        },
+        "size": {
+          "M": {
+            "padding": "space/12 space/16 (top/bottom, left/right)",
+            "text_style": "Label/M"
+          },
+          "S": {
+            "padding": "space/8 space/12",
+            "text_style": "Label/S"
+          }
+        },
+        "variant": {
+          "Primary": {
+            "fill": "accent",
+            "stroke": "accent",
+            "text": "accent-text",
+            "hover_fill": "accent-hover"
+          },
+          "Secondary": {
+            "fill": "bg",
+            "stroke": "border-strong",
+            "text": "text"
+          },
+          "Ghost": {
+            "fill": null,
+            "stroke": "transparent (opacity 0, keeps the 1px in layout)",
+            "text": "text"
+          }
+        },
+        "children": [
+          "Label (text, white-space nowrap)"
+        ],
+        "size_px": {
+          "M": "height 46 = 20 line + 2*12 padding + 2 stroke",
+          "S": "height 34 = 16 + 2*8 + 2"
+        }
+      }
+    },
+    "Input": {
+      "properties": {
+        "State": [
+          "Default",
+          "Error"
+        ]
+      },
+      "text_props": [
+        "Label",
+        "Placeholder"
+      ],
+      "anatomy": {
+        "root": {
+          "layout": "VERTICAL auto layout, width FILL (parent), height hug",
+          "gap": "space/8"
+        },
+        "children": [
+          {
+            "name": "Label",
+            "text_style": "Label/M",
+            "text": "text"
+          },
+          {
+            "name": "Field",
+            "layout": "HORIZONTAL, FILL width, center vertically",
+            "padding": "space/12 space/16",
+            "radius": "radius/md",
+            "stroke": "border/1 INSIDE, included in layout",
+            "text_style": "Body/M",
+            "children": [
+              "Placeholder (text, color text-muted)"
+            ]
+          }
+        ],
+        "state": {
+          "Default": {
+            "field_fill": "bg",
+            "field_stroke": "border-strong"
+          },
+          "Error": {
+            "field_fill": "status/error-bg",
+            "field_stroke": "status/error"
+          }
+        },
+        "size_px": "field height 50 = 24 + 2*12 + 2; component 78 = 20 + 8 + 50"
+      }
+    },
+    "Badge": {
+      "properties": {
+        "Tone": [
+          "Neutral",
+          "Ok",
+          "Warn",
+          "Error"
+        ]
+      },
+      "text_props": [
+        "Label"
+      ],
+      "anatomy": {
+        "root": {
+          "layout": "HORIZONTAL, hug, center",
+          "padding": "space/4 space/8",
+          "radius": "radius/full",
+          "text_style": "Label/S"
+        },
+        "tone": {
+          "Neutral": {
+            "fill": "border",
+            "text": "text"
+          },
+          "Ok": {
+            "fill": "status/ok-bg",
+            "text": "status/ok"
+          },
+          "Warn": {
+            "fill": "status/warn-bg",
+            "text": "status/warn"
+          },
+          "Error": {
+            "fill": "status/error-bg",
+            "text": "status/error"
+          }
+        },
+        "children": [
+          "Label (text)"
+        ],
+        "size_px": "height 24 = 16 + 2*4"
+      }
+    },
+    "Avatar": {
+      "properties": {
+        "Size": [
+          "M",
+          "S"
+        ]
+      },
+      "text_props": [
+        "Initials"
+      ],
+      "anatomy": {
+        "root": {
+          "layout": "HORIZONTAL, fixed size, center/center",
+          "radius": "radius/full",
+          "fill": "accent-subtle",
+          "text": "text"
+        },
+        "size": {
+          "M": {
+            "w": 40,
+            "h": 40,
+            "text_style": "Label/M"
+          },
+          "S": {
+            "w": 32,
+            "h": 32,
+            "text_style": "Label/S"
+          }
+        },
+        "children": [
+          "Initials (text)"
+        ]
+      }
+    },
+    "Checkbox": {
+      "properties": {
+        "Checked": [
+          "True",
+          "False"
+        ]
+      },
+      "text_props": [
+        "Label"
+      ],
+      "anatomy": {
+        "root": {
+          "layout": "HORIZONTAL, hug, center vertically",
+          "gap": "space/12"
+        },
+        "children": [
+          {
+            "name": "Box",
+            "w": 20,
+            "h": 20,
+            "radius": "radius/sm",
+            "stroke": "border/1 INSIDE, included in layout",
+            "Checked=False": {
+              "fill": "bg",
+              "stroke": "border-strong"
+            },
+            "Checked=True": {
+              "fill": "accent",
+              "stroke": "accent",
+              "icon": "check mark 12x12, stroke accent-text, weight 2.5"
+            }
+          },
+          {
+            "name": "Label",
+            "text_style": "Body/M",
+            "text": "text"
+          }
+        ]
+      }
+    }
+  }
+}

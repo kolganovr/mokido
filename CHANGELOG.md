@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- **figma_html: `var(--token)` binds to Figma variables (T-077, F9 9.1).** A CSS variable in a fill, border color, text color, padding, gap, corner radius or border width is looked up among the file's local variables (name normalized: `--status-ok-bg` = `status/ok-bg` = `Status/OK bg`, also collection + name) and bound with `setBoundVariableForPaint` / `setBoundVariable`; a missing, ambiguous or wrong-type variable keeps the raw value and adds one merged warning (`var_not_found`, `var_ambiguous`, `var_type_mismatch`, `var_expr`; a stale value is bound and reported as `var_value_differs`). The reply gets a `bound` counter. New plugin part `html-ds.js`. Stub only, not yet measured in a live file.
 - **HTML to Figma in one call (preview, T-077).** New tool `figma_html` and macro `bridge.fromHtml(html, { width | widths, height, parent, name, x, y })`
   build a screen from one HTML document (or a local `.html` path): the plugin window lays it out in a hidden iframe, flex becomes
   Auto Layout, text keeps its font and mixed styles, fills, gradients, borders, radii, shadows, svg and `data:` images are kept, and

@@ -23,6 +23,7 @@ const WRITABLE = {
   VECTOR: [...BASE, "fills", "strokes", "strokeWeight"],
   TEXT: [...BASE, "fills", "characters", "fontName", "fontSize", "lineHeight", "textAlignHorizontal", "textAutoResize", "textTruncation", "maxLines"]
 };
+const BINDABLE = new Set(["itemSpacing", "counterAxisSpacing", "paddingTop", "paddingRight", "paddingBottom", "paddingLeft", "cornerRadius", "topLeftRadius", "topRightRadius", "bottomLeftRadius", "bottomRightRadius", "strokeWeight", "strokeTopWeight", "strokeRightWeight", "strokeBottomWeight", "strokeLeftWeight", "opacity", "width", "height", "minWidth", "maxWidth", "minHeight", "maxHeight", "visible", "characters", "gridRowGap", "gridColumnGap"]);
 const clone = (v) => (v === undefined ? undefined : JSON.parse(JSON.stringify(v)));
 
 function createHtmlStub(opts) {
@@ -128,6 +129,16 @@ function createHtmlStub(opts) {
       remove() { if (d.parent) d.parent.children = d.parent.children.filter((x) => x !== node); d.removed = true; registry.delete(d.id); },
       findAll(pred) { const out = []; (function walk(n) { for (const c of n.children || []) { if (!pred || pred(c)) out.push(c); walk(c); } })(d); return out; },
       async loadAsync() {},
+      // Plugin API: node.setBoundVariable(field, Variable | null). The stub checks the field, the variable type and Auto Layout fields.
+      setBoundVariable(field, variable) {
+        if (!BINDABLE.has(field)) fail("setBoundVariable: field " + field + " is not bindable");
+        if (variable !== null && !(variable && typeof variable === "object" && variable.id && variable.resolvedType)) fail("setBoundVariable: needs a Variable object or null (an id string is deprecated)");
+        if (variable && variable.resolvedType !== "FLOAT") fail("setBoundVariable: " + field + " needs a FLOAT variable, got " + variable.resolvedType);
+        if ((field === "itemSpacing" || field === "counterAxisSpacing" || field.startsWith("padding")) && d.layoutMode === "NONE") fail("setBoundVariable: " + field + " needs auto layout");
+        if (field === "counterAxisSpacing" && d.layoutWrap !== "WRAP") fail("setBoundVariable: counterAxisSpacing needs wrap");
+        d.boundVars = d.boundVars || {};
+        if (variable === null) delete d.boundVars[field]; else d.boundVars[field] = { id: variable.id, name: variable.name };
+      },
       setRangeFontName(s, e, f) { if (!loaded.has(f.family + "|" + f.style)) fail("unloaded font in setRangeFontName"); rng("fontName", s, e, f); },
       setRangeFontSize(s, e, v) { rng("fontSize", s, e, v); },
       setRangeFills(s, e, v) { checkPaints(v, "setRangeFills"); rng("fills", s, e, clone(v)); },
@@ -149,7 +160,7 @@ function createHtmlStub(opts) {
         if (k === "appendChild" && !d.children) return undefined;
         if (methods[k] && !(["setRangeFontName", "setRangeFontSize", "setRangeFills", "setRangeTextDecoration"].includes(k) && d.type !== "TEXT")) return methods[k];
         if (k === "textStyleId") return "";
-        if (k === "boundVariables") return {};
+        if (k === "boundVariables") { const o = {}; for (const f of Object.keys(d.boundVars || {})) o[f] = { type: "VARIABLE_ALIAS", id: d.boundVars[f].id }; return o; }
         return d[k];
       },
       set(t, k, v) { setProp(node, d, k, v); return true; },
@@ -195,11 +206,34 @@ function createHtmlStub(opts) {
     },
     async getNodeByIdAsync(id) { return registry.get(id) || null; },
     getNodeById(id) { return registry.get(id) || null; },
-    variables: { async getVariableByIdAsync() { return null; } },
+    // opts.variables = { collections: [{ id, name, defaultModeId, modes }], variables: [{ id, name, resolvedType, variableCollectionId, remote, valuesByMode }] }
+    variables: {
+      async getVariableByIdAsync(id) { return ((opts.variables || {}).variables || []).find((v) => v.id === id) || null; },
+      async getLocalVariablesAsync(type) { if (!opts.variables) fail("variables API not set up (opts.variables)"); return opts.variables.variables.filter((v) => !type || v.resolvedType === type); },
+      async getLocalVariableCollectionsAsync() { if (!opts.variables) fail("variables API not set up (opts.variables)"); return opts.variables.collections; },
+      // returns a copy of the paint bound to the variable (the Plugin API contract); the paint must be a SOLID and the variable a COLOR
+      setBoundVariableForPaint(paint, field, variable) {
+        if (!paint || paint.type !== "SOLID") fail("setBoundVariableForPaint: only a SolidPaint can be bound, got " + (paint && paint.type));
+        if (field !== "color") fail("setBoundVariableForPaint: field must be 'color'");
+        if (!(variable && variable.id && variable.resolvedType)) fail("setBoundVariableForPaint: needs a Variable object or null");
+        if (variable.resolvedType !== "COLOR") fail("setBoundVariableForPaint: needs a COLOR variable, got " + variable.resolvedType);
+        return Object.assign(clone(paint), { boundVariables: { color: { type: "VARIABLE_ALIAS", id: variable.id } } });
+      }
+    },
     async getStyleByIdAsync() { return null; },
     notify(t) { state.notifies.push(t); }
   };
   return { figma, state, hooks, page, loaded, registry };
 }
 
-module.exports = { createHtmlStub, MIXED };
+// A design system as stub variables: collection "Etalon UI" (one mode), colors COLOR, sizes FLOAT, names as in ds.json ("status/ok", "space/16").
+function dsVariables(ds, extra) {
+  const hex = (h) => ({ r: parseInt(h.slice(1, 3), 16) / 255, g: parseInt(h.slice(3, 5), 16) / 255, b: parseInt(h.slice(5, 7), 16) / 255, a: 1 });
+  const cl = { id: "VariableCollectionId:1:1", name: ds.name || "Etalon UI", defaultModeId: "1:0", modes: [{ modeId: "1:0", name: "Default" }] };
+  let i = 0;
+  const mk = (name, resolvedType, value) => ({ id: "VariableID:1:" + ++i, name, resolvedType, variableCollectionId: cl.id, remote: false, valuesByMode: { "1:0": value } });
+  const variables = [].concat(ds.colors.map((c) => mk(c.name, "COLOR", hex(c.value))), ds.sizes.map((s) => mk(s.name, "FLOAT", s.value)), extra || []);
+  return { collections: [cl], variables };
+}
+
+module.exports = { createHtmlStub, MIXED, dsVariables };

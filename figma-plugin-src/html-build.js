@@ -106,7 +106,7 @@ function htmlBuildPaints(list, p, ctx) {
       else { htmlBuildWarn(ctx, p, "gradient_parse", "cannot parse gradient, first stop color used"); out.push(htmlBuildSolid(f.hex, f.opacity)); }
     }
   }
-  return out;
+  return typeof htmlDsPaints === "function" ? htmlDsPaints(list || [], out, p, ctx) : out;
 }
 
 // ---------- fonts ----------
@@ -224,7 +224,7 @@ function htmlBuildText(n, p, ctx) {
     htmlBuildTry(ctx, p, "range_error", () => {
       if (r.fontStyle) n.setRangeFontName(s, e, htmlBuildFont(ctx, t.fontFamily, r.fontStyle));
       if (r.fontSize) n.setRangeFontSize(s, e, r.fontSize);
-      if (r.hex) n.setRangeFills(s, e, [htmlBuildSolid(r.hex, r.opacity)]);
+      if (r.hex) n.setRangeFills(s, e, htmlBuildPaints([{ type: "SOLID", hex: r.hex, opacity: r.opacity, var: r.var }], p, ctx));
       if (r.decoration && r.decoration !== "NONE") n.setRangeTextDecoration(s, e, r.decoration);
     });
   }
@@ -302,6 +302,7 @@ async function htmlBuildNode(p, par, ctx, parentFigma, isRoot) {
     htmlBuildStyle(n, p, ctx);
     htmlBuildTry(ctx, p, "resize_error", () => htmlBuildResize(n, p));
     if (p.type === "FRAME") htmlBuildSizeModes(n, p, ctx);
+    if (typeof htmlDsBindNode === "function") htmlDsBindNode(n, p, ctx);
     if (p.type === "TEXT") htmlBuildTry(ctx, p, "text_error", () => { n.textAutoResize = (p.text && p.text.autoResize) || "WIDTH_AND_HEIGHT"; });
     // T-103: truncation (Plugin API: textTruncation "DISABLED" | "ENDING", maxLines >= 1 | null; set after the auto-resize mode)
     if (p.type === "TEXT" && p.text && p.text.maxLines) htmlBuildTry(ctx, p, "text_error", () => { n.textTruncation = "ENDING"; n.maxLines = p.text.maxLines; });
@@ -494,10 +495,11 @@ function htmlBuildSelfCheck(root, ctx, report) {
 
 async function htmlBuild(plan, opts) {
   opts = opts || {};
-  const ctx = { warnings: [], created: 0, al: 0, entries: [], fonts: new Map() };
+  const ctx = { warnings: [], created: 0, al: 0, entries: [], fonts: new Map(), ds: null, dsw: new Map(), bound: 0 };
   const report = { root_id: null, created: 0, auto_layout: 0, absolute_fallback: 0, text_fixed: 0, text_wrapped: 0, box_ok: { num: 0, den: 0 }, warnings: ctx.warnings };
   if (!plan || !plan.root) { htmlBuildWarn(ctx, null, "no_plan", "plan.root is missing"); return report; }
   await htmlBuildLoadFonts(plan.root, ctx);
+  if (typeof htmlDsIndex === "function") ctx.ds = await htmlDsIndex();
   const parent = opts.parent || figma.currentPage;
   const root = await htmlBuildNode(plan.root, null, ctx, parent, true);
   if (!root) return report;
@@ -510,5 +512,7 @@ async function htmlBuild(plan, opts) {
   htmlBuildSelfCheck(root, ctx, report);
   report.created = ctx.created;
   report.auto_layout = ctx.al;
+  report.bound = ctx.bound;
+  if (ctx.ds) htmlDsWarnFlush(ctx.dsw, ctx.warnings);
   return report;
 }

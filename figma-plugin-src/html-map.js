@@ -191,7 +191,7 @@ function htmlMapTextNode(c, E, pieces, box, pc, folded) {
   const p = htmlMapBase(c, folded ? E : pieces[0], "TEXT", rect);
   if (!folded) p.name = "text";
   const col = htmlMapHex(s.color) || { hex: "#000000", opacity: 1 };
-  p.fills = [{ type: "SOLID", hex: col.hex, opacity: col.opacity, var: null }];
+  p.fills = [{ type: "SOLID", hex: col.hex, opacity: col.opacity, var: typeof htmlDsTextVar === "function" ? htmlDsTextVar(pieces[0]) : null }];
   p.opacity = 1;
   // characters: join pieces; a space only where the rects have a gap or a line break between them
   let chars = "", ranges = [];
@@ -204,7 +204,7 @@ function htmlMapTextNode(c, E, pieces, box, pc, folded) {
     const st = q.style;
     if (st.fontWeight !== s.fontWeight || st.color !== s.color || st.fontSize !== s.fontSize) {
       const cc = htmlMapHex(st.color) || col;
-      ranges.push({ start: chars.length, end: chars.length + q.text.length, fontStyle: htmlMapWeightName(st.fontWeight), hex: cc.hex, fontSize: st.fontSize, decoration: null });
+      ranges.push({ start: chars.length, end: chars.length + q.text.length, fontStyle: htmlMapWeightName(st.fontWeight), hex: cc.hex, fontSize: st.fontSize, decoration: null, var: typeof htmlDsTextVar === "function" ? htmlDsTextVar(q) : null });
     }
     chars += q.text;
   });
@@ -473,6 +473,7 @@ function htmlMapNode(c, n, pc, isRoot) {
 }
 
 function htmlMapClean(p, c) {
+  if (typeof htmlDsPlan === "function") htmlDsPlan(p, c);
   delete p._n; delete p._m;
   c.count++;
   if (p.positioning === "ABSOLUTE") c.stats.absolute++;
@@ -481,7 +482,7 @@ function htmlMapClean(p, c) {
 }
 
 function htmlMap(tree, opts) {
-  const c = { kids: {}, warn: [], count: 0, stats: { frames: 0, auto_layout: 0, absolute: 0, collapsed: 0, text: 0, leaf: 0, overlay: 0 } };
+  const c = { kids: {}, warn: [], dsw: new Map(), count: 0, stats: { frames: 0, auto_layout: 0, absolute: 0, collapsed: 0, text: 0, leaf: 0, overlay: 0 } };
   const nodes = tree.nodes || [];
   let root = null;
   nodes.forEach((n) => { c.kids[n.id] = c.kids[n.id] || []; if (n.parent == null) root = n; else (c.kids[n.parent] = c.kids[n.parent] || []).push(n); });
@@ -494,5 +495,6 @@ function htmlMap(tree, opts) {
   r.h = (tree.page && tree.page.h) || root.rect.h;
   r.sizingH = "FIXED"; r.sizingV = "FIXED"; r.positioning = "AUTO";
   htmlMapClean(r, c);
+  if (typeof htmlDsWarnFlush === "function") htmlDsWarnFlush(c.dsw, c.warn);
   return { root: r, count: c.count, warnings: c.warn, stats: c.stats };
 }
