@@ -13,6 +13,11 @@
   "Log out" broke onto a second line. One-line text now stays hug-width, and after the build every text is compared
   with its line count in the browser: a one-line text that wrapped goes back to hug, a multi-line one is widened by
   up to 4%, and whatever still wraps is reported as `text_wrapped` (in the reply) with a warning naming the text.
+- **`figma_html`: box self-check no longer cascades (T-104, T-100).** It used to compare absolute coordinates top-down, so one text a few px
+  taller shifted its neighbours and ancestors and half the screen went ABSOLUTE. Now size and position (relative to the real parent) are
+  judged apart, bottom-up, with a 2 px threshold: a leaf with a wrong size is resized on the spot (one-line text is left alone), a container
+  with right children and a wrong size is fixed in place, and only the children of a container that has right sizes but wrong positions go
+  ABSOLUTE. The reply still reports the share of boxes within 1 px. The converter iframe also hides its scrollbar (it ate 15 px of width on tall pages).
 - **Internal split, no behavior change.** The server moved from one 213 KB `figma/index.js` into modules under
   `figma/lib/` (`index.js` stays the entry point and re-exports the same names for tests). The plugin is now
   edited in `figma-plugin-src/` and built into `figma-plugin/code.js` by `node scripts/build-plugin.mjs`; the

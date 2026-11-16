@@ -121,7 +121,7 @@ function createHtmlStub(opts) {
       },
       resize(w, h) {
         if (!(w >= 0.01 && h >= 0.01)) fail("resize needs sizes >= 0.01");
-        d.width = w; d.height = h;
+        d.width = w; d.height = h; d.resizes = (d.resizes || 0) + 1;
         if (d.type === "TEXT" && hooks.textWidth) { if (d.textAutoResize === "WIDTH_AND_HEIGHT") d.textAutoResize = "HEIGHT"; reflow(d); }
       },
       remove() { if (d.parent) d.parent.children = d.parent.children.filter((x) => x !== node); d.removed = true; registry.delete(d.id); },

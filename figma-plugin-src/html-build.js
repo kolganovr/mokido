@@ -321,18 +321,58 @@ function htmlBuildDelta(e, org) {
   const p = e.p;
   return Math.max(Math.abs(b.x - org.x - p.x), Math.abs(b.y - org.y - p.y), Math.abs(b.width - p.w), Math.abs(b.height - p.h));
 }
+function htmlBuildBox(e) { try { return e.n.absoluteBoundingBox || null; } catch (x) { return null; } }
+// T-104: size and position are judged apart, and the position against the node's ACTUAL parent, so one shifted node
+// does not drag its ancestors with it. delta/ok (absolute, 1 px) only feed the report.
+const HTML_BUILD_TOL = 2;
 function htmlBuildMeasure(ctx, org) {
-  for (const e of ctx.entries) { e.delta = htmlBuildDelta(e, org); e.ok = e.delta === null || e.delta <= 1; }
+  for (const e of ctx.entries) {
+    e.delta = htmlBuildDelta(e, org); e.ok = e.delta === null || e.delta <= 1;
+    const b = htmlBuildBox(e), p = e.p, pb = e.par ? htmlBuildBox(e.par) : org;
+    e.dSize = b ? Math.max(Math.abs(b.width - p.w), Math.abs(b.height - p.h)) : 0;
+    const ex = e.par ? p.x - e.par.p.x : p.x, ey = e.par ? p.y - e.par.p.y : p.y;
+    e.dPos = b && pb ? Math.max(Math.abs(b.x - pb.x - ex), Math.abs(b.y - pb.y - ey)) : 0;
+  }
 }
-function htmlBuildApplyFallback(e, ctx) {
+// A container's own size is wrong: HUG becomes FIXED at the plan size (the root is always fixed).
+function htmlBuildFixSelf(e, ctx) {
   const p = e.p;
+  e.fixed = true;
+  if (e.par && p.sizingH !== "HUG" && p.sizingV !== "HUG") return false;
   htmlBuildTry(ctx, p, "fallback_error", () => {
     if (e.par) {
       if (p.sizingH === "HUG") e.n.layoutSizingHorizontal = "FIXED";
       if (p.sizingV === "HUG") e.n.layoutSizingVertical = "FIXED";
     } else { e.n.primaryAxisSizingMode = "FIXED"; e.n.counterAxisSizingMode = "FIXED"; }
-    if (p.sizingH === "HUG" || p.sizingV === "HUG" || !e.par) htmlBuildResize(e.n, p);
+    htmlBuildResize(e.n, p);
   });
+  return true;
+}
+// A leaf with a wrong size is fixed in place: text gets the DOM width (height follows its lines), anything else the DOM box.
+// One-line text is left alone: its width is the font's, a fixed browser width would only wrap it.
+function htmlBuildFixLeaf(e, ctx) {
+  const p = e.p, n = e.n;
+  e.fixed = true;
+  if (p.type === "TEXT" && htmlBuildLines(p) === 1) return false;
+  let fh = false, fv = false;
+  try { fh = n.layoutSizingHorizontal === "FILL"; fv = n.layoutSizingVertical === "FILL"; } catch (x) { /* not in a flow */ }
+  if (fh && fv) return false;
+  htmlBuildTry(ctx, p, "fallback_error", () => {
+    if (!fh && n.layoutSizingHorizontal === "HUG") n.layoutSizingHorizontal = "FIXED";
+    if (p.type === "TEXT") {
+      n.textAutoResize = "HEIGHT";
+      n.resize(Math.max(fh ? n.width : p.w, 0.01), Math.max(n.height, 0.01));
+      n.textAutoResize = "HEIGHT";
+    } else {
+      if (!fv && n.layoutSizingVertical === "HUG") n.layoutSizingVertical = "FIXED";
+      n.resize(Math.max(fh ? n.width : p.w, 0.01), Math.max(fv ? n.height : p.h, 0.01));
+    }
+  });
+  return true;
+}
+function htmlBuildApplyFallback(e, ctx) {
+  const p = e.p;
+  htmlBuildFixSelf(e, ctx);
   for (const k of e.kids) {
     htmlBuildTry(ctx, k.p, "fallback_error", () => {
       k.n.layoutPositioning = "ABSOLUTE";
@@ -406,29 +446,31 @@ function htmlBuildTextGuard(ctx, report) {
     }
   }
 }
-// A container "diverged as a whole" when its own box is off, or at least half of its non-text in-flow children are off.
-function htmlBuildFindDiverged(e, out) {
-  if (e.p.type === "FRAME" && e.p.layoutMode !== "NONE" && !e.fb && e.kids.length) {
-    const flow = e.kids.filter((k) => k.p.positioning !== "ABSOLUTE" && k.p.type !== "TEXT");
-    const bad = flow.filter((k) => !k.ok).length;
-    if (!e.ok || (bad > 0 && bad * 2 >= flow.length)) { out.push(e); return; }
-  }
-  for (const k of e.kids) htmlBuildFindDiverged(k, out);
-}
+// Size is fine when within 2 px, or when a fix was already tried (it must not loop).
+const htmlBuildSizeOk = (e) => e.dSize <= HTML_BUILD_TOL || !!e.fixed;
 function htmlBuildSelfCheck(root, ctx, report) {
   let org = { x: 0, y: 0 };
   try { const b = root.n.absoluteBoundingBox; if (b) org = { x: b.x, y: b.y }; } catch (e) { /* keep 0,0 */ }
-  for (let round = 0; round < 4; round++) {
+  const rev = ctx.entries.slice().reverse(); // children before parents
+  for (let round = 0; round < 8; round++) {
     htmlBuildMeasure(ctx, org);
-    const bad = [];
-    htmlBuildFindDiverged(root, bad);
-    if (!bad.length) break;
-    for (const e of bad) {
-      const worst = Math.max(e.delta || 0, ...e.kids.map((k) => k.delta || 0));
-      htmlBuildWarn(ctx, e.p, "absolute_fallback", "container diverged (max " + Math.round(worst * 100) / 100 + " px), children placed ABSOLUTE by plan boxes");
+    let changed = false;
+    // 1) leaves with a wrong size are fixed in place; 2) containers whose children are right but whose own size is not;
+    // 3) only then a container whose children have the right sizes but the wrong positions: its in-flow children go ABSOLUTE.
+    for (const e of rev) if (!e.kids.length && !e.fixed && e.dSize > HTML_BUILD_TOL && htmlBuildFixLeaf(e, ctx)) changed = true;
+    if (changed) continue;
+    for (const e of rev) if (e.kids.length && !e.fixed && e.dSize > HTML_BUILD_TOL && e.kids.every(htmlBuildSizeOk) && htmlBuildFixSelf(e, ctx)) changed = true;
+    if (changed) continue;
+    for (const e of rev) {
+      if (e.p.type !== "FRAME" || !e.kids.length || e.fb || e.p.layoutMode === "NONE") continue;
+      const flow = e.kids.filter((k) => k.p.positioning !== "ABSOLUTE");
+      if (!flow.length || !flow.every(htmlBuildSizeOk) || !flow.some((k) => k.dPos > HTML_BUILD_TOL)) continue;
+      htmlBuildWarn(ctx, e.p, "absolute_fallback", "children positions off (max " + Math.round(Math.max(...flow.map((k) => k.dPos)) * 100) / 100 + " px), placed ABSOLUTE by plan boxes");
       htmlBuildApplyFallback(e, ctx);
       report.absolute_fallback++;
+      changed = true;
     }
+    if (!changed) break;
   }
   htmlBuildTextGuard(ctx, report);
   htmlBuildMeasure(ctx, org);

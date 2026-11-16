@@ -166,6 +166,7 @@ const codes = (r) => r.warnings.map((w) => w.code);
 
 async function buildFixture(name, opts, oopts) {
   const plan = readPlan(name);
+  if (oopts && oopts.mutate) oopts.mutate(plan);
   const stub = createHtmlStub();
   const ctx = load(stub);
   let fontLoadsAtFirstNode = null;
@@ -321,60 +322,74 @@ async function buildFixture(name, opts, oopts) {
     eq("opts: boxes measured against the root origin", [report.box_ok.num === report.box_ok.den, report.absolute_fallback], [true, 0]);
   }
 
-  // ================= self-check: it catches boxes that are wrong (known answers) =================
+  // ================= self-check (T-104): size and position judged apart, bottom-up, 2 px threshold =================
   {
-    // a leaf (text) off by 5 px: reported with the size, no fallback (a text does not make its container diverge)
-    const planOf = () => readPlan("02_cards");
     const spoil = (names, fn) => (pn, box, node) => (names.includes(pn.name) ? fn(box, pn, node) : null);
+    // a physical shift: the named nodes and everything under them move together (a child never moves alone inside its parent)
+    const under = (node, names) => { for (let d = node.__d; d; d = d.parent) if (names.includes(d.name)) return true; return false; };
+    const shiftTree = (names, dx, dy) => (pn, box, node) => { let top = null; for (let d = node.__d; d; d = d.parent) if (names.includes(d.name)) top = d; return top && top.layoutPositioning !== "ABSOLUTE" ? Object.assign({}, box, { x: box.x + dx, y: box.y + dy }) : null; };
+    const inFlow = (node) => node.__d.layoutPositioning !== "ABSOLUTE";
+    const d2of = (b) => (function find(p) { return p.name === "d2" ? p : p.children.map(find).find(Boolean); })(b.plan.root);
+
+    // a leaf (text d2) that stays 5 px off for good: one box_mismatch with the size; its container put its children ABSOLUTE once
     let b = await buildFixture("02_cards", {}, { perturb: spoil(["d2"], (box) => Object.assign({}, box, { x: box.x + 5 })) });
     const mm = b.report.warnings.filter((w) => w.code === "box_mismatch");
-    eq("self-check: one wrong leaf gives exactly one box_mismatch", mm.length, 1);
-    const d2 = (function find(p) { return p.name === "d2" ? p : p.children.map(find).find(Boolean); })(b.plan.root);
-    eq("self-check: the warning points at the node", [mm[0].id, mm[0].dom], [d2.id, d2.dom]);
+    eq("self-check: a leaf that stays wrong gives exactly one box_mismatch", mm.length, 1);
+    eq("self-check: the warning points at the node", [mm[0].id, mm[0].dom], [d2of(b).id, d2of(b).dom]);
     check("self-check: the warning carries the size of the miss (5 px)", /by 5 px/.test(mm[0].msg), mm[0].msg);
-    eq("self-check: box_ok counts the miss", [b.report.box_ok.den - b.report.box_ok.num, b.report.absolute_fallback], [1, 0]);
+    eq("self-check: only d2's own container fell back, nobody above it", b.report.absolute_fallback, 1);
+    eq("self-check: box_ok counts the miss", b.report.box_ok.den - b.report.box_ok.num, 1);
+    // the same leaf off only while it is in the flow: the ABSOLUTE placement cures it
+    b = await buildFixture("02_cards", {}, { perturb: spoil(["d2"], (box, pn, node) => (inFlow(node) ? Object.assign({}, box, { x: box.x + 5 }) : null)) });
+    eq("self-check: a wrong in-flow position is cured by ABSOLUTE children of ITS container only", [b.report.absolute_fallback, codes(b.report).includes("box_mismatch")], [1, false]);
 
-    // a miss of exactly 1 px is within tolerance, 1.5 px is not
+    // tolerance: 1 px silent, 1.5 px reported but nothing moved, 2 px nothing moved, 2.5 px action
     b = await buildFixture("02_cards", {}, { perturb: spoil(["d2"], (box) => Object.assign({}, box, { y: box.y + 1 })) });
-    eq("self-check: 1 px is tolerated", codes(b.report).filter((c) => c === "box_mismatch").length, 0);
+    eq("self-check: 1 px is tolerated, no warning", [codes(b.report).filter((c) => c === "box_mismatch").length, b.report.absolute_fallback], [0, 0]);
     b = await buildFixture("02_cards", {}, { perturb: spoil(["d2"], (box) => Object.assign({}, box, { y: box.y + 1.5 })) });
-    eq("self-check: 1.5 px is reported", codes(b.report).filter((c) => c === "box_mismatch").length, 1);
+    eq("self-check: 1.5 px is reported but nothing is moved", [codes(b.report).filter((c) => c === "box_mismatch").length, b.report.absolute_fallback], [1, 0]);
+    b = await buildFixture("02_cards", {}, { perturb: spoil(["d2"], (box) => Object.assign({}, box, { y: box.y + 2 })) });
+    eq("self-check: exactly 2 px does not trigger a fallback", b.report.absolute_fallback, 0);
+    b = await buildFixture("02_cards", {}, { perturb: spoil(["d2"], (box, pn, node) => (inFlow(node) ? Object.assign({}, box, { y: box.y + 2.5 }) : null)) });
+    eq("self-check: 2.5 px triggers the fallback of its container", b.report.absolute_fallback, 1);
 
-    // a container whose own box is wrong while its children are in flow: children go ABSOLUTE by plan boxes
-    b = await buildFixture("02_cards", {}, {
-      perturb: (pn, box, node) => {
-        if (pn.name !== "Card 2") return null;
-        const kidsAbsolute = node.__d.children.some((c) => c.__d.layoutPositioning === "ABSOLUTE");
-        return kidsAbsolute ? null : Object.assign({}, box, { width: box.width + 10 });
-      }
-    });
-    eq("fallback: one container fell back", b.report.absolute_fallback, 1);
-    check("fallback: absolute_fallback warning with the size", b.report.warnings.some((w) => w.code === "absolute_fallback" && /max 10 px/.test(w.msg)), b.report.warnings);
+    // a container whose own size is wrong while its children are right: fixed IN PLACE (HUG height -> FIXED, plan size), children stay in flow
+    b = await buildFixture("02_cards", {}, { perturb: (pn, box, node) => (pn.name === "Card 2" && node.__d.layoutSizingVertical !== "FIXED" ? Object.assign({}, box, { width: box.width + 10 }) : null) });
+    eq("size fix: no fallback, the container is repaired on the spot", b.report.absolute_fallback, 0);
     const row = b.stub.registry.get(b.report.root_id).__d.children[1].__d;
     const c2 = row.children[1].__d;
-    eq("fallback: children of the container are ABSOLUTE at plan offsets", c2.children.map((k) => [k.__d.layoutPositioning, k.__d.x, k.__d.y]), [["ABSOLUTE", 20, 20], ["ABSOLUTE", 20, 60]]);
-    eq("fallback: HUG height of the container became FIXED, the plan size set", [c2.layoutSizingVertical, c2.height], ["FIXED", 220]);
-    eq("fallback: the siblings stayed in flow", row.children.map((c) => c.__d.layoutPositioning), ["AUTO", "AUTO", "AUTO"]);
-    eq("fallback: after it the boxes agree, no leftover mismatch", [b.report.box_ok.num === b.report.box_ok.den, codes(b.report).includes("box_mismatch")], [true, false]);
+    eq("size fix: HUG height became FIXED at the plan size", [c2.layoutSizingVertical, c2.height], ["FIXED", 220]);
+    eq("size fix: its children stayed in flow", c2.children.map((k) => k.__d.layoutPositioning), ["AUTO", "AUTO"]);
+    eq("size fix: siblings stayed in flow, no leftover mismatch", [row.children.map((c) => c.__d.layoutPositioning), codes(b.report).includes("box_mismatch")], [["AUTO", "AUTO", "AUTO"], false]);
 
-    // half of the in-flow children wrong -> the parent row diverged as a whole
-    b = await buildFixture("02_cards", {}, {
-      perturb: (pn, box, node) => {
-        if (pn.name !== "Card 1" && pn.name !== "Card 2") return null;
-        const rowNode = node.__d.parent;
-        return rowNode.children.some((c) => c.__d.layoutPositioning === "ABSOLUTE") ? null : Object.assign({}, box, { x: box.x + 7 });
-      }
-    });
-    eq("fallback: 2 of 3 wrong cards make the row fall back", b.report.absolute_fallback, 1);
+    // a container whose children are the right size but at the wrong places: they go ABSOLUTE at plan offsets, nothing above it moves
+    b = await buildFixture("02_cards", {}, { perturb: (pn, box, node) => (node.__d.name !== "Card 2" && under(node, ["Card 2"]) && inFlow(node) ? Object.assign({}, box, { y: box.y + 10 }) : null) });
+    eq("position fix: one container fell back", b.report.absolute_fallback, 1);
+    check("position fix: absolute_fallback warning with the size", b.report.warnings.some((w) => w.code === "absolute_fallback" && /max 10 px/.test(w.msg)), b.report.warnings);
+    const rowB = b.stub.registry.get(b.report.root_id).__d.children[1].__d;
+    eq("position fix: children are ABSOLUTE at plan offsets", rowB.children[1].__d.children.map((k) => [k.__d.layoutPositioning, k.__d.x, k.__d.y]), [["ABSOLUTE", 20, 20], ["ABSOLUTE", 20, 60]]);
+    eq("position fix: siblings and the row stayed in flow", [rowB.layoutPositioning, rowB.children.map((c) => c.__d.layoutPositioning)], ["AUTO", ["AUTO", "AUTO", "AUTO"]]);
+
+    // a leaf with a wrong SIZE is repaired on the spot (resized to the DOM box), no fallback
+    const fixedCover = (p) => { p.root.children[1].children[0].children[0].sizingH = "FIXED"; };
+    b = await buildFixture("02_cards", {}, { mutate: fixedCover, perturb: spoil(["cover"], (box, pn, node) => (node.__d.resizes >= 2 ? null : Object.assign({}, box, { width: box.width + 9 }))) });
+    const cover = b.stub.registry.get(b.report.root_id).__d.children[1].__d.children[0].__d.children[0].__d;
+    eq("leaf fix: a leaf 9 px too wide was resized to the plan box once more, no fallback, no leftover", [cover.resizes, cover.width, cover.height, b.report.absolute_fallback, codes(b.report).includes("box_mismatch")], [2, 240, 100, 0, false]);
+    // one-line text is never forced to the browser width (it would wrap): the miss stays reported
+    b = await buildFixture("02_cards", {}, { perturb: spoil(["new"], (box) => Object.assign({}, box, { width: box.width + 5 })) });
+    const nw = [...b.stub.registry.values()].map((n) => n.__d).find((d) => d.type === "TEXT" && d.characters === "New") || [...b.stub.registry.values()].map((n) => n.__d).find((d) => d.name === "new");
+    eq("leaf fix: a one-line text 5 px wider is left alone (resized only at creation), reported once", [nw.resizes, codes(b.report).filter((c) => c === "box_mismatch").length, b.report.absolute_fallback], [1, 1, 0]);
+
+    // cards shifted whole (with their content): the ROW falls back, the cards keep their layout
+    b = await buildFixture("02_cards", {}, { perturb: shiftTree(["Card 1", "Card 2"], 7, 0) });
+    eq("position fix: 2 of 3 shifted cards make the row fall back, once", b.report.absolute_fallback, 1);
     const row2 = b.stub.registry.get(b.report.root_id).__d.children[1].__d;
-    eq("fallback: all three cards are ABSOLUTE with plan offsets", row2.children.map((c) => [c.__d.layoutPositioning, c.__d.x, c.__d.y]), [["ABSOLUTE", 0, 0], ["ABSOLUTE", 304, 0], ["ABSOLUTE", 608, 0]]);
-    // 1 of 3 wrong -> no fallback (just a warning)
-    b = await buildFixture("02_cards", {}, { perturb: (pn, box) => (pn.name === "Card 3" ? Object.assign({}, box, { x: box.x + 7 }) : null) });
-    // Card 3 itself is wrong, which makes Card 3 (a container) fall back, but not the row
-    eq("fallback: one wrong card falls back alone, not its row", b.report.absolute_fallback, 1);
-    const row3 = b.stub.registry.get(b.report.root_id).__d.children[1].__d;
-    eq("fallback: row kids stay in flow", row3.children.map((c) => c.__d.layoutPositioning), ["AUTO", "AUTO", "AUTO"]);
-    void planOf;
+    eq("position fix: all three cards are ABSOLUTE with plan offsets", row2.children.map((c) => [c.__d.layoutPositioning, c.__d.x, c.__d.y]), [["ABSOLUTE", 0, 0], ["ABSOLUTE", 304, 0], ["ABSOLUTE", 608, 0]]);
+    eq("position fix: card contents stayed as the plan had them (the badge is ABSOLUTE in the plan itself)", row2.children[0].__d.children.map((k) => k.__d.layoutPositioning), ["AUTO", "AUTO", "ABSOLUTE"]);
+    // the old cascade: one shifted node must not drag its ancestors into ABSOLUTE (it did: 25 of 56 nodes on screen 04)
+    b = await buildFixture("02_cards", {}, { perturb: shiftTree(["Card 3"], 7, 0) });
+    eq("cascade: one shifted card makes its row fall back once, nothing else", b.report.absolute_fallback, 1);
+    check("cascade: the root stays an Auto Layout frame, the card contents stay in flow", b.stub.registry.get(b.report.root_id).__d.children.every((c) => c.__d.layoutPositioning !== "ABSOLUTE"));
   }
 
   // ================= text wrap guard (T-105): Figma Inter runs wider than the browser's =================
@@ -390,8 +405,10 @@ async function buildFixture(name, opts, oopts) {
     let b = await buildFixture("02_cards", {}, {
       textWidth: wider(2),
       perturb: (pn, box, node) => {
-        if (pn.name !== "Card 2") return null;
-        return node.__d.children.some((c) => c.__d.layoutPositioning === "ABSOLUTE") ? null : Object.assign({}, box, { width: box.width + 10 });
+        // Card 2's children sit 10 px low while in flow: the container falls back, its texts become ABSOLUTE
+        let in2 = false;
+        for (let d = node.__d.parent; d; d = d.parent) if (d.name === "Card 2") in2 = true;
+        return in2 && node.__d.layoutPositioning !== "ABSOLUTE" ? Object.assign({}, box, { y: box.y + 10 }) : null;
       }
     });
     eq("wrap guard: the fallback happened", b.report.absolute_fallback, 1);
