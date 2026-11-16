@@ -132,7 +132,7 @@ const TOOLS_CORE = [
   },
   {
     name: "figma_html",
-    description: "WRITE tool: build a screen from ONE HTML in one call (flex -> Auto Layout, text, fills, borders, shadows, svg). Pass `html` or `path` of a local .html (no JS, <style> inside, Inter, flex+gap not margin, data-name = layer name; else warnings). Reply: root ids, layers, auto_layout share, absolute_fallback, text_wrapped (texts with more lines than in the browser; 0 = good), boxes_within_1px, <=10 warnings. widths:[1440,390] = one frame per width. Plugin window must be open. Undo: figma_rollback.",
+    description: "WRITE tool: build a screen from ONE HTML (flex -> Auto Layout, text, fills, borders, shadows, svg). Pass `html` or `path` of a local .html (no JS, <style> inside, Inter, flex+gap not margin, data-name = layer name; else warnings). Reply: root ids, layers, auto_layout share, absolute_fallback, text_wrapped (extra line wraps, want 0), boxes_within_1px, <=10 warnings. widths:[1440,390] = one frame per width. Plugin window must be open.",
     inputSchema: {
       type: "object",
       properties: {
