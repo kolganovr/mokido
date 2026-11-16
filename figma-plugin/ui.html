@@ -1913,6 +1913,8 @@ function htmlWalk(doc, opts) {
         await Promise.race([loaded, wait(8000)]);
         const doc = frame.contentDocument;
         if (!doc || !doc.body) throw new Error('the hidden iframe document is not reachable (srcdoc blocked?)');
+        // T-100: hide the page scrollbar (it would eat 15 px of width); the iframe height stays as is so vh does not move
+        try { const st = doc.createElement('style'); st.setAttribute('data-mokido', 'noscrollbar'); st.textContent = 'html,body{scrollbar-width:none}::-webkit-scrollbar{display:none}'; (doc.head || doc.documentElement).appendChild(st); } catch (e) {}
         try { await Promise.race([doc.fonts.ready, wait(4000)]); } catch (e) {}
         await Promise.race([new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))), wait(300)]);
         const tree = htmlWalk(doc, { etalon: null, viewport: { w: w, h: h } });
