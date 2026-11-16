@@ -3,7 +3,7 @@
 //  - map side (runs in htmlMap): htmlDsPlan(p, c) reads the CSS names of var(--token) from the walker's `declared` and writes them into the plan
 //    (fills[i].var, strokes[i].var, bound.*). Only explicit var() marks count, nothing is guessed from values.
 //  - build side (runs in htmlBuild): htmlDsIndex() indexes the local variables once per call, htmlDsPaints / htmlDsBindNode replace a name by the found variable.
-// components and textStyles of the index are empty stubs with the final interface (filled by 9.2 and 9.3).
+// components (9.2, lazy) and textStyles (9.3) of the index: see htmlDsComponents and htmlDsTextStyles.
 // html-map.js and html-build.js call into this file through `typeof htmlDsX === "function"` guards (tests may load them alone).
 
 // ---------- names ----------
@@ -56,6 +56,7 @@ const HTML_DS_RADIUS = ["topLeftRadius", "topRightRadius", "bottomRightRadius", 
 function htmlDsPlan(p, c) {
   if (typeof htmlInstPlan === "function") htmlInstPlan(p, c);
   const n = p._n;
+  if (p.type === "TEXT" && p.text && n && n.classes && n.classes.length) p.text.cls = n.classes.slice(); // 9.3: class names for the text style lookup
   if (!n || p.dom == null || !n.declared) return; // wrappers made by the mapper have no DOM node of their own
   const d = n.declared;
   const isFrame = p.type === "FRAME";
@@ -129,6 +130,7 @@ async function htmlDsIndex() {
         norm: htmlDsNorm(v.name), full: htmlDsNorm((cl ? cl.name + "/" : "") + v.name), cl, byId });
     }
   } catch (e) { idx.error = e && e.message ? e.message : String(e); }
+  await htmlDsTextStyles(idx);
   return idx;
 }
 // 9.2: local component sets and single components, from the plugin's own component index (components.js, the one figma_find_components uses).
@@ -210,4 +212,44 @@ function htmlDsBindNode(n, p, ctx) {
     try { n.setBoundVariable(f, v); ctx.bound++; }
     catch (e) { htmlDsWarnAdd(ctx.dsw, p, "var_bind_failed", name, String(e && e.message || e).slice(0, 80)); }
   }
+}
+
+// ---------- 9.3: text styles by exact match (contract section 3) ----------
+// Plugin API: LineHeight / LetterSpacing are { unit: "PIXELS" | "PERCENT" | "AUTO", value }; a percent is of the font size, AUTO has no px.
+function htmlDsTsPx(v, size) { return !v || v.unit === "AUTO" ? null : (v.unit === "PERCENT" ? v.value * size / 100 : v.value); }
+async function htmlDsTextStyles(idx) {
+  try {
+    if (typeof figma.getLocalTextStylesAsync !== "function") return;
+    for (const s of await figma.getLocalTextStylesAsync()) {
+      const f = s.fontName || {}, size = s.fontSize || 0;
+      idx.textStyles.push({ s, id: s.id, name: s.name, norm: htmlDsNorm(s.name), family: f.family, style: f.style, size, lh: htmlDsTsPx(s.lineHeight, size), ls: htmlDsTsPx(s.letterSpacing, size) || 0 });
+    }
+    idx.textStyles.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+  } catch (e) { idx.error = (idx.error ? idx.error + "; " : "") + "text styles: " + (e && e.message ? e.message : String(e)); }
+}
+// Rule 1: family, style name (weight by the F8 table), size, line height (0.5 px; AUTO = the browser's "normal" 1.21), letter spacing when the style has one (0.1).
+function htmlDsTsMatch(e, t) {
+  const fam = t.fontFamily || "Inter", st = typeof htmlBuildStyleName === "function" ? htmlBuildStyleName(t.fontStyle) : t.fontStyle;
+  if (e.family !== fam || e.style !== st || Math.abs(e.size - t.fontSize) > 0.01) return false;
+  const lh = typeof t.lineHeight === "number" ? t.lineHeight : t.fontSize * 1.21;
+  if (e.lh === null ? Math.abs(lh - t.fontSize * 1.21) > 0.5 : Math.abs(e.lh - lh) > 0.5) return false;
+  return !e.ls || Math.abs(e.ls - (t.letterSpacing || 0)) <= 0.1;
+}
+// { e } the style to apply, { differs, e } the class names a style whose values do not match (rule 3), or null.
+function htmlDsTextStyleFor(list, t) {
+  const cls = (t.cls || []).map((c) => htmlDsNorm(String(c).replace(/^t-/, "")));
+  const named = list.filter((e) => cls.indexOf(e.norm) >= 0);
+  const hit = list.filter((e) => htmlDsTsMatch(e, t));
+  if (hit.length) return { e: hit.find((e) => cls.indexOf(e.norm) >= 0) || hit[0] };
+  return named.length ? { differs: true, e: named[0] } : null;
+}
+// Rule 4: the style goes on the whole TEXT right after the base font props and BEFORE the ranges (a style write resets range overrides). Never called for instances (rule 5).
+async function htmlDsTextStyle(n, p, ctx) {
+  const t = p.text;
+  if (!t || !ctx.ds || !ctx.ds.textStyles.length) return;
+  const r = htmlDsTextStyleFor(ctx.ds.textStyles, t);
+  if (!r) return;
+  if (r.differs) { htmlDsWarnAdd(ctx.dsw, p, "text_style_differs", r.e.name, "css " + t.fontFamily + " " + htmlBuildStyleName(t.fontStyle) + " " + t.fontSize + "/" + t.lineHeight + " style " + r.e.family + " " + r.e.style + " " + r.e.size + "/" + r.e.lh); return; }
+  try { await n.setTextStyleIdAsync(r.e.id); t.styleName = r.e.name; ctx.textStyles++; }
+  catch (err) { htmlDsWarnAdd(ctx.dsw, p, "text_style_failed", r.e.name, String(err && err.message || err).slice(0, 80)); }
 }

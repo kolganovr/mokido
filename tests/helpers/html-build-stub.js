@@ -132,6 +132,14 @@ function createHtmlStub(opts) {
       remove() { if (d.parent) d.parent.children = d.parent.children.filter((x) => x !== node); d.removed = true; registry.delete(d.id); },
       findAll(pred) { const out = []; (function walk(n) { for (const c of n.children || []) { if (!pred || pred(c)) out.push(c); walk(c); } })(d); return out; },
       async loadAsync() {},
+      // F9 9.3: only on a TEXT, only a style of opts.textStyles; like Figma it resets the range overrides, styleSetAfterRanges records the order
+      async setTextStyleIdAsync(id) {
+        if (d.type !== "TEXT") fail("setTextStyleIdAsync: only on a TEXT");
+        const s = (opts.textStyles || []).find((x) => x.id === id);
+        if (!s) fail("setTextStyleIdAsync: no text style " + id);
+        d.textStyleId = id; d.styleSetAfterRanges = (d.ranges || []).length > 0; d.styleCalls = (d.styleCalls || 0) + 1;
+        d.fontName = clone(s.fontName); d.fontSize = s.fontSize; d.lineHeight = clone(s.lineHeight); d.ranges = (d.ranges || []).filter((r) => r.kind === "fills");
+      },
       // F9 9.2 component API. Variant COMPONENT nodes carry d.variantProps; an instance carries componentProperties (values by key) and mainComponent.
       createInstance() {
         if (d.type !== "COMPONENT") fail("createInstance: only on a COMPONENT");
@@ -212,7 +220,7 @@ function createHtmlStub(opts) {
         if (k === "findAll" && !d.children) return undefined;
         if (k === "appendChild" && !d.children) return undefined;
         if (methods[k] && !(["setRangeFontName", "setRangeFontSize", "setRangeFills", "setRangeTextDecoration"].includes(k) && d.type !== "TEXT")) return methods[k];
-        if (k === "textStyleId") return "";
+        if (k === "textStyleId") return d.textStyleId || "";
         if (k === "boundVariables") { const o = {}; for (const f of Object.keys(d.boundVars || {})) o[f] = { type: "VARIABLE_ALIAS", id: d.boundVars[f].id }; return o; }
         return d[k];
       },
@@ -259,6 +267,7 @@ function createHtmlStub(opts) {
     },
     async getNodeByIdAsync(id) { return registry.get(id) || null; },
     getNodeById(id) { return registry.get(id) || null; },
+    async getLocalTextStylesAsync() { return opts.textStyles ? opts.textStyles.slice() : []; },
     // opts.variables = { collections: [{ id, name, defaultModeId, modes }], variables: [{ id, name, resolvedType, variableCollectionId, remote, valuesByMode }] }
     variables: {
       async getVariableByIdAsync(id) { return ((opts.variables || {}).variables || []).find((v) => v.id === id) || null; },
@@ -328,4 +337,10 @@ function dsVariables(ds, extra) {
   return { collections: [cl], variables };
 }
 
-module.exports = { createHtmlStub, MIXED, dsVariables };
+// ds.json text_styles as stub local text styles ("Heading/L": Inter Bold 28 / 36 px).
+function dsTextStyles(ds) {
+  const W = { 100: "Thin", 200: "Extra Light", 300: "Light", 400: "Regular", 500: "Medium", 600: "Semi Bold", 700: "Bold", 800: "Extra Bold", 900: "Black" };
+  return ds.text_styles.map((s, i) => ({ id: "S:" + (i + 1), name: s.name, fontName: { family: s.family, style: W[s.weight] }, fontSize: s.size, lineHeight: { unit: "PIXELS", value: s.lineHeight }, letterSpacing: { unit: "PIXELS", value: 0 } }));
+}
+
+module.exports = { createHtmlStub, MIXED, dsVariables, dsTextStyles };

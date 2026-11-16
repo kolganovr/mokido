@@ -3892,7 +3892,7 @@ function htmlMap(tree, opts) {
 //  - map side (runs in htmlMap): htmlDsPlan(p, c) reads the CSS names of var(--token) from the walker's `declared` and writes them into the plan
 //    (fills[i].var, strokes[i].var, bound.*). Only explicit var() marks count, nothing is guessed from values.
 //  - build side (runs in htmlBuild): htmlDsIndex() indexes the local variables once per call, htmlDsPaints / htmlDsBindNode replace a name by the found variable.
-// components and textStyles of the index are empty stubs with the final interface (filled by 9.2 and 9.3).
+// components (9.2, lazy) and textStyles (9.3) of the index: see htmlDsComponents and htmlDsTextStyles.
 // html-map.js and html-build.js call into this file through `typeof htmlDsX === "function"` guards (tests may load them alone).
 
 // ---------- names ----------
@@ -3945,6 +3945,7 @@ const HTML_DS_RADIUS = ["topLeftRadius", "topRightRadius", "bottomRightRadius", 
 function htmlDsPlan(p, c) {
   if (typeof htmlInstPlan === "function") htmlInstPlan(p, c);
   const n = p._n;
+  if (p.type === "TEXT" && p.text && n && n.classes && n.classes.length) p.text.cls = n.classes.slice(); // 9.3: class names for the text style lookup
   if (!n || p.dom == null || !n.declared) return; // wrappers made by the mapper have no DOM node of their own
   const d = n.declared;
   const isFrame = p.type === "FRAME";
@@ -4018,6 +4019,7 @@ async function htmlDsIndex() {
         norm: htmlDsNorm(v.name), full: htmlDsNorm((cl ? cl.name + "/" : "") + v.name), cl, byId });
     }
   } catch (e) { idx.error = e && e.message ? e.message : String(e); }
+  await htmlDsTextStyles(idx);
   return idx;
 }
 // 9.2: local component sets and single components, from the plugin's own component index (components.js, the one figma_find_components uses).
@@ -4099,6 +4101,46 @@ function htmlDsBindNode(n, p, ctx) {
     try { n.setBoundVariable(f, v); ctx.bound++; }
     catch (e) { htmlDsWarnAdd(ctx.dsw, p, "var_bind_failed", name, String(e && e.message || e).slice(0, 80)); }
   }
+}
+
+// ---------- 9.3: text styles by exact match (contract section 3) ----------
+// Plugin API: LineHeight / LetterSpacing are { unit: "PIXELS" | "PERCENT" | "AUTO", value }; a percent is of the font size, AUTO has no px.
+function htmlDsTsPx(v, size) { return !v || v.unit === "AUTO" ? null : (v.unit === "PERCENT" ? v.value * size / 100 : v.value); }
+async function htmlDsTextStyles(idx) {
+  try {
+    if (typeof figma.getLocalTextStylesAsync !== "function") return;
+    for (const s of await figma.getLocalTextStylesAsync()) {
+      const f = s.fontName || {}, size = s.fontSize || 0;
+      idx.textStyles.push({ s, id: s.id, name: s.name, norm: htmlDsNorm(s.name), family: f.family, style: f.style, size, lh: htmlDsTsPx(s.lineHeight, size), ls: htmlDsTsPx(s.letterSpacing, size) || 0 });
+    }
+    idx.textStyles.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+  } catch (e) { idx.error = (idx.error ? idx.error + "; " : "") + "text styles: " + (e && e.message ? e.message : String(e)); }
+}
+// Rule 1: family, style name (weight by the F8 table), size, line height (0.5 px; AUTO = the browser's "normal" 1.21), letter spacing when the style has one (0.1).
+function htmlDsTsMatch(e, t) {
+  const fam = t.fontFamily || "Inter", st = typeof htmlBuildStyleName === "function" ? htmlBuildStyleName(t.fontStyle) : t.fontStyle;
+  if (e.family !== fam || e.style !== st || Math.abs(e.size - t.fontSize) > 0.01) return false;
+  const lh = typeof t.lineHeight === "number" ? t.lineHeight : t.fontSize * 1.21;
+  if (e.lh === null ? Math.abs(lh - t.fontSize * 1.21) > 0.5 : Math.abs(e.lh - lh) > 0.5) return false;
+  return !e.ls || Math.abs(e.ls - (t.letterSpacing || 0)) <= 0.1;
+}
+// { e } the style to apply, { differs, e } the class names a style whose values do not match (rule 3), or null.
+function htmlDsTextStyleFor(list, t) {
+  const cls = (t.cls || []).map((c) => htmlDsNorm(String(c).replace(/^t-/, "")));
+  const named = list.filter((e) => cls.indexOf(e.norm) >= 0);
+  const hit = list.filter((e) => htmlDsTsMatch(e, t));
+  if (hit.length) return { e: hit.find((e) => cls.indexOf(e.norm) >= 0) || hit[0] };
+  return named.length ? { differs: true, e: named[0] } : null;
+}
+// Rule 4: the style goes on the whole TEXT right after the base font props and BEFORE the ranges (a style write resets range overrides). Never called for instances (rule 5).
+async function htmlDsTextStyle(n, p, ctx) {
+  const t = p.text;
+  if (!t || !ctx.ds || !ctx.ds.textStyles.length) return;
+  const r = htmlDsTextStyleFor(ctx.ds.textStyles, t);
+  if (!r) return;
+  if (r.differs) { htmlDsWarnAdd(ctx.dsw, p, "text_style_differs", r.e.name, "css " + t.fontFamily + " " + htmlBuildStyleName(t.fontStyle) + " " + t.fontSize + "/" + t.lineHeight + " style " + r.e.family + " " + r.e.style + " " + r.e.size + "/" + r.e.lh); return; }
+  try { await n.setTextStyleIdAsync(r.e.id); t.styleName = r.e.name; ctx.textStyles++; }
+  catch (err) { htmlDsWarnAdd(ctx.dsw, p, "text_style_failed", r.e.name, String(err && err.message || err).slice(0, 80)); }
 }
 // html-inst.js (T-077, F9 9.2): data-component -> component instances (contract: planning/fable/F9_контракт.md, section 2).
 // A part of the plugin scope (no import/export), prefix htmlInst*. Two halves:
@@ -4467,7 +4509,7 @@ function htmlBuildSizeModes(n, p, ctx) {
   });
 }
 
-function htmlBuildText(n, p, ctx) {
+async function htmlBuildText(n, p, ctx) {
   const t = p.text || {};
   const base = htmlBuildFont(ctx, t.fontFamily, t.fontStyle);
   n.fontName = base;
@@ -4478,6 +4520,7 @@ function htmlBuildText(n, p, ctx) {
     n.lineHeight = typeof t.lineHeight === "number" ? { unit: "PIXELS", value: t.lineHeight } : { unit: "AUTO" };
     if (t.align) n.textAlignHorizontal = t.align;
   });
+  if (typeof htmlDsTextStyle === "function") await htmlDsTextStyle(n, p, ctx);
   for (const r of t.ranges || []) {
     const s = Math.max(0, r.start | 0), e = Math.min(len, r.end | 0);
     if (!(e > s)) continue;
@@ -4570,7 +4613,7 @@ async function htmlBuildNode(p, par, ctx, parentFigma, isRoot) {
   if (p.component && typeof htmlInstBuild === "function") { const ie = await htmlBuildInstance(p, par, ctx, parentFigma, isRoot); if (ie) return ie; }
   try {
     n = htmlBuildCreate(p, ctx);
-    if (p.type === "TEXT") htmlBuildText(n, p, ctx);
+    if (p.type === "TEXT") await htmlBuildText(n, p, ctx);
     if (p.type === "FRAME") htmlBuildFrameLayout(n, p, ctx);
     htmlBuildStyle(n, p, ctx);
     htmlBuildTry(ctx, p, "resize_error", () => htmlBuildResize(n, p));
@@ -4771,7 +4814,7 @@ function htmlBuildSelfCheck(root, ctx, report) {
 
 async function htmlBuild(plan, opts) {
   opts = opts || {};
-  const ctx = { warnings: [], created: 0, al: 0, entries: [], fonts: new Map(), ds: null, dsw: new Map(), bound: 0, instances: 0 };
+  const ctx = { warnings: [], created: 0, al: 0, entries: [], fonts: new Map(), ds: null, dsw: new Map(), bound: 0, instances: 0, textStyles: 0 };
   const report = { root_id: null, created: 0, auto_layout: 0, absolute_fallback: 0, text_fixed: 0, text_wrapped: 0, box_ok: { num: 0, den: 0 }, warnings: ctx.warnings };
   if (!plan || !plan.root) { htmlBuildWarn(ctx, null, "no_plan", "plan.root is missing"); return report; }
   await htmlBuildLoadFonts(plan.root, ctx);
@@ -4790,6 +4833,7 @@ async function htmlBuild(plan, opts) {
   report.auto_layout = ctx.al;
   report.bound = ctx.bound;
   report.instances = ctx.instances;
+  report.text_styles = ctx.textStyles;
   if (typeof htmlDsWarnFlush === "function") htmlDsWarnFlush(ctx.dsw, ctx.warnings);
   return report;
 }
@@ -4850,7 +4894,7 @@ async function htmlBridgeFromHtml(html, opts) {
     if (!parent || typeof parent.appendChild !== "function") throw new Error("bridge.fromHtml: parent " + String(o.parent) + " is not a node that can hold children");
   }
   const roots = [], perRoot = [], warnings = [], codes = {};
-  let bound = 0, inst = 0, created = 0, al = 0, frames = 0, abs = 0, wrapped = 0, boxNum = 0, boxDen = 0, x = typeof o.x === "number" ? o.x : null, y = typeof o.y === "number" ? o.y : 0;
+  let bound = 0, inst = 0, tst = 0, created = 0, al = 0, frames = 0, abs = 0, wrapped = 0, boxNum = 0, boxDen = 0, x = typeof o.x === "number" ? o.x : null, y = typeof o.y === "number" ? o.y : 0;
   for (let i = 0; i < widths.length; i++) {
     const w = widths[i];
     const tree = await htmlBridgeRequestTree(html, w, height);
@@ -4866,7 +4910,7 @@ async function htmlBridgeFromHtml(html, opts) {
       if (widths.length > 1) perRoot.push(w + ": " + report.created + " layers, AL " + report.auto_layout + "/" + plan.stats.frames + ", abs " + report.absolute_fallback + ", bound " + (report.bound || 0));
       try { if (activeCheckpoint) activeCheckpoint.created.push(report.root_id); } catch (e) { /* journal is best effort */ }
     }
-    created += report.created; bound += report.bound || 0; inst += report.instances || 0; al += report.auto_layout; frames += plan.stats.frames; abs += report.absolute_fallback; wrapped += report.text_wrapped || 0;
+    created += report.created; bound += report.bound || 0; inst += report.instances || 0; tst += report.text_styles || 0; al += report.auto_layout; frames += plan.stats.frames; abs += report.absolute_fallback; wrapped += report.text_wrapped || 0;
     boxNum += report.box_ok.num; boxDen += report.box_ok.den;
     report.warnings.concat(plan.warnings).forEach((wn) => {
       codes[wn.code] = (codes[wn.code] || 0) + 1;
@@ -4882,6 +4926,7 @@ async function htmlBridgeFromHtml(html, opts) {
     absolute_fallback: abs,
     bound,
     instances: inst,
+    text_styles: tst,
     text_wrapped: wrapped,
     boxes_within_1px: boxDen ? boxNum + "/" + boxDen : "n/a",
     warning_counts: codes

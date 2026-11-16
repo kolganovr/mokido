@@ -207,7 +207,7 @@ function htmlBuildSizeModes(n, p, ctx) {
   });
 }
 
-function htmlBuildText(n, p, ctx) {
+async function htmlBuildText(n, p, ctx) {
   const t = p.text || {};
   const base = htmlBuildFont(ctx, t.fontFamily, t.fontStyle);
   n.fontName = base;
@@ -218,6 +218,7 @@ function htmlBuildText(n, p, ctx) {
     n.lineHeight = typeof t.lineHeight === "number" ? { unit: "PIXELS", value: t.lineHeight } : { unit: "AUTO" };
     if (t.align) n.textAlignHorizontal = t.align;
   });
+  if (typeof htmlDsTextStyle === "function") await htmlDsTextStyle(n, p, ctx);
   for (const r of t.ranges || []) {
     const s = Math.max(0, r.start | 0), e = Math.min(len, r.end | 0);
     if (!(e > s)) continue;
@@ -310,7 +311,7 @@ async function htmlBuildNode(p, par, ctx, parentFigma, isRoot) {
   if (p.component && typeof htmlInstBuild === "function") { const ie = await htmlBuildInstance(p, par, ctx, parentFigma, isRoot); if (ie) return ie; }
   try {
     n = htmlBuildCreate(p, ctx);
-    if (p.type === "TEXT") htmlBuildText(n, p, ctx);
+    if (p.type === "TEXT") await htmlBuildText(n, p, ctx);
     if (p.type === "FRAME") htmlBuildFrameLayout(n, p, ctx);
     htmlBuildStyle(n, p, ctx);
     htmlBuildTry(ctx, p, "resize_error", () => htmlBuildResize(n, p));
@@ -511,7 +512,7 @@ function htmlBuildSelfCheck(root, ctx, report) {
 
 async function htmlBuild(plan, opts) {
   opts = opts || {};
-  const ctx = { warnings: [], created: 0, al: 0, entries: [], fonts: new Map(), ds: null, dsw: new Map(), bound: 0, instances: 0 };
+  const ctx = { warnings: [], created: 0, al: 0, entries: [], fonts: new Map(), ds: null, dsw: new Map(), bound: 0, instances: 0, textStyles: 0 };
   const report = { root_id: null, created: 0, auto_layout: 0, absolute_fallback: 0, text_fixed: 0, text_wrapped: 0, box_ok: { num: 0, den: 0 }, warnings: ctx.warnings };
   if (!plan || !plan.root) { htmlBuildWarn(ctx, null, "no_plan", "plan.root is missing"); return report; }
   await htmlBuildLoadFonts(plan.root, ctx);
@@ -530,6 +531,7 @@ async function htmlBuild(plan, opts) {
   report.auto_layout = ctx.al;
   report.bound = ctx.bound;
   report.instances = ctx.instances;
+  report.text_styles = ctx.textStyles;
   if (typeof htmlDsWarnFlush === "function") htmlDsWarnFlush(ctx.dsw, ctx.warnings);
   return report;
 }
