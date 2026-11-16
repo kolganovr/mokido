@@ -307,6 +307,38 @@ function htmlMapClose(a, b) {
   return Math.abs(a.x - b.x) <= 1 && Math.abs(a.y - b.y) <= 1 && Math.abs(a.w - b.w) <= 1 && Math.abs(a.h - b.h) <= 1;
 }
 
+// T-105: margins of flex children (ADR-004 p. 3). The gap between neighbours = css gap + margins. The smallest gap is the container's
+// itemSpacing (equal margins end up there); a bigger one is a margin on that child: padding of the child if it is an unpainted
+// Auto Layout frame, otherwise a wrapper frame with a warning. Main axis only; wrap and space-between are left alone.
+function htmlMapFlexMargins(c, n, P, flow, kids) {
+  const row = n.flex.dir === "row", side = row ? 3 : 0;
+  const pos = (k) => (row ? k.x : k.y), len = (k) => (row ? k.w : k.h);
+  const gaps = flow.slice(1).map((k, i) => pos(k) - (pos(flow[i]) + len(flow[i])));
+  if (gaps.some((g) => g < -0.5)) return;
+  let lo = Math.min.apply(null, gaps);
+  if (Math.max.apply(null, gaps) - lo > 1 && n.flex.gap <= lo + 0.5) lo = n.flex.gap; // unequal: the css gap stays the spacing, margins go to the children
+  P.itemSpacing = htmlMapR2(lo);
+  flow.slice(1).forEach((k, i) => {
+    const extra = htmlMapR2(gaps[i] - lo);
+    if (extra <= 1) return;
+    const bare = k.type === "FRAME" && k.layoutMode !== "NONE" && !k.fills.length && !k.strokes.length && !k.effects.length;
+    if (bare) {
+      k.padding[side] = htmlMapR2(k.padding[side] + extra);
+      if (row) { k.x = htmlMapR2(k.x - extra); k.w = htmlMapR2(k.w + extra); } else { k.y = htmlMapR2(k.y - extra); k.h = htmlMapR2(k.h + extra); }
+      return;
+    }
+    const w = htmlMapBase(c, k._n, "FRAME");
+    w.dom = null; w.id = k.id + "m"; w.name = k.name + " margin";
+    w.x = row ? htmlMapR2(k.x - extra) : k.x; w.y = row ? k.y : htmlMapR2(k.y - extra);
+    w.w = row ? htmlMapR2(k.w + extra) : k.w; w.h = row ? k.h : htmlMapR2(k.h + extra);
+    w.layoutMode = row ? "HORIZONTAL" : "VERTICAL"; w.padding[side] = extra;
+    w.sizingH = k.sizingH; w.sizingV = k.sizingV; w.children = [k];
+    kids[kids.indexOf(k)] = w;
+    c.stats.frames++; c.stats.auto_layout++;
+    c.warn.push({ dom: k.dom, code: "margin-wrapper", msg: "margin " + extra + " px before this node needs a wrapper layer" });
+  });
+}
+
 // Element -> list of plan nodes (empty: nothing; one: node; collapsed wrappers give their child instead).
 function htmlMapNode(c, n, pc, isRoot) {
   if (n.tag === "#text") return [htmlMapTextNode(c, n, [n], null, pc, false)];
@@ -387,6 +419,7 @@ function htmlMapNode(c, n, pc, isRoot) {
     P.itemSpacing = n.flex.gap; P.padding = pad.slice();
     P.primaryAxisAlignItems = n.flex.justify === "space-between" || n.flex.justify === "space-around" || n.flex.justify === "space-evenly" ? "SPACE_BETWEEN" : htmlMapAlign(n.flex.justify);
     P.counterAxisAlignItems = htmlMapAlign(n.flex.align);
+    if (!n.flex.wrap && flow.length >= 2 && P.primaryAxisAlignItems !== "SPACE_BETWEEN") htmlMapFlexMargins(c, n, P, flow, kids);
     if (n.flex.wrap) {
       P.layoutWrap = "WRAP";
       const rows = [];

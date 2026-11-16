@@ -71,7 +71,11 @@ function measure(dom, plan) {
       g += Math.abs(f.itemSpacing - n.grid.colGap) <= 1 && Math.abs(f.counterAxisSpacing - n.grid.rowGap) <= 1;
     } else {
       d += f.layoutMode === (n.flex.dir === "row" ? "HORIZONTAL" : "VERTICAL");
-      g += Math.abs(f.itemSpacing - n.flex.gap) <= 1;
+      // equal margins between neighbours are part of the spacing (ADR-004 p. 3, T-105): expected = the real gap when all gaps are equal
+      const ks = nodes.filter((k) => k.parent === n.id && k.position !== "absolute" && k.position !== "fixed" && k.rect.w > 0).sort((x, y) => (n.flex.dir === "row" ? x.rect.x - y.rect.x : x.rect.y - y.rect.y));
+      const gp = ks.slice(1).map((k, i) => (n.flex.dir === "row" ? k.rect.x - ks[i].rect.x - ks[i].rect.w : k.rect.y - ks[i].rect.y - ks[i].rect.h));
+      const want = !n.flex.wrap && gp.length && gp.every((v) => v >= 0 && Math.abs(v - gp[0]) <= 1) && !/space/.test(n.flex.justify) ? gp[0] : n.flex.gap;
+      g += Math.abs(f.itemSpacing - want) <= 1;
     }
     p += n.padding.every((v, i) => Math.abs(f.padding[i] - v) <= 1);
   });
@@ -345,6 +349,29 @@ const kids = (p) => p.children;
   const h = kids(plan.root)[0];
   check("img merge: the container got an IMAGE fill and the source", h.fills.some((f) => f.type === "IMAGE") && h.build.img === "data:image/png;base64,AAAA", [h.fills, h.build]);
   check("img merge: the image is not a layer of its own, only the chip (overlay) is left", kids(h).length === 1 && kids(h)[0].type === "FRAME" && kids(h)[0].dom === 3, kids(h).map((k) => k.type));
+}
+
+{ // T-105: margins of flex children are not lost (04: icon + label, 10 px apart)
+  nid = 0;
+  const mk = (list, gap) => { nid = 0; const body = el(null, "body", [0, 0, 400, 100], flexOf("row", gap || 0, "flex-start", "flex-start")); return run([body].concat(list(body)), 400, 100); };
+  // equal margin between two neighbours -> itemSpacing
+  let plan = mk(() => [withStyle(el(0, "div", [0, 0, 20, 20], { declared: { width: "20px", height: "20px" } }), bg("#ff0000ff")), withStyle(el(0, "div", [30, 0, 40, 20], { declared: { width: "40px", height: "20px" } }), bg("#00ff00ff"))]);
+  check("margin: 10 px between two neighbours -> itemSpacing 10", plan.root.itemSpacing === 10 && kids(plan.root).length === 2, [plan.root.itemSpacing, kids(plan.root).length]);
+  // different margins, painted children -> wrapper on the second one only, with a warning
+  plan = mk(() => [0, 1, 2].map((i) => withStyle(el(0, "div", [[0, 30, 80][i], 0, 20, 20], { declared: { width: "20px", height: "20px" } }), bg("#ff0000ff"))), 10);
+  const ks = kids(plan.root);
+  check("margin: gaps 10 and 30 -> itemSpacing 10, wrapper with padding-left 20 before the 3rd", plan.root.itemSpacing === 10 && ks.length === 3 && ks[2].type === "FRAME" && ks[2].padding[3] === 20 && ks[2].children.length === 1 && ks[2].x === 60 && ks[2].w === 40, [plan.root.itemSpacing, ks.map((k) => [k.type, k.padding, k.x, k.w])]);
+  check("margin: the wrapper is warned about, the 2nd child stays bare", plan.warnings.some((w) => w.code === "margin-wrapper") && ks[1].children.length === 0, plan.warnings);
+  // unpainted Auto Layout child takes it as its own padding, no wrapper
+  plan = mk(() => {
+    const a = withStyle(el(0, "div", [0, 0, 20, 20], { declared: { width: "20px", height: "20px" } }), bg("#ff0000ff"));
+    const f = el(0, "div", [60, 0, 40, 20], Object.assign({ declared: { width: "40px", height: "20px" } }, flexOf("row", 0)));
+    const t = withStyle(el(2, "div", [60, 0, 30, 20], { declared: { width: "30px", height: "20px" } }), bg("#0000ffff"));
+    const c3 = withStyle(el(0, "div", [110, 0, 20, 20], { declared: { width: "20px", height: "20px" } }), bg("#ff0000ff"));
+    return [a, f, t, c3];
+  }, 10);
+  const k2 = kids(plan.root);
+  check("margin: gaps 40 and 10 with an unpainted container -> its own padding-left 30, no wrapper, spacing 10", plan.root.itemSpacing === 10 && k2.length === 3 && k2[1].padding[3] === 30 && k2[1].x === 30 && k2[1].w === 70 && !plan.warnings.some((w) => w.code === "margin-wrapper"), [plan.root.itemSpacing, k2.map((k) => [k.type, k.padding, k.x, k.w])]);
 }
 
 console.log(failures ? "FAILURES: " + failures + " of " + checks : "ALL PASS (" + checks + " checks passed)");
