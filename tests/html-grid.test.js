@@ -14,7 +14,7 @@ function check(name, ok, detail) {
   console.log("  FAIL " + name + (detail !== undefined ? " :: " + (typeof detail === "string" ? detail : JSON.stringify(detail)).slice(0, 500) : ""));
 }
 const ctx = vm.createContext({});
-["html-map.js", "html-grid.js"].forEach((f) => vm.runInContext(fs.readFileSync(path.join(SRC, f), "utf8"), ctx));
+["html-map.js", "html-grid.js", "html-ds.js"].forEach((f) => vm.runInContext(fs.readFileSync(path.join(SRC, f), "utf8"), ctx));
 const j = (x) => JSON.parse(JSON.stringify(x));
 
 // ---------------------------------------------------------------- hand-made trees
@@ -94,6 +94,48 @@ const codes = (p) => p.warnings.map((w) => w.code);
 }
 check("htmlGridStrategy is the one extension point", typeof ctx.htmlGridStrategy === "function");
 
+// ---------------------------------------------------------------- gap tokens (9.4 follow-up): by meaning, on the plan and on the stub
+const gv = (list) => ({ collections: [{ id: "C:1", name: "DS", defaultModeId: "m", modes: [{ modeId: "m", name: "D" }] }], variables: list.map((x, i) => ({ id: "V:" + (i + 1), name: x[0], resolvedType: "FLOAT", variableCollectionId: "C:1", remote: false, valuesByMode: { m: x[1] } })) });
+const GV = gv([["space/8", 8], ["space/16", 16], ["space/24", 24]]);
+async function gapCase(cols, rowGap, colGap, decl, boxes, w) {
+  const g = gridPlan(cols, [rowGap, colGap], boxes, { w: w || 400, declared: decl });
+  g.plan.root.children[0].name = "g";
+  const stub = createHtmlStub({ variables: GV });
+  const b = vm.createContext({ figma: stub.figma, console });
+  ["html-ds.js", "html-build.js"].forEach((f) => vm.runInContext(fs.readFileSync(path.join(SRC, f), "utf8"), b));
+  const rep = await b.htmlBuild(g.plan, {});
+  const root = stub.registry.get(rep.root_id);
+  const find = (pred) => { let hit = null; (function w(n) { if (!hit && pred(n)) hit = n; (n.children || []).forEach(w); })(root); return hit; };
+  const nm = (n, f) => { const x = n && n.boundVariables && n.boundVariables[f]; const v = x && GV.variables.find((y) => y.id === x.id); return v ? v.name : null; };
+  return { g: g, find: find, nm: nm, rep: rep };
+}
+const SPANNED = [[0, 0, 400, 50, { "grid-column": "span 2" }], [0, 66, 192, 60], [208, 66, 192, 60]];
+const SPANNED2 = [[0, 0, 400, 50, { "grid-column": "span 2" }], [0, 74, 196, 60], [204, 74, 196, 60]];
+const EQ4 = (cw, rg, cg) => [[0, 0, cw, 60], [cw + cg, 0, cw, 60], [0, 60 + rg, cw, 60], [cw + cg, 60 + rg, cw, 60]];
+const gapRun = (async () => {
+  { // rows + shorthand gap: both gaps are the one token
+    const r = await gapCase("192px 192px", 16, 16, { gap: "var(--space-16)" }, SPANNED);
+    const row1 = r.find((n) => n.name === "row 1"), row2 = r.find((n) => n.name === "row 2");
+    check("gap rows+shorthand: grid itemSpacing bound to space/16 (row gap), plan keeps it once", r.nm(r.find((n) => n.name === "g"), "itemSpacing") === "space/16", r.g.plan.root.children[0].bound);
+    check("gap rows+shorthand: every row frame itemSpacing bound to space/16", r.nm(row1, "itemSpacing") === "space/16" && r.nm(row2, "itemSpacing") === "space/16", [row1 && row1.boundVariables, row2 && row2.boundVariables]);
+  }
+  { // rows + separate tokens: row-gap to the stack, column-gap to the rows
+    const r = await gapCase("196px 196px", 24, 8, { "row-gap": "var(--space-24)", "column-gap": "var(--space-8)" }, SPANNED2);
+    check("gap rows+separate: stack itemSpacing = row-gap token space/24", r.nm(r.find((n) => n.name === "g"), "itemSpacing") === "space/24", r.g.plan.root.children[0].bound);
+    check("gap rows+separate: row frames itemSpacing = column-gap token space/8", ["row 1", "row 2"].every((x) => r.nm(r.find((n) => n.name === x), "itemSpacing") === "space/8"));
+    check("gap rows: the stack is not bound to the column-gap token", r.g.plan.root.children[0].bound.itemSpacing === "--space-24", r.g.plan.root.children[0].bound);
+  }
+  { // wrap + shorthand and separate tokens: column-gap -> itemSpacing, row-gap -> counterAxisSpacing
+    const a = await gapCase("190px 190px", 16, 16, { gap: "var(--space-16)" }, EQ4(190, 16, 16), 396);
+    const ga = a.find((n) => n.name === "g");
+    check("gap wrap+shorthand: itemSpacing and counterAxisSpacing both space/16", a.nm(ga, "itemSpacing") === "space/16" && a.nm(ga, "counterAxisSpacing") === "space/16", ga && ga.boundVariables);
+    const b = await gapCase("196px 196px", 24, 8, { "row-gap": "var(--space-24)", "column-gap": "var(--space-8)" }, EQ4(196, 24, 8));
+    const gb = b.find((n) => n.name === "g");
+    check("gap wrap+separate: column-gap space/8 -> itemSpacing, row-gap space/24 -> counterAxisSpacing", b.nm(gb, "itemSpacing") === "space/8" && b.nm(gb, "counterAxisSpacing") === "space/24", gb && gb.boundVariables);
+    check("gap wrap: no row frames", !b.find((n) => n.name === "row 1"));
+  }
+})();
+
 // ---------------------------------------------------------------- etalon 07 and the stub
 const T07 = JSON.parse(fs.readFileSync(path.join(__dirname, "fixtures", "html", "07_settings_grid@1440.dom.json"), "utf8"));
 const p07 = j(ctx.htmlMap(T07, {}));
@@ -104,7 +146,8 @@ check("07: every grid has span: VERTICAL of row frames, never ABSOLUTE", grids.e
 check("07: rows 4 + 3 + 2, one grid_rows per grid", grids.map((g) => g.children.length).join() === "4,3,2" && p07.warnings.filter((w) => w.code === "grid_rows").length === 3, grids.map((g) => g.children.length));
 check("07: in a row the 468 px tracks fill the container: FILL", grids.every((g) => g.children.every((r) => r.children.every((k) => k.sizingH === "FILL"))), "sizing");
 
-(async () => { // the same tree built on the strict stub: row frames are made as ordinary frames
+(async () => { await gapRun;
+  // the same tree built on the strict stub: row frames are made as ordinary frames
   const stub = createHtmlStub({});
   const bctx = vm.createContext({ figma: stub.figma, console, setTimeout, clearTimeout, Promise });
   bctx.activeCheckpoint = { created: [] };

@@ -98,7 +98,7 @@ function htmlDsPlan(p, c) {
     if (sides[i] && Math.abs((n.padding || [0, 0, 0, 0])[i] - p.padding[i]) <= 0.5) p.bound[k] = sides[i];
   });
   // gap: row-gap / column-gap, "gap: row column"
-  if (n.flex || n.grid) {
+  if ((n.flex || n.grid) && !p.build.gapBound) { // gapBound: html-grid.js (rows mode) bound the gap tokens itself
     const gp = d.gap ? htmlDsSplit(d.gap).map((x) => htmlDsName(x, c, p)) : [];
     const row = d["row-gap"] ? htmlDsName(d["row-gap"], c, p) : gp[0] || null;
     const col = d["column-gap"] ? htmlDsName(d["column-gap"], c, p) : (gp.length > 1 ? gp[1] : gp[0]) || null;

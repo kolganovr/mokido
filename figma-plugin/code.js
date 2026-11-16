@@ -3957,6 +3957,13 @@ function htmlGridSize(k, g, c, full) {
   if (!fill) k.w = w;
   if (k.type === "TEXT") k.text.autoResize = "HEIGHT";
 }
+// CSS names of the gap tokens: row-gap / column-gap, or the shorthand "gap: row column" (needs html-ds.js; null without it)
+function htmlGridGapTokens(c, n, P) {
+  const d = n.declared || {};
+  if (typeof htmlDsName !== "function" || typeof htmlDsSplit !== "function") return null;
+  const gp = d.gap ? htmlDsSplit(d.gap).map((x) => htmlDsName(x, c, P)) : [];
+  return { row: d["row-gap"] ? htmlDsName(d["row-gap"], c, P) : gp[0] || null, col: d["column-gap"] ? htmlDsName(d["column-gap"], c, P) : (gp.length > 1 ? gp[1] : gp[0]) || null };
+}
 function htmlGridApply(c, n, P, flow, pad) {
   P.padding = pad.slice();
   const g = htmlGridInfo(n, flow, pad);
@@ -3976,6 +3983,8 @@ function htmlGridApply(c, n, P, flow, pad) {
   }
   // rows: VERTICAL of "row N" frames, every row is a one-row grid (rule 1)
   P.layoutMode = "VERTICAL"; P.itemSpacing = n.grid.rowGap; P.counterAxisSpacing = n.grid.rowGap;
+  const gt = htmlGridGapTokens(c, n, P); // tokens by meaning: row-gap -> the stack, column-gap -> every row frame
+  if (gt) { P.build.gapBound = true; if (gt.row) P.bound.itemSpacing = gt.row; }
   const out = P.children.filter((k) => flow.indexOf(k) < 0);
   g.rows.forEach((ks, i) => {
     const cols = ks.map((k) => g.col(k));
@@ -3992,6 +4001,7 @@ function htmlGridApply(c, n, P, flow, pad) {
       opacity: 1, clips: false, fills: [], strokes: [], strokeWeight: 0, radius: [0, 0, 0, 0], effects: [], bound: {}, component: null, text: null,
       build: { tokens: {}, componentHint: null }, children: ks
     });
+    if (gt && gt.col) out[out.length - 1].bound.itemSpacing = gt.col;
     c.stats.frames++; c.stats.auto_layout++;
   });
   P.children = out;
@@ -4097,7 +4107,7 @@ function htmlDsPlan(p, c) {
     if (sides[i] && Math.abs((n.padding || [0, 0, 0, 0])[i] - p.padding[i]) <= 0.5) p.bound[k] = sides[i];
   });
   // gap: row-gap / column-gap, "gap: row column"
-  if (n.flex || n.grid) {
+  if ((n.flex || n.grid) && !p.build.gapBound) { // gapBound: html-grid.js (rows mode) bound the gap tokens itself
     const gp = d.gap ? htmlDsSplit(d.gap).map((x) => htmlDsName(x, c, p)) : [];
     const row = d["row-gap"] ? htmlDsName(d["row-gap"], c, p) : gp[0] || null;
     const col = d["column-gap"] ? htmlDsName(d["column-gap"], c, p) : (gp.length > 1 ? gp[1] : gp[0]) || null;
