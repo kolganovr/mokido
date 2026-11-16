@@ -735,7 +735,7 @@ async function groupListings() {
 }
 
 async function main() {
-  if (typeof WebSocket === "undefined") { console.log("SKIP: needs Node >= 22 (global WebSocket)"); return; }
+  if (typeof WebSocket === "undefined") require("./helpers/ws-skip").wsMissing("golden-tools");
   fs.mkdirSync(FIX_DIR, { recursive: true });
   const started = Date.now();
   await groupListings();

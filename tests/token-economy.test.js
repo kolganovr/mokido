@@ -8,7 +8,7 @@
 // what it was sent, so the tests can assert on both directions of the wire.
 // Needs Node >= 22 (global WebSocket).
 // Node 18 has no global WebSocket client: suites that drive the server over one are skipped there (CI runs Node 18 and 22).
-if (typeof WebSocket !== "function") { console.log("skip: needs Node >= 22 (global WebSocket), this is " + process.versions.node); process.exit(0); }
+if (typeof WebSocket !== "function") require("./helpers/ws-skip").wsMissing("token-economy");
 const path = require("path");
 const { spawn } = require("child_process");
 
@@ -192,10 +192,7 @@ function check(name, cond, extra) {
 }
 
 async function main() {
-  if (typeof WebSocket === "undefined") {
-    console.log("SKIP: needs Node >= 22 (global WebSocket)");
-    return;
-  }
+  if (typeof WebSocket === "undefined") require("./helpers/ws-skip").wsMissing("token-economy main");
 
   const master = startServer();
   await master.call("initialize", { protocolVersion: "2024-11-05", capabilities: {}, clientInfo: { name: "test", version: "0" } })
