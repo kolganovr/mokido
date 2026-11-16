@@ -4656,6 +4656,7 @@ async function htmlBridgeFromHtml(html, opts) {
   const o = opts || {};
   if (typeof html !== "string" || !html.trim()) throw new Error("bridge.fromHtml: html must be a non-empty string");
   const widths = Array.isArray(o.widths) && o.widths.length ? o.widths.map(Number) : [Number(o.width) || 1440];
+  if (widths.length > 4) throw new Error("bridge.fromHtml: at most 4 widths per call, got " + widths.length + ". Split into several calls.");
   if (widths.some((w) => !(w >= 100 && w <= 8000))) throw new Error("bridge.fromHtml: width must be 100..8000 px, got " + JSON.stringify(widths));
   const height = Number(o.height) || 900;
   let parent = null;
@@ -4663,7 +4664,7 @@ async function htmlBridgeFromHtml(html, opts) {
     parent = typeof o.parent === "string" ? figma.getNodeById(o.parent) : o.parent;
     if (!parent || typeof parent.appendChild !== "function") throw new Error("bridge.fromHtml: parent " + String(o.parent) + " is not a node that can hold children");
   }
-  const roots = [], warnings = [], codes = {};
+  const roots = [], perRoot = [], warnings = [], codes = {};
   let bound = 0, created = 0, al = 0, frames = 0, abs = 0, wrapped = 0, boxNum = 0, boxDen = 0, x = typeof o.x === "number" ? o.x : null, y = typeof o.y === "number" ? o.y : 0;
   for (let i = 0; i < widths.length; i++) {
     const w = widths[i];
@@ -4673,10 +4674,11 @@ async function htmlBridgeFromHtml(html, opts) {
       if (parent) x = 0;
       else { const pos = getFreeCanvasPosition(w, plan.root.h); x = pos.x; y = typeof o.y === "number" ? o.y : pos.y; }
     }
-    const name = o.name ? (widths.length > 1 ? o.name + " / " + w : o.name) : (widths.length > 1 ? "HTML / " + w : "HTML");
+    const name = o.name ? (widths.length > 1 ? o.name + "@" + w : o.name) : (widths.length > 1 ? "HTML@" + w : "HTML");
     const report = await htmlBuild(plan, { parent: parent || figma.currentPage, x, y, name });
     if (report.root_id) {
       roots.push({ id: report.root_id, name, w: plan.root.w, h: plan.root.h, x, y });
+      if (widths.length > 1) perRoot.push(w + ": " + report.created + " layers, AL " + report.auto_layout + "/" + plan.stats.frames + ", abs " + report.absolute_fallback + ", bound " + (report.bound || 0));
       try { if (activeCheckpoint) activeCheckpoint.created.push(report.root_id); } catch (e) { /* journal is best effort */ }
     }
     created += report.created; bound += report.bound || 0; al += report.auto_layout; frames += plan.stats.frames; abs += report.absolute_fallback; wrapped += report.text_wrapped || 0;
@@ -4698,6 +4700,7 @@ async function htmlBridgeFromHtml(html, opts) {
     boxes_within_1px: boxDen ? boxNum + "/" + boxDen : "n/a",
     warning_counts: codes
   };
+  if (perRoot.length) out.per_root = perRoot;
   if (warnings.length) out.warnings = warnings;
   return out;
 }

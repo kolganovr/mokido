@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- **figma_html: breakpoints (T-077, F9 9.5).** `widths` roots are named `<name>@<width>`, at most 4 widths per call (more is an error), the reply carries one counter line per root (`per_root`); covered by tests (order, gap 80, page height, hidden `display:none` elements make no layers, two-width reply under 1500 B).
 - **figma_html: `var(--token)` binds to Figma variables (T-077, F9 9.1).** A CSS variable in a fill, border color, text color, padding, gap, corner radius or border width is looked up among the file's local variables (name normalized: `--status-ok-bg` = `status/ok-bg` = `Status/OK bg`, also collection + name) and bound with `setBoundVariableForPaint` / `setBoundVariable`; a missing, ambiguous or wrong-type variable keeps the raw value and adds one merged warning (`var_not_found`, `var_ambiguous`, `var_type_mismatch`, `var_expr`; a stale value is bound and reported as `var_value_differs`). The reply gets a `bound` counter. New plugin part `html-ds.js`. Stub only, not yet measured in a live file.
 - **HTML to Figma in one call (preview, T-077).** New tool `figma_html` and macro `bridge.fromHtml(html, { width | widths, height, parent, name, x, y })`
   build a screen from one HTML document (or a local `.html` path): the plugin window lays it out in a hidden iframe, flex becomes
@@ -101,7 +102,8 @@
   no Google Fonts (works offline); no `install.py` / port hardcoded in texts.
 - **Server:** answers `CLIENT_READY` with `CLIENT_ACK { clientId }` and adds `limits` (`escalateMs`,
   `stalledAfterMs`) to `GET /status`, so the plugin shows "long task" / "looks stuck" at the server's thresholds.
-- **`figma_inspect` props/variant on sets and masters.** `props` on a COMPONENT_SET or COMPONENT returns the property definitions (`{type, default, options}`, `#id` dropped) instead of null; a variant inside a set reads its parent set's. `variant` on a set lists each variant property with its values. Instances are unchanged.
+
+- **`figma_inspect` props/variant on sets and masters.** `props` on a COMPONENT_SET or COMPONENT returns the property definitions (`{type, default, options}`, `#id` dropped) instead of null; a variant inside a set reads its parent set's. `variant` on a set lists each variant property with its values. Instances are unchanged.
 - **`figma_inspect` props:["texts"].** All TEXT descendants of a frame as `id characters` lines, full text (no 40-char cut), paged with `offset=K` like the outline. `props:["text"]` on a non-TEXT node now answers with a hint to use "texts" instead of null.
 - **`figma_inspect` find with no match names the page.** Without node_ids, "no matches" now says which page was searched and lists the match count on the other pages (loads at most 8 of them), since a find only covers the current page.
 - **`install.mjs` names a server left running from before the update.** Only one server process owns port 8765; one started before `--update` keeps the old code in memory, so the plugin kept asking to update. The installer now asks the running server for its version and, if it differs, prints the version, the PID and how to restart it (`/mcp` reconnect, close that session, or stop the process). `/status` reports `pid`.

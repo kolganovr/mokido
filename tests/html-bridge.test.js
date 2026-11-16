@@ -57,8 +57,35 @@ const rejects = async (p) => { try { await p; return null; } catch (e) { return 
     const t = setup((m) => ({ tree: TREES[m.width] }));
     const r = plain(await t.ctx.htmlBridgeFromHtml("<div/>", { widths: [1440, 390], name: "Page", x: 0, y: 0 }));
     check("two roots, one HTML_WALK per width", r.ok && r.roots.length === 2 && t.sent.length === 2 && t.sent[1].width === 390, r);
-    check("names carry the width", r.roots[0].name === "Page / 1440" && r.roots[1].name === "Page / 390", r.roots);
+    check("names carry the width", r.roots[0].name === "Page@1440" && r.roots[1].name === "Page@390", r.roots);
     check("second frame is to the right with a gap", r.roots[1].x === r.roots[0].x + 1440 + 80, r.roots);
+    check("order as in widths, left to right, gap 80", r.roots[0].w === 1440 && r.roots[1].x - (r.roots[0].x + r.roots[0].w) === 80, r.roots);
+    check("each width: own walk with that width, own root, height from that page tree", t.sent[0].width === 1440 && t.sent[1].width === 390 && r.roots[0].h === TREES[1440].page.h && r.roots[1].h === TREES[390].page.h && r.roots[0].id !== r.roots[1].id, [r.roots.map((q) => q.h), TREES[1440].page, TREES[390].page]);
+    check("two widths: response <= 1500 B, one counter line per root", Buffer.byteLength(JSON.stringify(r)) <= 1500 && r.per_root.length === 2, Buffer.byteLength(JSON.stringify(r)));
+    console.log("  info: two-width response " + Buffer.byteLength(JSON.stringify(r)) + " B");
+    const rev = setup((m) => ({ tree: TREES[m.width] }));
+    const rr = plain(await rev.ctx.htmlBridgeFromHtml("<div/>", { widths: [390, 1440], name: "P", x: 0, y: 0 }));
+    check("reversed widths keep the given order", rr.roots[0].name === "P@390" && rr.roots[1].name === "P@1440" && rr.roots[1].x === 390 + 80, rr.roots);
+    const five = setup((m) => ({ tree: TREES[1440] }));
+    const e5 = await rejects(five.ctx.htmlBridgeFromHtml("<div/>", { widths: [320, 390, 768, 1024, 1440] }));
+    check("more than 4 widths: clear error, no walk", /at most 4 widths/.test(e5 || "") && five.sent.length === 0, e5);
+    const four = setup((m) => ({ tree: TREES[1440] }));
+    const r4 = plain(await four.ctx.htmlBridgeFromHtml("<div/>", { widths: [320, 390, 768, 1024], x: 0, y: 0 }));
+    check("exactly 4 widths allowed", r4.ok && r4.roots.length === 4, r4.ok);
+    // display:none: the walker drops the node, so a tree without it gives no layer; names of the shared nodes stay equal
+    const walkSrc = fs.readFileSync(path.join(SRC, "html-walk.js"), "utf8");
+    check("walker skips display:none elements (no hidden layers)", /cs\.display === "none"\) return;/.test(walkSrc));
+    const full = JSON.parse(JSON.stringify(TREES[1440]));
+    const cut = JSON.parse(JSON.stringify(full));
+    const parents = new Set(cut.nodes.map((n) => n.parent));
+    const victim = cut.nodes.filter((n) => n.parent != null && !parents.has(n.id) && !n.text).pop() || cut.nodes.filter((n) => n.parent != null && !parents.has(n.id)).pop();
+    const removed = !!victim;
+    if (victim) cut.nodes = cut.nodes.filter((n) => n.id !== victim.id);
+    const ta = setup((m) => ({ tree: m.width === 1440 ? full : cut }));
+    const rt = plain(await ta.ctx.htmlBridgeFromHtml("<div/>", { widths: [1440, 390], name: "H", x: 0, y: 0 }));
+    const layersOf = (id) => { const out = []; (function w(n) { out.push(n.name); (n.children || []).forEach(w); })(ta.stub.figma.getNodeById(id)); return out; };
+    const la = layersOf(rt.roots[0].id).slice(1), lb = layersOf(rt.roots[1].id).slice(1);
+    check("hidden element on the narrow width: fewer layers, the rest named the same", removed && lb.length < la.length && lb.every((n) => la.includes(n)), [la.length, lb.length]);
   }
   // 3. parent by id
   {
