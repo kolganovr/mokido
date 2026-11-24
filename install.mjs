@@ -9,8 +9,10 @@ import path from "node:path";
 import crypto from "node:crypto";
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { createRequire } from "node:module";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const { computeCodeHash } = createRequire(import.meta.url)("./figma/lib/codehash.js");
 
 // ==========================================================================
 // ONE physical copy of the server/plugin, ~/.mokido/mcp, and every MCP config
@@ -669,7 +671,7 @@ function runDoctor(home, appdata) {
  * memory, so the plugin keeps saying "Update needed" although the files on
  * disk are new. Ask the running master for its version and say which
  * process to restart. fetchStatus/findPid are injectable for tests. */
-async function checkRunningServer({ port = 8765, token = "", expectedVersion = "", fetchStatus, findPid } = {}) {
+async function checkRunningServer({ port = 8765, token = "", expectedVersion = "", expectedCodeHash = "", fetchStatus, findPid } = {}) {
   fetchStatus = fetchStatus || (async () => {
     const res = await fetch(`http://127.0.0.1:${port}/status`, {
       headers: token ? { "X-Bridge-Token": token } : {},
@@ -687,12 +689,16 @@ async function checkRunningServer({ port = 8765, token = "", expectedVersion = "
   }
   if (!status || !status.serverVersion) return { status: "unknown", httpStatus: status && status.httpStatus };
   const version = status.serverVersion;
-  if (!expectedVersion || version === expectedVersion) return { status: "ok", version };
+  // Same version is not enough: 4.4.0 before and after an update is the same
+  // number. A master without codeHash predates the check, so it is old code too.
+  const versionDiffers = !!expectedVersion && version !== expectedVersion;
+  const codeDiffers = !!expectedCodeHash && status.codeHash !== expectedCodeHash;
+  if (!versionDiffers && !codeDiffers) return { status: "ok", version, codeHash: status.codeHash || "" };
   let pid = status.pid || null;
   if (!pid) {
     try { pid = findPid() || null; } catch { pid = null; }
   }
-  return { status: "stale", version, pid };
+  return { status: "stale", version, pid, reason: versionDiffers ? "version" : "code", codeHash: status.codeHash || "", expectedCodeHash };
 }
 
 /** PID listening on the port, best effort (masters before 4.4.0 don't report it in /status). */
@@ -712,11 +718,16 @@ function findListeningPid(port) {
 function reportRunningServer(result, expectedVersion) {
   if (result.status === "stale") {
     console.log(`[!] A Mokido server v${result.version} is still running${result.pid ? ` (PID ${result.pid})` : ""} and holds port 8765;`);
-    console.log(`    it was started before this update, so the plugin will report it instead of v${expectedVersion}.`);
+    if (result.reason === "code") {
+      console.log(`    The version is the same (v${expectedVersion}) but the code is not the code on disk (running ${result.codeHash || "no code hash: older build"}, on disk ${result.expectedCodeHash}).`);
+      console.log("    Measurements taken now would run on the OLD code.");
+    } else {
+      console.log(`    it was started before this update, so the plugin will report it instead of v${expectedVersion}.`);
+    }
     console.log("    Restart the MCP server in the agent session that started it (Claude Code: /mcp > figma > Reconnect),");
     console.log(`    or close that session${result.pid ? `, or stop the process: ${process.platform === "win32" ? `taskkill /PID ${result.pid}` : `kill ${result.pid}`}` : ""}.`);
   } else if (result.status === "ok") {
-    console.log(`[✓] Running server on port 8765 is v${result.version}`);
+    console.log(`[✓] Running server on port 8765 is v${result.version}${result.codeHash ? ` (code ${result.codeHash})` : ""}`);
   }
 }
 
@@ -754,7 +765,7 @@ async function main() {
   const tokenFile = path.join(os.homedir(), ".mokido", "bridge_token.txt");
   const token = fs.existsSync(tokenFile) ? fs.readFileSync(tokenFile, "utf-8").trim() : "";
   const expectedVersion = JSON.parse(fs.readFileSync(path.join(__dirname, "package.json"), "utf-8")).version;
-  reportRunningServer(await checkRunningServer({ token, expectedVersion }), expectedVersion);
+  reportRunningServer(await checkRunningServer({ token, expectedVersion, expectedCodeHash: computeCodeHash(path.join(__dirname, "figma")) }), expectedVersion);
 }
 
 const isMainModule = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);

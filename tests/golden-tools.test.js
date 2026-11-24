@@ -34,7 +34,7 @@ function check(name, cond, extra) {
 
 // ---------------------------------------------------------------- normalising
 let SERVER_VERSION = null;
-const NUMERIC_KEYS = new Set(["lastSeenMsAgo", "lastPing", "pid", "elapsed_ms", "waited_ms", "ts"]);
+const NUMERIC_KEYS = new Set(["lastSeenMsAgo", "lastPing", "pid", "elapsed_ms", "waited_ms", "ts", "startedAt"]);
 const ROOT_VARIANTS = (() => {
   const r = path.resolve(ROOT);
   return [r, r.replace(/\\/g, "/"), r.replace(/\\/g, "\\\\")].sort((a, b) => b.length - a.length);
@@ -56,7 +56,7 @@ function normString(s) {
     .replace(/\b\d+s ago\b/g, "<N>s ago");
 }
 function norm(v, key) {
-  if (typeof v === "string") return normString(v);
+  if (typeof v === "string") return key === "codeHash" ? "<hash>" : normString(v);
   if (typeof v === "number") return NUMERIC_KEYS.has(key) ? "<n>" : v;
   if (Array.isArray(v)) return v.map((x) => norm(x));
   if (v && typeof v === "object") {

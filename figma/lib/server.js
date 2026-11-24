@@ -1,12 +1,16 @@
 const crypto = require("crypto");
 const http = require("http");
-const { BRIDGE_PORT, ALLOWED_ORIGINS, MAX_WS_MESSAGE_BYTES, MAX_HTTP_BODY_BYTES, SERVER_VERSION, TIMEOUTS, ECONOMY } = require("./config");
+const { BRIDGE_PORT, ALLOWED_ORIGINS, MAX_WS_MESSAGE_BYTES, MAX_HTTP_BODY_BYTES, SERVER_VERSION, TIMEOUTS, ECONOMY, FIGMA_DIR } = require("./config");
 const { state, wsClients, pendingCommands, wakeClientWaiters } = require("./state");
 const { isAuthorized, isOriginAllowed } = require("./auth");
 const { jobs, settleCommand, errorLocation, failCommandsOfClient, readJobSnapshot, takeLate } = require("./jobs");
 const { tryBecomeMaster, attachServer } = require("./master");
 const { sendCommandToPlugin, listTargets } = require("./dispatch");
 const { logExit, logRole } = require("./journal");
+const { computeCodeHash } = require("./codehash");
+// Taken at start: this is the code the process runs, whatever --update puts on disk later.
+const CODE_HASH = computeCodeHash(FIGMA_DIR);
+const STARTED_AT = Date.now();
 
 // Encode unmasked text frame (Server -> Client) as per RFC 6455
 function encodeWsFrame(data) {
@@ -410,6 +414,9 @@ const bridgeServer = http.createServer((req, res) => {
       lastPing: state.lastPluginPing,
       serverVersion: SERVER_VERSION,
       pid: process.pid,
+      // Not copied into any tool reply: figma_list_targets reads only `targets`.
+      codeHash: CODE_HASH,
+      startedAt: STARTED_AT,
       targets: listTargets(),
       // The plugin's "long task" / "looks stuck" states use the same thresholds as the server.
       limits: { escalateMs: TIMEOUTS.escalate, stalledAfterMs: ECONOMY.stalledAfterMs }

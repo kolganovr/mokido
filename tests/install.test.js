@@ -340,6 +340,30 @@ async function main() {
     check("master without pid in /status -> pid from the port owner", staleOld.status === "stale" && staleOld.pid === 77, staleOld);
     const forbidden = await run({ httpStatus: 403 }, null);
     check("wrong token -> unknown, no false alarm", forbidden.status === "unknown", forbidden);
+
+    // T-099: same version, different code.
+    const runH = (status, pid) => installer.checkRunningServer({
+      expectedVersion: "4.4.0", expectedCodeHash: "aaaaaaaaaaaa",
+      fetchStatus: async () => status, findPid: () => pid,
+    });
+    const sameCode = await runH({ serverVersion: "4.4.0", pid: 5, codeHash: "aaaaaaaaaaaa" }, null);
+    check("same version, same code hash -> ok", sameCode.status === "ok", sameCode);
+    const oldCode = await runH({ serverVersion: "4.4.0", pid: 5, codeHash: "bbbbbbbbbbbb" }, null);
+    check("same version, other code hash -> stale (reason code, pid)", oldCode.status === "stale" && oldCode.reason === "code" && oldCode.pid === 5, oldCode);
+    const noHash = await runH({ serverVersion: "4.4.0" }, 88);
+    check("same version, master without codeHash -> stale, pid from port owner", noHash.status === "stale" && noHash.reason === "code" && noHash.pid === 88, noHash);
+    const verOnly = await run({ serverVersion: "4.4.0" }, null);
+    check("no expected hash given -> version-only check still ok", verOnly.status === "ok", verOnly);
+
+    const { computeCodeHash } = require("../figma/lib/codehash.js");
+    const figmaSrc = path.join(__dirname, "..", "figma");
+    const h1 = computeCodeHash(figmaSrc);
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "codehash-"));
+    fs.cpSync(figmaSrc, tmp, { recursive: true });
+    check("codeHash: a copy of figma/ hashes the same", h1.length === 12 && computeCodeHash(tmp) === h1);
+    fs.appendFileSync(path.join(tmp, "lib", "config.js"), "\n// changed\n");
+    check("codeHash: one changed byte changes it", computeCodeHash(tmp) !== h1);
+    fs.rmSync(tmp, { recursive: true, force: true });
   }
 
   console.log(`\n${failures === 0 ? "All install.mjs checks passed." : failures + " check(s) FAILED."}`);
