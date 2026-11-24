@@ -5,6 +5,8 @@
     "lastPing": "<n>",
     "serverVersion": "<version>",
     "pid": "<n>",
+    "codeHash": "<hash>",
+    "startedAt": "<n>",
     "targets": [
       {
         "id": "<ws_id>",
