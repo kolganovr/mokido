@@ -325,7 +325,27 @@ console.log("\n== defaults and metadata ==");
   // (each description is re-sent on every turn).
   const lens = srv.TOOLS.map(t => [t.name, t.description.length]);
   check("every tool description stays <= 2400 chars", lens.every(([, n]) => n <= 2400), lens.filter(([, n]) => n > 2000));
-  check("all tool descriptions together stay <= 9000 chars", lens.reduce((a, [, n]) => a + n, 0) <= 9000, lens.reduce((a, [, n]) => a + n, 0));
+  // T-122: what the model really gets is getActiveTools(), not all of TOOLS.
+  // Reference only (no assert): all TOOLS incl. REST and legacy.
+  console.log("  info all " + srv.TOOLS.length + " TOOLS (incl. REST + legacy, not what the model sees): descriptions " + lens.reduce((a, [, n]) => a + n, 0) + " chars");
+  // FIGMA_TOKEN is read when lib/config.js loads, so each mode runs in a child process.
+  const measure = (withToken) => {
+    const env = { ...process.env };
+    delete env.FIGMA_PERSONAL_ACCESS_TOKEN; delete env.FIGMA_API_KEY; delete env.FIGMA_MCP_LEGACY_TOOLS;
+    if (withToken) env.FIGMA_PERSONAL_ACCESS_TOKEN = "test-token";
+    const code = 'const t=require(' + JSON.stringify(path.join(__dirname, "..", "figma", "lib", "tools.js")) + ').getActiveTools();' +
+      'console.log(JSON.stringify({n:t.length,d:t.reduce((a,x)=>a+x.description.length,0),j:Buffer.byteLength(JSON.stringify(t)),h:Math.max(...t.filter(x=>x.name==="figma_html").map(x=>x.description.length),0)}))';
+    const r = spawnSync(process.execPath, ["-e", code], { env, encoding: "utf-8" });
+    return JSON.parse(r.stdout);
+  };
+  // limits: descriptions 9000 chars; full JSON = fact of 24.11 + 5 %, rounded up to 1000 B
+  for (const [label, withToken, descMax, jsonMax] of [["default (no REST token)", false, 9000, 29000], ["with REST token", true, 9000, 34000]]) {
+    const m = measure(withToken);
+    console.log("  info " + label + ": " + m.n + " tools, descriptions " + m.d + "/" + descMax + " chars (headroom " + (descMax - m.d) + "), full JSON " + m.j + "/" + jsonMax + " B (headroom " + (jsonMax - m.j) + ")");
+    check(label + ": active tool descriptions together <= " + descMax + " chars", m.d <= descMax, m.d);
+    check(label + ": active tools full JSON <= " + jsonMax + " B", m.j <= jsonMax, m.j);
+    check(label + ": figma_html description <= 450 chars", m.h <= 450, m.h);
+  }
   const insp = srv.TOOLS.find(t => t.name === "figma_inspect").description;
   check("inspect decodes a:start/center (start = MIN, end = MAX)", /primaryAxisAlignItems\/counterAxisAlignItems/.test(insp) && /start = MIN/.test(insp) && /end = MAX/.test(insp));
   check("inspect: compare gives REF lines for the write", /compare[^.]*REF lines/.test(insp));
