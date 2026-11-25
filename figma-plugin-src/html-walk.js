@@ -134,7 +134,7 @@ function htmlWalkCurrentColor(src, dst, win) {
   var isStyleTag = String(el.tagName).toLowerCase() === "style" && hasCc(el.textContent);
   if (!need && !isStyleTag) return;
   var c = htmlWalkColor(win.getComputedStyle(isStyleTag ? src.parentElement || src : src).color);
-  var hex6 = c.hex.length >= 7 ? c.hex.slice(0, 7) : "#000000";
+  var hex6 = c.hex.length >= 7 && c.hex.charAt(0) === "#" ? c.hex.slice(0, 7) : "rgb(0, 0, 0)";
   var re = /currentcolor/gi;
   HTML_WALK_CC.forEach(function (a) {
     if (!hasCc(el.getAttribute(a))) return;
