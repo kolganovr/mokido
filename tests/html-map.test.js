@@ -80,7 +80,9 @@ function measure(dom, plan) {
       const want = !n.flex.wrap && gp.length && gp.every((v) => v >= 0 && Math.abs(v - gp[0]) <= 1) && !/space/.test(n.flex.justify) ? gp[0] : n.flex.gap;
       g += Math.abs(f.itemSpacing - want) <= 1;
     }
-    p += n.padding.every((v, i) => Math.abs(f.padding[i] - v) <= 1);
+    // T-134: padding that came from a margin (build.marginPad: margin of the first / last child, or of this node itself) is not css padding
+    const mp = (f.build && f.build.marginPad) || [0, 0, 0, 0];
+    p += n.padding.every((v, i) => Math.abs(f.padding[i] - mp[i] - v) <= 1);
   });
   res.auto_layout = pct(a, cont.length); res.dir = pct(d, cont.length); res.gap = pct(g, cont.length); res.padding = pct(p, cont.length);
   // sizing: independent restatement of the SPEC heuristic (the test may know the answer, the translator does not)

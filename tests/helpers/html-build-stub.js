@@ -7,18 +7,18 @@
 const MIXED = Symbol("figma.mixed");
 const FRAMEISH = new Set(["FRAME", "COMPONENT", "COMPONENT_SET", "INSTANCE"]);
 const ENUM = {
-  layoutMode: ["NONE", "HORIZONTAL", "VERTICAL"], layoutWrap: ["NO_WRAP", "WRAP"],
+  layoutMode: ["NONE", "HORIZONTAL", "VERTICAL", "GRID"], layoutWrap: ["NO_WRAP", "WRAP"],
   primaryAxisSizingMode: ["AUTO", "FIXED"], counterAxisSizingMode: ["AUTO", "FIXED"],
   primaryAxisAlignItems: ["MIN", "CENTER", "MAX", "SPACE_BETWEEN"], counterAxisAlignItems: ["MIN", "CENTER", "MAX", "BASELINE"],
   strokeAlign: ["INSIDE", "OUTSIDE", "CENTER"], layoutSizingHorizontal: ["FIXED", "HUG", "FILL"], layoutSizingVertical: ["FIXED", "HUG", "FILL"],
   layoutPositioning: ["AUTO", "ABSOLUTE"], textAutoResize: ["NONE", "WIDTH_AND_HEIGHT", "HEIGHT", "TRUNCATE"],
   textAlignHorizontal: ["LEFT", "CENTER", "RIGHT", "JUSTIFIED"], textTruncation: ["DISABLED", "ENDING"]
 };
-const NUM = new Set(["x", "y", "opacity", "itemSpacing", "counterAxisSpacing", "paddingTop", "paddingRight", "paddingBottom", "paddingLeft", "strokeWeight", "strokeTopWeight", "strokeRightWeight", "strokeBottomWeight", "strokeLeftWeight", "cornerRadius", "topLeftRadius", "topRightRadius", "bottomLeftRadius", "bottomRightRadius", "fontSize"]);
-const BASE = ["constraints", "name", "visible", "x", "y", "opacity", "layoutSizingHorizontal", "layoutSizingVertical", "layoutPositioning", "effects"];
+const NUM = new Set(["gridRowCount", "gridColumnCount", "gridRowGap", "gridColumnGap", "gridColumnSpan", "gridRowSpan", "x", "y", "opacity", "itemSpacing", "counterAxisSpacing", "paddingTop", "paddingRight", "paddingBottom", "paddingLeft", "strokeWeight", "strokeTopWeight", "strokeRightWeight", "strokeBottomWeight", "strokeLeftWeight", "cornerRadius", "topLeftRadius", "topRightRadius", "bottomLeftRadius", "bottomRightRadius", "fontSize"]);
+const BASE = ["gridColumnSpan", "gridRowSpan", "constraints", "name", "visible", "x", "y", "opacity", "layoutSizingHorizontal", "layoutSizingVertical", "layoutPositioning", "effects"];
 const WRITABLE = {
   PAGE: [],
-  FRAME: [...BASE, "fills", "strokes", "strokeWeight", "strokeAlign", "strokesIncludedInLayout", "strokeTopWeight", "strokeRightWeight", "strokeBottomWeight", "strokeLeftWeight", "clipsContent", "layoutMode", "layoutWrap", "primaryAxisSizingMode", "counterAxisSizingMode", "primaryAxisAlignItems", "counterAxisAlignItems", "itemSpacing", "counterAxisSpacing", "paddingTop", "paddingRight", "paddingBottom", "paddingLeft", "cornerRadius", "topLeftRadius", "topRightRadius", "bottomLeftRadius", "bottomRightRadius"],
+  FRAME: [...BASE, "fills", "strokes", "strokeWeight", "strokeAlign", "strokesIncludedInLayout", "strokeTopWeight", "strokeRightWeight", "strokeBottomWeight", "strokeLeftWeight", "clipsContent", "layoutMode", "gridRowCount", "gridColumnCount", "gridRowGap", "gridColumnGap", "gridColumnSizes", "gridRowSizes", "layoutWrap", "primaryAxisSizingMode", "counterAxisSizingMode", "primaryAxisAlignItems", "counterAxisAlignItems", "itemSpacing", "counterAxisSpacing", "paddingTop", "paddingRight", "paddingBottom", "paddingLeft", "cornerRadius", "topLeftRadius", "topRightRadius", "bottomLeftRadius", "bottomRightRadius"],
   RECTANGLE: [...BASE, "fills", "strokes", "strokeWeight", "strokeAlign", "strokeTopWeight", "strokeRightWeight", "strokeBottomWeight", "strokeLeftWeight", "cornerRadius", "topLeftRadius", "topRightRadius", "bottomLeftRadius", "bottomRightRadius"],
   VECTOR: [...BASE, "fills", "strokes", "strokeWeight"],
   // F9 9.2: inside an instance only name, visibility, opacity, position and layout sizing may be written (contract section 2, rule 6); colors, radius, padding throw
@@ -69,6 +69,14 @@ function createHtmlStub(opts) {
     if (!allowed.includes(k)) fail("unimplemented/readonly set " + d.type + "." + k);
     if (ENUM[k] && !ENUM[k].includes(v)) fail("bad value for " + k + ": " + String(v));
     if (NUM.has(k) && !Number.isFinite(v)) fail(k + " must be a finite number");
+    if (/^grid(Row|Column)(Count|Gap|Sizes)$/.test(k) && d.layoutMode !== "GRID") fail(k + " needs layoutMode GRID (set it first)");
+    if ((k === "gridRowCount" || k === "gridColumnCount") && !(Number.isInteger(v) && v >= 1)) fail(k + " must be an integer >= 1");
+    if (k === "gridColumnSpan" || k === "gridRowSpan") { if (!(Number.isInteger(v) && v >= 1)) fail(k + " must be an integer >= 1"); if (!(d.parent && d.parent.layoutMode === "GRID")) fail(k + " needs a GRID parent"); const lim = k === "gridColumnSpan" ? d.parent.gridColumnCount : d.parent.gridRowCount, at = d.gridPos ? (k === "gridColumnSpan" ? d.gridPos.col : d.gridPos.row) : 0; if (at + v > lim) fail(k + " " + v + " goes past the " + lim + " tracks"); }
+    if (k === "gridColumnSizes" || k === "gridRowSizes") {
+      const cnt = k === "gridColumnSizes" ? d.gridColumnCount : d.gridRowCount;
+      if (!Array.isArray(v) || v.length !== cnt) fail(k + " needs one entry per track (" + cnt + ")");
+      for (const s of v) if (!s || !["FLEX", "FIXED", "HUG"].includes(s.type) || (s.type !== "HUG" && !(s.value > 0))) fail(k + " entry must be {type: FLEX|FIXED|HUG, value > 0}");
+    }
     if (k === "maxLines" && !(v === null || (Number.isInteger(v) && v >= 1))) fail("maxLines must be an integer >= 1 or null");
     if (k === "opacity" && !(v >= 0 && v <= 1)) fail("opacity out of 0..1");
     if (k === "fills" || k === "strokes") checkPaints(v, k);
@@ -127,7 +135,14 @@ function createHtmlStub(opts) {
       resize(w, h) {
         if (!(w >= 0.01 && h >= 0.01)) fail("resize needs sizes >= 0.01");
         d.width = w; d.height = h; d.resizes = (d.resizes || 0) + 1;
+        if (FRAMEISH.has(d.type) && d.layoutMode !== "NONE") { d.primaryAxisSizingMode = "FIXED"; d.counterAxisSizingMode = "FIXED"; } // like Figma: resize() turns hug off
         if (d.type === "TEXT" && hooks.textWidth) { if (d.textAutoResize === "WIDTH_AND_HEIGHT") d.textAutoResize = "HEIGHT"; reflow(d); }
+      },
+      setGridChildPosition(row, col) {
+        const par = d.parent;
+        if (!par || par.layoutMode !== "GRID") fail("setGridChildPosition needs a GRID parent");
+        if (!(Number.isInteger(row) && row >= 0 && row < par.gridRowCount && Number.isInteger(col) && col >= 0 && col < par.gridColumnCount)) fail("setGridChildPosition(" + row + ", " + col + ") is outside the " + par.gridRowCount + "x" + par.gridColumnCount + " grid");
+        d.gridPos = { row, col };
       },
       remove() { if (d.parent) d.parent.children = d.parent.children.filter((x) => x !== node); d.removed = true; registry.delete(d.id); },
       findAll(pred) { const out = []; (function walk(n) { for (const c of n.children || []) { if (!pred || pred(c)) out.push(c); walk(c); } })(d); return out; },

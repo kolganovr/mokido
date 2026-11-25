@@ -119,3 +119,27 @@ function htmlGridApply(c, n, P, flow, pad) {
   P.children = out;
   c.warn.push({ dom: n.id, code: "grid_rows", msg: "grid with spans or unequal tracks: " + g.rows.length + " row frames" });
 }
+
+// T-134 (decision 25.11): a flex row whose children ALL grow with unequal flex-grow (flex: 2 / flex: 1) is a native Figma GRID with FLEX columns:
+// Auto Layout FILL splits the space equally, a grid keeps 2:1. Plan: layoutMode stays HORIZONTAL (older Figma gets the plain row), build.grid = { cols, gap }
+// tells the builder. Only when the row really fills its container in those proportions with the css gap between children (no margins, no free space);
+// equal grows, fixed widths mixed with grow, wrap, absolute children and hugging rows stay as they were.
+function htmlGridNative(n, P, flow, kids, pc, abs) {
+  if (n.flex.dir !== "row" || n.flex.wrap || flow.length < 2 || abs.length || P.layoutMode !== "HORIZONTAL" || P.primaryAxisAlignItems === "SPACE_BETWEEN") return;
+  if (!flow.every((k) => kids.indexOf(k) >= 0 && k._n && htmlMapGrow(k._n.declared || {}) > 0)) return;
+  const g = flow.map((k) => htmlMapGrow(k._n.declared || {}));
+  if (Math.max.apply(null, g) - Math.min.apply(null, g) < 0.001) return;
+  if (htmlMapAxis(n, pc, "h") === "HUG") return;
+  const bw = (n.style && n.style.borderWidth) || [0, 0, 0, 0];
+  const inner = P.w - bw[1] - bw[3] - P.padding[1] - P.padding[3];
+  const sw = flow.reduce((a, k) => a + k.w, 0), sg = g.reduce((a, b) => a + b, 0);
+  if (Math.abs(sw + n.flex.gap * (flow.length - 1) - inner) > 2) return;
+  if (!flow.slice(1).every((k, i) => Math.abs(k.x - (flow[i].x + flow[i].w) - n.flex.gap) <= 1)) return;
+  // css shares the free space by grow on top of each child's padding + border (basis 0): outer_i = pb_i + g_i / sum(g) * (inner - gaps - sum(pb))
+  const pb = flow.map((k) => { const b = (k._n.style && k._n.style.borderWidth) || [0, 0, 0, 0]; return k.padding[1] + k.padding[3] + b[1] + b[3]; });
+  const free = inner - n.flex.gap * (flow.length - 1) - pb.reduce((a, b) => a + b, 0);
+  if (!flow.every((k, i) => Math.abs(k.w - (pb[i] + (g[i] / sg) * free)) <= 1.5)) return;
+  // a Figma FLEX track shares the whole width by its value, padding included: equal to the grow ratio without padding, else the measured widths
+  const exact = flow.every((k, i) => Math.abs(k.w / sw - g[i] / sg) <= 0.002);
+  P.build.grid = { cols: exact ? g : flow.map((k) => htmlMapR2(k.w)), gap: n.flex.gap };
+}

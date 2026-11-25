@@ -3637,7 +3637,7 @@ function htmlMapAlign(v) {
 }
 
 // Block flow (no flex) -> AL: vertical with FILL width, or a horizontal run of inline-blocks. Margins from rects.
-function htmlMapFlow(c, n, P, flow) {
+function htmlMapFlow(c, n, P, flow, kids) {
   const bw = n.style.borderWidth || [0, 0, 0, 0], pad = n.padding;
   const cx = P.x + bw[3] + pad[3], cy = P.y + bw[0] + pad[0];
   const cw = P.w - bw[1] - bw[3] - pad[1] - pad[3], ch = P.h - bw[0] - bw[2] - pad[0] - pad[2];
@@ -3656,7 +3656,11 @@ function htmlMapFlow(c, n, P, flow) {
     P.layoutMode = "VERTICAL";
     const gaps = flow.slice(1).map((k, i) => k.y - (flow[i].y + flow[i].h));
     P.itemSpacing = htmlMapMode(gaps);
-    if (gaps.length && Math.max.apply(null, gaps) - Math.min.apply(null, gaps) > 1.5) warn("uneven-margin", "block children have different margins " + gaps.map(Math.round).join(","));
+    if (gaps.length && Math.max.apply(null, gaps) - Math.min.apply(null, gaps) > 1.5) {
+      // T-134: different margins between block children: the smallest is the spacing, the rest goes to the next child (padding or a wrapper, as for flex)
+      if (gaps.every((g) => g >= -0.5)) htmlMapMargins(c, n, P, flow, kids, { row: false, edges: false, gap: null, hug: false });
+      else warn("uneven-margin", "block children have different margins " + gaps.map(Math.round).join(","));
+    }
     pd[0] += Math.max(0, flow[0].y - cy);
     const last = flow[flow.length - 1];
     if (!htmlMapDsz(n.declared && n.declared.height) || htmlMapDsz(n.declared.height).k !== "px") pd[2] += Math.max(0, cy + ch - (last.y + last.h));
@@ -3701,36 +3705,55 @@ function htmlMapClose(a, b) {
   return Math.abs(a.x - b.x) <= 1 && Math.abs(a.y - b.y) <= 1 && Math.abs(a.w - b.w) <= 1 && Math.abs(a.h - b.h) <= 1;
 }
 
-// T-105: margins of flex children (ADR-004 p. 3). The gap between neighbours = css gap + margins. The smallest gap is the container's
-// itemSpacing (equal margins end up there); a bigger one is a margin on that child: padding of the child if it is an unpainted
-// Auto Layout frame, otherwise a wrapper frame with a warning. Main axis only; wrap and space-between are left alone.
-function htmlMapFlexMargins(c, n, P, flow, kids) {
-  const row = n.flex.dir === "row", side = row ? 3 : 0;
+// T-105 / T-134: margins of flex children and of block-flow children (ADR-004 p. 3). The gap between neighbours = css gap + margins. The smallest
+// gap is the container's itemSpacing (equal margins end up there); a bigger one is a margin on that child: padding of the child if it is an
+// unpainted Auto Layout frame, otherwise a wrapper frame with a warning. Main axis only; wrap and space-between are left alone.
+// T-134: the margin before the first child and after the last one go to the container's padding (leading: container aligned to the start
+// or hugging; trailing: aligned to the end or hugging, because otherwise the free space is not a margin).
+// o: { row, edges (leading / trailing margin too: flex only), gap (css gap of a flex container; null for block flow: the smallest gap wins), hug }
+// padding that came from a margin, not from css padding (side 0..3 = top, right, bottom, left): build.marginPad, for the measure and for token binding
+function htmlMapMarginPad(p, side, v) {
+  p.build.marginPad = p.build.marginPad || [0, 0, 0, 0];
+  p.build.marginPad[side] = htmlMapR2(p.build.marginPad[side] + v);
+}
+function htmlMapMargins(c, n, P, flow, kids, o) {
+  const row = o.row, side = row ? 3 : 0, far = row ? 1 : 2;
   const pos = (k) => (row ? k.x : k.y), len = (k) => (row ? k.w : k.h);
+  const snap = (v) => (Math.abs(v - Math.round(v)) <= 0.05 ? Math.round(v) : htmlMapR2(v));
   const gaps = flow.slice(1).map((k, i) => pos(k) - (pos(flow[i]) + len(flow[i])));
   if (gaps.some((g) => g < -0.5)) return;
-  let lo = Math.min.apply(null, gaps);
-  if (Math.max.apply(null, gaps) - lo > 1 && n.flex.gap <= lo + 0.5) lo = n.flex.gap; // unequal: the css gap stays the spacing, margins go to the children
-  P.itemSpacing = htmlMapR2(lo);
-  flow.slice(1).forEach((k, i) => {
-    const extra = htmlMapR2(gaps[i] - lo);
-    if (extra <= 1) return;
-    const bare = k.type === "FRAME" && k.layoutMode !== "NONE" && !k.fills.length && !k.strokes.length && !k.effects.length;
-    if (bare) {
-      k.padding[side] = htmlMapR2(k.padding[side] + extra);
-      if (row) { k.x = htmlMapR2(k.x - extra); k.w = htmlMapR2(k.w + extra); } else { k.y = htmlMapR2(k.y - extra); k.h = htmlMapR2(k.h + extra); }
-      return;
-    }
-    const w = htmlMapBase(c, k._n, "FRAME");
-    w.dom = null; w.id = k.id + "m"; w.name = k.name + " margin";
-    w.x = row ? htmlMapR2(k.x - extra) : k.x; w.y = row ? k.y : htmlMapR2(k.y - extra);
-    w.w = row ? htmlMapR2(k.w + extra) : k.w; w.h = row ? k.h : htmlMapR2(k.h + extra);
-    w.layoutMode = row ? "HORIZONTAL" : "VERTICAL"; w.padding[side] = extra;
-    w.sizingH = k.sizingH; w.sizingV = k.sizingV; w.children = [k];
-    kids[kids.indexOf(k)] = w;
-    c.stats.frames++; c.stats.auto_layout++;
-    c.warn.push({ dom: k.dom, code: "margin-wrapper", msg: "margin " + extra + " px before this node needs a wrapper layer" });
-  });
+  if (gaps.length) {
+    let lo = Math.min.apply(null, gaps);
+    if (o.gap !== null && Math.max.apply(null, gaps) - lo > 1 && o.gap <= lo + 0.5) lo = o.gap; // unequal: the css gap stays the spacing, margins go to the children
+    P.itemSpacing = snap(lo);
+    flow.slice(1).forEach((k, i) => {
+      const extra = htmlMapR2(gaps[i] - lo);
+      if (extra <= 1) return;
+      const bare = k.type === "FRAME" && k.layoutMode !== "NONE" && !k.fills.length && !k.strokes.length && !k.effects.length;
+      if (bare) {
+        k.padding[side] = htmlMapR2(k.padding[side] + extra);
+        htmlMapMarginPad(k, side, extra);
+        if (row) { k.x = htmlMapR2(k.x - extra); k.w = htmlMapR2(k.w + extra); } else { k.y = htmlMapR2(k.y - extra); k.h = htmlMapR2(k.h + extra); }
+        return;
+      }
+      const w = htmlMapBase(c, k._n, "FRAME");
+      w.dom = null; w.id = k.id + "m"; w.name = k.name + " margin";
+      w.x = row ? htmlMapR2(k.x - extra) : k.x; w.y = row ? k.y : htmlMapR2(k.y - extra);
+      w.w = row ? htmlMapR2(k.w + extra) : k.w; w.h = row ? k.h : htmlMapR2(k.h + extra);
+      w.layoutMode = row ? "HORIZONTAL" : "VERTICAL"; w.padding[side] = extra; htmlMapMarginPad(w, side, extra);
+      w.sizingH = k.sizingH; w.sizingV = k.sizingV; w.children = [k];
+      kids[kids.indexOf(k)] = w;
+      c.stats.frames++; c.stats.auto_layout++;
+      c.warn.push({ dom: k.dom, code: "margin-wrapper", msg: "margin " + extra + " px before this node needs a wrapper layer" });
+    });
+  }
+  if (!o.edges) return; // block flow keeps its own edge rules (htmlMapFlow)
+  const bw = (n.style && n.style.borderWidth) || [0, 0, 0, 0];
+  const first = flow[0], last = flow[flow.length - 1], pa = P.primaryAxisAlignItems;
+  const lead = htmlMapR2(pos(first) - ((row ? P.x : P.y) + bw[side] + P.padding[side]));
+  const trail = htmlMapR2(((row ? P.x + P.w : P.y + P.h) - bw[far] - P.padding[far]) - (pos(last) + len(last)));
+  if (lead > 1 && (o.hug || pa === "MIN")) { P.padding[side] = snap(P.padding[side] + lead); htmlMapMarginPad(P, side, lead); }
+  if (trail > 1 && (o.hug || pa === "MAX")) { P.padding[far] = snap(P.padding[far] + trail); htmlMapMarginPad(P, far, trail); }
 }
 
 // T-105 follow-up (ADR-004 p. 3): size and constraints of an ABSOLUTE child. Declared px: FIXED; 100% or both opposite sides: FIXED +
@@ -3831,7 +3854,8 @@ function htmlMapNode(c, n, pc, isRoot) {
     P.itemSpacing = n.flex.gap; P.padding = pad.slice();
     P.primaryAxisAlignItems = n.flex.justify === "space-between" || n.flex.justify === "space-around" || n.flex.justify === "space-evenly" ? "SPACE_BETWEEN" : htmlMapAlign(n.flex.justify);
     P.counterAxisAlignItems = htmlMapAlign(n.flex.align);
-    if (!n.flex.wrap && flow.length >= 2 && P.primaryAxisAlignItems !== "SPACE_BETWEEN") htmlMapFlexMargins(c, n, P, flow, kids);
+    if (!n.flex.wrap && flow.length >= 1 && P.primaryAxisAlignItems !== "SPACE_BETWEEN") htmlMapMargins(c, n, P, flow, kids, { row: n.flex.dir === "row", edges: true, gap: n.flex.gap, hug: !isRoot && htmlMapAxis(n, pc, n.flex.dir === "row" ? "h" : "v") === "HUG" && !(n.declared && n.declared[n.flex.dir === "row" ? "min-width" : "min-height"]) });
+    if (typeof htmlGridNative === "function") htmlGridNative(n, P, flow, kids, pc, abs); // html-grid.js (T-134)
     if (n.flex.wrap) {
       P.layoutWrap = "WRAP";
       const rows = [];
@@ -3842,7 +3866,7 @@ function htmlMapNode(c, n, pc, isRoot) {
   } else if (overlay) {
     htmlMapOverlay(n, P, overlay);
   } else if (flow.length) {
-    htmlMapFlow(c, n, P, flow);
+    htmlMapFlow(c, n, P, flow, kids);
   } else P.padding = pad.slice();
   P.clips = !!n.overflow && /hidden|clip|auto|scroll/.test(n.overflow);
   if (P.layoutMode !== "NONE") c.stats.auto_layout++;
@@ -4011,6 +4035,30 @@ function htmlGridApply(c, n, P, flow, pad) {
   });
   P.children = out;
   c.warn.push({ dom: n.id, code: "grid_rows", msg: "grid with spans or unequal tracks: " + g.rows.length + " row frames" });
+}
+
+// T-134 (decision 25.11): a flex row whose children ALL grow with unequal flex-grow (flex: 2 / flex: 1) is a native Figma GRID with FLEX columns:
+// Auto Layout FILL splits the space equally, a grid keeps 2:1. Plan: layoutMode stays HORIZONTAL (older Figma gets the plain row), build.grid = { cols, gap }
+// tells the builder. Only when the row really fills its container in those proportions with the css gap between children (no margins, no free space);
+// equal grows, fixed widths mixed with grow, wrap, absolute children and hugging rows stay as they were.
+function htmlGridNative(n, P, flow, kids, pc, abs) {
+  if (n.flex.dir !== "row" || n.flex.wrap || flow.length < 2 || abs.length || P.layoutMode !== "HORIZONTAL" || P.primaryAxisAlignItems === "SPACE_BETWEEN") return;
+  if (!flow.every((k) => kids.indexOf(k) >= 0 && k._n && htmlMapGrow(k._n.declared || {}) > 0)) return;
+  const g = flow.map((k) => htmlMapGrow(k._n.declared || {}));
+  if (Math.max.apply(null, g) - Math.min.apply(null, g) < 0.001) return;
+  if (htmlMapAxis(n, pc, "h") === "HUG") return;
+  const bw = (n.style && n.style.borderWidth) || [0, 0, 0, 0];
+  const inner = P.w - bw[1] - bw[3] - P.padding[1] - P.padding[3];
+  const sw = flow.reduce((a, k) => a + k.w, 0), sg = g.reduce((a, b) => a + b, 0);
+  if (Math.abs(sw + n.flex.gap * (flow.length - 1) - inner) > 2) return;
+  if (!flow.slice(1).every((k, i) => Math.abs(k.x - (flow[i].x + flow[i].w) - n.flex.gap) <= 1)) return;
+  // css shares the free space by grow on top of each child's padding + border (basis 0): outer_i = pb_i + g_i / sum(g) * (inner - gaps - sum(pb))
+  const pb = flow.map((k) => { const b = (k._n.style && k._n.style.borderWidth) || [0, 0, 0, 0]; return k.padding[1] + k.padding[3] + b[1] + b[3]; });
+  const free = inner - n.flex.gap * (flow.length - 1) - pb.reduce((a, b) => a + b, 0);
+  if (!flow.every((k, i) => Math.abs(k.w - (pb[i] + (g[i] / sg) * free)) <= 1.5)) return;
+  // a Figma FLEX track shares the whole width by its value, padding included: equal to the grow ratio without padding, else the measured widths
+  const exact = flow.every((k, i) => Math.abs(k.w / sw - g[i] / sg) <= 0.002);
+  P.build.grid = { cols: exact ? g : flow.map((k) => htmlMapR2(k.w)), gap: n.flex.gap };
 }
 // html-ds.js (T-077, F9 9.1): design system of the file for figma_html (contract: planning/fable/F9_контракт.md, sections 0 and 1).
 // A part of the plugin scope (no import/export), prefix htmlDs*. Two halves:
@@ -4684,9 +4732,23 @@ function htmlBuildStyle(n, p, ctx) {
   if (p.effects && p.effects.length) htmlBuildTry(ctx, p, "effects_error", () => { n.effects = htmlBuildEffects(p.effects); });
   if (t === "FRAME") n.clipsContent = !!p.clips;
 }
+// T-134: a row of unequal flex-grow children is a native GRID with FLEX columns (Plugin API: layoutMode "GRID", gridRowCount, gridColumnCount,
+// gridColumnGap, gridRowGap, gridColumnSizes [{type: "FLEX", value}], child.setGridChildPosition(row, col)). Any failure: the plain row, warning grid_unsupported.
+function htmlBuildGrid(n, p, g, ctx) {
+  try {
+    n.layoutMode = "GRID";
+    n.gridRowCount = 1; n.gridColumnCount = g.cols.length;
+    n.gridColumnSizes = g.cols.map((v) => ({ type: "FLEX", value: v }));
+    n.gridColumnGap = g.gap || 0; n.gridRowGap = 0;
+    const pd = p.padding || [0, 0, 0, 0];
+    n.paddingTop = pd[0]; n.paddingRight = pd[1]; n.paddingBottom = pd[2]; n.paddingLeft = pd[3];
+    return true;
+  } catch (e) { htmlBuildWarn(ctx, p, "grid_unsupported", htmlBuildErr(e) + ", a plain row is used"); return false; }
+}
 function htmlBuildFrameLayout(n, p, ctx) {
   const m = p.layoutMode;
   if (m !== "HORIZONTAL" && m !== "VERTICAL") { n.layoutMode = "NONE"; return; }
+  if (m === "HORIZONTAL" && p.build && p.build.grid && htmlBuildGrid(n, p, p.build.grid, ctx)) return;
   n.layoutMode = m;
   htmlBuildTry(ctx, p, "layout_error", () => {
     if (p.layoutWrap === "WRAP") {
@@ -4704,6 +4766,7 @@ function htmlBuildFrameLayout(n, p, ctx) {
 }
 function htmlBuildSizeModes(n, p, ctx) {
   if (p.layoutMode !== "HORIZONTAL" && p.layoutMode !== "VERTICAL") return;
+  if (n.layoutMode === "GRID") return; // sizes of a grid come from layoutSizing* and the tracks
   const hugH = p.sizingH === "HUG", hugV = p.sizingV === "HUG";
   const horiz = p.layoutMode === "HORIZONTAL";
   htmlBuildTry(ctx, p, "layout_error", () => {
@@ -4785,6 +4848,7 @@ function htmlBuildPlace(e, par, ctx) {
     }
     htmlBuildTry(ctx, p, "sizing_error", () => { if (h && h !== "FIXED") n.layoutSizingHorizontal = h; });
     htmlBuildTry(ctx, p, "sizing_error", () => { if (v && v !== "FIXED") n.layoutSizingVertical = v; });
+    if (par.n.layoutMode === "GRID") htmlBuildTry(ctx, p, "grid_position", () => n.setGridChildPosition(0, par.kids.length)); // T-134: one row, the i-th child in the i-th column
   } else {
     if (parAL) htmlBuildTry(ctx, p, "absolute_error", () => { n.layoutPositioning = "ABSOLUTE"; });
     if (parAL && p.constraints) htmlBuildTry(ctx, p, "constraints_error", () => { n.constraints = { horizontal: p.constraints.h, vertical: p.constraints.v }; });

@@ -179,9 +179,23 @@ function htmlBuildStyle(n, p, ctx) {
   if (p.effects && p.effects.length) htmlBuildTry(ctx, p, "effects_error", () => { n.effects = htmlBuildEffects(p.effects); });
   if (t === "FRAME") n.clipsContent = !!p.clips;
 }
+// T-134: a row of unequal flex-grow children is a native GRID with FLEX columns (Plugin API: layoutMode "GRID", gridRowCount, gridColumnCount,
+// gridColumnGap, gridRowGap, gridColumnSizes [{type: "FLEX", value}], child.setGridChildPosition(row, col)). Any failure: the plain row, warning grid_unsupported.
+function htmlBuildGrid(n, p, g, ctx) {
+  try {
+    n.layoutMode = "GRID";
+    n.gridRowCount = 1; n.gridColumnCount = g.cols.length;
+    n.gridColumnSizes = g.cols.map((v) => ({ type: "FLEX", value: v }));
+    n.gridColumnGap = g.gap || 0; n.gridRowGap = 0;
+    const pd = p.padding || [0, 0, 0, 0];
+    n.paddingTop = pd[0]; n.paddingRight = pd[1]; n.paddingBottom = pd[2]; n.paddingLeft = pd[3];
+    return true;
+  } catch (e) { htmlBuildWarn(ctx, p, "grid_unsupported", htmlBuildErr(e) + ", a plain row is used"); return false; }
+}
 function htmlBuildFrameLayout(n, p, ctx) {
   const m = p.layoutMode;
   if (m !== "HORIZONTAL" && m !== "VERTICAL") { n.layoutMode = "NONE"; return; }
+  if (m === "HORIZONTAL" && p.build && p.build.grid && htmlBuildGrid(n, p, p.build.grid, ctx)) return;
   n.layoutMode = m;
   htmlBuildTry(ctx, p, "layout_error", () => {
     if (p.layoutWrap === "WRAP") {
@@ -199,6 +213,7 @@ function htmlBuildFrameLayout(n, p, ctx) {
 }
 function htmlBuildSizeModes(n, p, ctx) {
   if (p.layoutMode !== "HORIZONTAL" && p.layoutMode !== "VERTICAL") return;
+  if (n.layoutMode === "GRID") return; // sizes of a grid come from layoutSizing* and the tracks
   const hugH = p.sizingH === "HUG", hugV = p.sizingV === "HUG";
   const horiz = p.layoutMode === "HORIZONTAL";
   htmlBuildTry(ctx, p, "layout_error", () => {
@@ -280,6 +295,7 @@ function htmlBuildPlace(e, par, ctx) {
     }
     htmlBuildTry(ctx, p, "sizing_error", () => { if (h && h !== "FIXED") n.layoutSizingHorizontal = h; });
     htmlBuildTry(ctx, p, "sizing_error", () => { if (v && v !== "FIXED") n.layoutSizingVertical = v; });
+    if (par.n.layoutMode === "GRID") htmlBuildTry(ctx, p, "grid_position", () => n.setGridChildPosition(0, par.kids.length)); // T-134: one row, the i-th child in the i-th column
   } else {
     if (parAL) htmlBuildTry(ctx, p, "absolute_error", () => { n.layoutPositioning = "ABSOLUTE"; });
     if (parAL && p.constraints) htmlBuildTry(ctx, p, "constraints_error", () => { n.constraints = { horizontal: p.constraints.h, vertical: p.constraints.v }; });
