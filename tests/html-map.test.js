@@ -120,7 +120,9 @@ function measure(dom, plan) {
   res.layers_ratio = Math.round(100 * (fl.length - gridRows) / cands.length) / 100;
   const comp = fl.filter((f) => by[f.node.dom] && by[f.node.dom].in_component).length;
   res.layers_ratio_no_comp = Math.round(100 * (fl.length - comp - gridRows) / cands.length) / 100;
-  res.absolute = pct(fl.filter((f) => f.node.positioning === "ABSOLUTE" || f.parent.layoutMode === "NONE").length, fl.length);
+  // explicit css position absolute/fixed is an expected ABSOLUTE (ADR-004 "absolute_unexpected"); T-135: the 08 tag chips stay ABSOLUTE over a vector cover instead of becoming a padded overlay
+  const cssAbs = (f) => !!(by[f.node.dom] && /^(absolute|fixed)$/.test(by[f.node.dom].position || ""));
+  res.absolute = pct(fl.filter((f) => (f.node.positioning === "ABSOLUTE" && !cssAbs(f)) || f.parent.layoutMode === "NONE").length, fl.length);
   const nont = fl.filter((f) => f.node.type !== "TEXT");
   res.names_default = pct(nont.filter((f) => DEFAULT_NAME.test(f.node.name || "")).length, nont.length);
   const avail = {};

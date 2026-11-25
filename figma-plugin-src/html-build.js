@@ -230,10 +230,6 @@ async function htmlBuildText(n, p, ctx) {
     });
   }
 }
-function htmlBuildDecodeSvg(m) {
-  if (m[2]) { const bin = String(figma.base64Decode ? Array.from(figma.base64Decode(m[3]), (c) => String.fromCharCode(c)).join("") : ""); return decodeURIComponent(escape(bin)); }
-  return decodeURIComponent(m[3]);
-}
 // IMAGE paint from p.build.img. Whatever cannot become one (not a data: URI, createImage fails) is a grey solid plus a warning:
 // a container that took the image as its fill must never end up empty (T-103).
 function htmlBuildImagePaint(p, ctx) {
@@ -247,15 +243,12 @@ function htmlBuildImagePaint(p, ctx) {
   } else htmlBuildWarn(ctx, p, "img_placeholder", "image is not a data: URI, placeholder used: " + src.slice(0, 80));
   return htmlBuildSolid("#d9d9d9", 1);
 }
-// img leaf: svg data URI -> vector; anything else -> rectangle with the image paint (or the grey placeholder).
+// img leaf: svg data URI -> vector fitted by object-fit (html-img.js); anything else -> rectangle with the image paint (or the grey placeholder).
 function htmlBuildImage(p, ctx) {
-  const src = String((p.build && p.build.img) || "");
-  const m = /^data:([^,]*?)(;base64)?,([\s\S]*)$/i.exec(src);
-  if (m && /svg/i.test(m[1])) {
-    try { return figma.createNodeFromSvg(htmlBuildDecodeSvg(m)); } catch (e) { htmlBuildWarn(ctx, p, "img_failed", "svg data uri: " + htmlBuildErr(e)); }
-  }
+  const v = typeof htmlImgSvg === "function" ? htmlImgSvg(p, ctx) : null;
+  if (v) return v;
   const r = figma.createRectangle();
-  r.fills = [htmlBuildImagePaint(p, ctx)];
+  r.fills = [v === false ? htmlBuildSolid("#d9d9d9", 1) : htmlBuildImagePaint(p, ctx)];
   return r;
 }
 

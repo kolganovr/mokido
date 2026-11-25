@@ -31,7 +31,7 @@ function check(name, cond, extra) {
 const eq = (name, got, want) => check(name, JSON.stringify(got, round) === JSON.stringify(want, round), { got, want });
 const near = (name, got, want, eps = 1e-6) => check(name, Math.abs(got - want) <= eps, { got, want });
 
-const SOURCE = fs.readFileSync(SRC, "utf8");
+const SOURCE = fs.readFileSync(path.join(path.dirname(SRC), "html-img.js"), "utf8") + "\n" + fs.readFileSync(SRC, "utf8");
 function load(stub) {
   const ctx = vm.createContext({ figma: stub.figma, console });
   vm.runInContext(SOURCE, ctx);

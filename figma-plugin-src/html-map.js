@@ -53,6 +53,8 @@ function htmlMapCtx(n) {
   if (n.grid) return { mode: "grid", align: "normal" };
   return { mode: "block", align: "normal" };
 }
+// T-135: an svg source (data: URI or a .svg file) cannot be an IMAGE fill (createImage takes PNG/JPEG/GIF): it stays a vector leaf
+function htmlMapSvgSrc(s) { return /^data:image\/svg/i.test(s || "") || /\.svg([?#]|$)/i.test(s || ""); }
 function htmlMapInline(n) { return /^inline/.test(n.display || ""); }
 
 // Sizing along one axis ("h"|"v") by declared / flex / parent kind.
@@ -95,6 +97,7 @@ function htmlMapSetSize(p, n, pc) {
 function htmlMapName(n) {
   if (n.name) return n.name;
   if (n.component) return n.component;
+  if (n.tag === "img") return n.alt || "image"; // T-135: layer name of an img from alt, else "image"
   if (n.tag === "svg") return (n.classes && n.classes[0]) || "icon";
   if (n.classes && n.classes[0]) return n.classes[0];
   return n.tag === "#text" ? "text" : n.tag;
@@ -363,7 +366,7 @@ function htmlMapNode(c, n, pc, isRoot) {
   if (n.tag === "#text") return [htmlMapTextNode(c, n, [n], null, pc, false)];
   if (n.tag === "svg" || n.tag === "img") {
     const p = htmlMapBase(c, n, n.tag === "svg" ? "SVG" : "IMAGE");
-    if (n.tag === "svg") p.build.svg = n.svg || null; else { p.build.img = n.src || null; p.fills = [{ type: "IMAGE", hex: null, opacity: 1, var: null }]; }
+    if (n.tag === "svg") p.build.svg = n.svg || null; else { p.build.img = n.src || null; p.build.fit = n.objectFit || null; p.fills = [{ type: "IMAGE", hex: null, opacity: 1, var: null }]; }
     htmlMapPaintInto(p, n);
     if (n.tag === "svg") p.fills = [];
     htmlMapSetSize(p, n, pc);
@@ -411,7 +414,7 @@ function htmlMapNode(c, n, pc, isRoot) {
     if (kn.position === "absolute" || kn.position === "fixed" || flow.some((f) => htmlMapOverlaps(f, k))) abs.push(k); else flow.push(k);
   });
   // an image covering the whole container under overlays: the container takes the image as its fill
-  if (abs.length && flow.length === 1 && flow[0].type === "IMAGE" && htmlMapClose(flow[0], P) && !P.fills.some((f) => f.type === "IMAGE")) {
+  if (abs.length && flow.length === 1 && flow[0].type === "IMAGE" && !htmlMapSvgSrc(flow[0].build.img) && htmlMapClose(flow[0], P) && !P.fills.some((f) => f.type === "IMAGE")) {
     P.fills.push(flow[0].fills[0]);
     P.build.img = flow[0].build.img;
     P.children = kids = abs;

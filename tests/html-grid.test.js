@@ -102,7 +102,7 @@ async function gapCase(cols, rowGap, colGap, decl, boxes, w) {
   g.plan.root.children[0].name = "g";
   const stub = createHtmlStub({ variables: GV });
   const b = vm.createContext({ figma: stub.figma, console });
-  ["html-ds.js", "html-build.js"].forEach((f) => vm.runInContext(fs.readFileSync(path.join(SRC, f), "utf8"), b));
+  ["html-ds.js", "html-img.js", "html-build.js"].forEach((f) => vm.runInContext(fs.readFileSync(path.join(SRC, f), "utf8"), b));
   const rep = await b.htmlBuild(g.plan, {});
   const root = stub.registry.get(rep.root_id);
   const find = (pred) => { let hit = null; (function w(n) { if (!hit && pred(n)) hit = n; (n.children || []).forEach(w); })(root); return hit; };
@@ -153,7 +153,7 @@ check("07: in a row the 468 px tracks fill the container: FILL", grids.every((g)
   bctx.activeCheckpoint = { created: [] };
   bctx.getFreeCanvasPosition = () => ({ x: 5000, y: 100 });
   stub.figma.ui = { postMessage(m) { if (m.type === "HTML_WALK") setTimeout(() => bctx.htmlBridgeOnTree({ type: "HTML_TREE", reqId: m.reqId, tree: T07 }), 0); } };
-  ["html-map.js", "html-grid.js", "html-build.js", "html-bridge.js"].forEach((f) => vm.runInContext(fs.readFileSync(path.join(SRC, f), "utf8"), bctx));
+  ["html-map.js", "html-grid.js", "html-img.js", "html-build.js", "html-bridge.js"].forEach((f) => vm.runInContext(fs.readFileSync(path.join(SRC, f), "utf8"), bctx));
   const r = j(await bctx.htmlBridgeFromHtml("<div/>", { name: "S07" }));
   check("07 on the stub: builds, +9 row layers (66 -> 75), grid_rows 3", r.ok === true && r.layers === 75 && r.warning_counts && r.warning_counts.grid_rows === 3, r);
   check("07 on the stub: response under 3500 bytes", Buffer.byteLength(JSON.stringify(r)) <= 3500, Buffer.byteLength(JSON.stringify(r)));

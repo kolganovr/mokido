@@ -27,7 +27,7 @@ const mapCtx = vm.createContext({});
 ["html-map.js", "html-ds.js", "html-inst.js"].forEach((f) => vm.runInContext(src(f), mapCtx));
 function newBuild(stub) {
   const ctx = vm.createContext({ figma: stub.figma, console });
-  ["components.js", "html-ds.js", "html-inst.js", "html-build.js"].forEach((f) => vm.runInContext(src(f), ctx));
+  ["components.js", "html-ds.js", "html-inst.js", "html-img.js", "html-build.js"].forEach((f) => vm.runInContext(src(f), ctx));
   return ctx;
 }
 

@@ -33,7 +33,7 @@ function setup(answer) {
       if (a) setTimeout(() => ctx.htmlBridgeOnTree(Object.assign({ type: "HTML_TREE", reqId: m.reqId }, a)), 0);
     }
   };
-  for (const f of ["html-map.js", "html-grid.js", "html-build.js", "html-bridge.js"]) vm.runInContext(fs.readFileSync(path.join(SRC, f), "utf8"), ctx);
+  for (const f of ["html-map.js", "html-grid.js", "html-img.js", "html-build.js", "html-bridge.js"]) vm.runInContext(fs.readFileSync(path.join(SRC, f), "utf8"), ctx);
   return { stub, ctx, sent, created };
 }
 const plain = (x) => JSON.parse(JSON.stringify(x));

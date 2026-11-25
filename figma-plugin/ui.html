@@ -979,7 +979,11 @@ function htmlWalkEl(c, el, parentId, ancDecl, ancTok) {
       declared: declared, tokens: tokens
     };
     if (isSvg) node.svg = htmlWalkSvg(el, rect);
-    if (isImg) node.src = el.currentSrc || el.getAttribute("src") || null;
+    if (isImg) {
+      node.src = el.currentSrc || el.getAttribute("src") || null;
+      node.alt = el.getAttribute("alt") || null; // T-135: layer name
+      node.objectFit = cs.objectFit || null; // T-135: how an svg source is fitted into the box
+    }
     c.nodes.push(node);
     myId = node.id;
     if (isSvg) return;
