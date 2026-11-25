@@ -70,6 +70,16 @@ function htmlWalkTokens(declared) {
   return t;
 }
 
+// T-130: the COMPUTED text-align (it is inherited, so a child of .hero { text-align: center } reports "center" itself).
+// start/end follow the direction; vendor values (-webkit-center) lose the prefix. Result: left | right | center | justify.
+function htmlWalkTextAlign(cs) {
+  var a = String(cs.textAlign || "").trim().toLowerCase().replace(/^-(webkit|moz)-/, "");
+  var rtl = String(cs.direction || "").toLowerCase() === "rtl";
+  if (a === "start") a = rtl ? "right" : "left";
+  else if (a === "end") a = rtl ? "left" : "right";
+  return a === "center" || a === "right" || a === "justify" ? a : "left";
+}
+
 function htmlWalkStyle(cs, rect, isText) {
   var bgc = htmlWalkColor(cs.backgroundColor);
   var bw = [htmlWalkPx(cs.borderTopWidth), htmlWalkPx(cs.borderRightWidth), htmlWalkPx(cs.borderBottomWidth), htmlWalkPx(cs.borderLeftWidth)];
@@ -100,6 +110,7 @@ function htmlWalkStyle(cs, rect, isText) {
     radius: isText ? [0, 0, 0, 0] : [rad(cs.borderTopLeftRadius), rad(cs.borderTopRightRadius), rad(cs.borderBottomRightRadius), rad(cs.borderBottomLeftRadius)],
     fontFamily: ff, fontSize: fs, fontWeight: parseInt(cs.fontWeight) || 400, lineHeight: lh, clamp: clamp,
     opacity: parseFloat(cs.opacity),
+    textAlign: htmlWalkTextAlign(cs),
     boxShadow: (isText || cs.boxShadow === "none") ? null : cs.boxShadow,
     bgImage: isText ? null : bgImage
   };

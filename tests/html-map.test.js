@@ -397,5 +397,31 @@ const kids = (p) => p.children;
   check("absolute sizes: px FIXED; undeclared AL container HUG; undeclared leaf FIXED; 100% / both sides FIXED + STRETCH", JSON.stringify(got) === JSON.stringify([["FIXED", "FIXED", "MIN", "MIN"], ["HUG", "HUG", "MIN", "MIN"], ["FIXED", "FIXED", "MIN", "MIN"], ["FIXED", "FIXED", "STRETCH", "MIN"], ["FIXED", "HUG", "STRETCH", "MIN"].map((v, i) => (i === 1 ? "FIXED" : v))]), got);
 }
 
+{ // T-130: inherited text-align (the walker reports the computed value in style.textAlign)
+  nid = 0;
+  const mk = (ta, lines, w) => {
+    nid = 0;
+    const body = el(null, "body", [0, 0, 400, 300]);
+    const p = el(0, "p", [50, 10, 300, 20 * lines], { style: Object.assign(el(0, "p", [0, 0, 1, 1]).style, { textAlign: ta }) });
+    const t = el(1, "#text", [50, 10, w || 300, 20 * lines], { text: "Some text", display: "text", style: Object.assign(el(0, "p", [0, 0, 1, 1]).style, { textAlign: ta }) });
+    return run([body, p, t]);
+  };
+  const txt = (plan) => { const f = []; (function w(n) { if (n.type === "TEXT") f.push(n); n.children.forEach(w); })(plan.root); return f[0]; };
+  check("text-align: two lines inheriting center -> CENTER", txt(mk("center", 2)).text.align === "CENTER", txt(mk("center", 2)).text.align);
+  check("text-align: two lines right -> RIGHT, justify -> JUSTIFIED, left -> LEFT", txt(mk("right", 2)).text.align === "RIGHT" && txt(mk("justify", 2)).text.align === "JUSTIFIED" && txt(mk("left", 2)).text.align === "LEFT");
+  check("text-align: one line that fills its box stays LEFT (box-based rule untouched)", txt(mk("center", 1)).text.align === "LEFT", txt(mk("center", 1)).text.align);
+  // 04 etalon: .hero { text-align: center }: h1 and .lead are multi-line texts, the walker now reports center for them
+  const dom = JSON.parse(fs.readFileSync(path.join(FIX, "04_landing_hero@1440.dom.json"), "utf8"));
+  const heroId = dom.nodes.find((n) => (n.name || "") === "Hero").id;
+  const inHero = (n) => { let c = n; while (c) { if (c.id === heroId) return true; c = dom.nodes[c.parent]; } return false; };
+  dom.nodes.forEach((n) => { if (inHero(n)) n.style.textAlign = "center"; else n.style.textAlign = "left"; });
+  const plan = j(htmlMap(dom, {}));
+  const byChars = {}; (function w(n) { if (n.type === "TEXT") byChars[n.text.characters.slice(0, 12)] = n; n.children.forEach(w); })(plan.root);
+  const h1 = Object.values(byChars).find((n) => /^Design systems/.test(n.text.characters)), lead = Object.values(byChars).find((n) => /^Lumen /.test(n.text.characters));
+  check("04: h1 and p.lead (multi-line, inherit center from .hero) -> CENTER", h1.text.align === "CENTER" && lead.text.align === "CENTER", [h1.text.align, lead.text.align, h1.text.lines, lead.text.lines]);
+  const nav = Object.values(byChars).find((n) => n.text.characters === "Product");
+  check("04: the navbar text outside .hero is still LEFT", nav.text.align === "LEFT", nav.text.align);
+}
+
 console.log(failures ? "FAILURES: " + failures + " of " + checks : "ALL PASS (" + checks + " checks passed)");
 process.exit(failures ? 1 : 0);

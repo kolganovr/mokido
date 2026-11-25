@@ -3609,6 +3609,8 @@ function htmlMapTextNode(c, E, pieces, box, pc, folded) {
     const l = ur.x - bx.x, r = bx.x + bx.w - (ur.x + ur.w);
     if (l > 2 && Math.abs(l - r) <= 2) align = "CENTER"; else if (l > 2 && r <= 2) align = "RIGHT";
   }
+  // T-130: multi-line text takes the browser's computed text-align (inherited from an ancestor too); a one-line text is placed by its box above
+  if (align === "LEFT" && multi) { const ta = s.textAlign; if (ta === "center") align = "CENTER"; else if (ta === "right") align = "RIGHT"; else if (ta === "justify") align = "JUSTIFIED"; }
   if (!(folded && E.name)) p.name = chars.slice(0, 40);
   p.text = { characters: chars, fontFamily: s.fontFamily, fontStyle: htmlMapWeightName(s.fontWeight), fontSize: s.fontSize, lineHeight: lh, styleName: null, align: align, autoResize: "HEIGHT", lines: multi ? Math.max(2, Math.round(ur.h / lh)) : 1, ranges: ranges };
   if (clamp) { p.text.maxLines = clamp; p.text.truncation = "ENDING"; }
