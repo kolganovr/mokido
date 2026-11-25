@@ -71,6 +71,37 @@ function walk(body, width) {
   check("center / right / justify / left / vendor prefix / unknown", al({ textAlign: "center" }) === "center" && al({ textAlign: "right" }) === "right" && al({ textAlign: "justify" }) === "justify" && al({ textAlign: "left" }) === "left" && al({ textAlign: "-webkit-center" }) === "center" && al({ textAlign: "match-parent" }) === "left" && al({}) === "left");
 }
 
+// ---------- T-133: currentColor in svg
+{
+  const circle = node("circle", { cx: "14", cy: "14", r: "11", fill: "currentColor" }, [], { color: "rgb(163, 155, 148)" }, [0, 0, 28, 28]);
+  const svg = node("svg", { width: "28", height: "28", viewBox: "0 0 28 28" }, [circle], { color: "rgb(163, 155, 148)" }, [10, 10, 28, 28]);
+  const lg = node("div", { class: "lg" }, [svg], { color: "rgb(163, 155, 148)" }, [10, 10, 28, 28]);
+  const body = node("body", {}, [lg], {}, [0, 0, 400, 300]);
+  const t = walk(body);
+  const s = t.nodes.find((n) => n.tag === "svg").svg;
+  check("svg: fill currentColor became the computed color (grey), none left", /fill="#a39b94"/.test(s) && !/currentcolor/i.test(s), s);
+  check("svg: size and xmlns still added", /^<svg xmlns="http:\/\/www\.w3\.org\/2000\/svg" width="28" height="28"/.test(s) || (/xmlns=/.test(s) && /width="28"/.test(s)), s);
+  check("the page element keeps its markup (the clone was edited, not the DOM)", circle.getAttribute("fill") === "currentColor");
+}
+{
+  // check mark: stroke on the path, own color per nested element; style attribute; translucent color; no currentColor = untouched
+  const path1 = node("path", { d: "M5 12l5 5L20 7", stroke: "currentColor", fill: "none" }, [], { color: "rgb(34, 160, 90)" });
+  const g = node("g", { style: "stroke: currentColor; fill: none" }, [node("path", { d: "M0 0", stroke: "currentColor" }, [], { color: "rgba(10, 20, 30, 0.5)" }), node("rect", { fill: "#ff0000" }, [], { color: "rgb(1, 2, 3)" })], { color: "rgb(200, 0, 0)" });
+  const svg = node("svg", { class: "icon", width: "16", height: "16", viewBox: "0 0 24 24", xmlns: "http://www.w3.org/2000/svg" }, [path1, g], { color: "rgb(34, 160, 90)" }, [0, 0, 16, 16]);
+  const t = walk(node("body", {}, [svg], {}, [0, 0, 400, 300]));
+  const s = t.nodes.find((n) => n.tag === "svg").svg;
+  check("check mark: stroke currentColor -> its own green", /stroke="#22a05a"/.test(s), s);
+  check("nested group: style currentColor -> the group's computed red", /style="stroke: #c80000; fill: none"/.test(s), s);
+  check("nested path: translucent color -> hex plus stroke-opacity 0.5", /stroke="#0a141e"/.test(s) && /stroke-opacity="0.5"/.test(s), s);
+  check("elements without currentColor are untouched", /fill="#ff0000"/.test(s) && /fill="none"/.test(s), s);
+  check("no currentColor left anywhere", !/currentcolor/i.test(s), s);
+  const plainSvg = node("svg", { width: "10", height: "10" }, [node("rect", { fill: "#123456" }, [])], { color: "rgb(9, 9, 9)" }, [0, 0, 10, 10]);
+  const s2 = walk(node("body", {}, [plainSvg], {}, [0, 0, 400, 300])).nodes.find((n) => n.tag === "svg").svg;
+  check("svg without currentColor: markup unchanged apart from xmlns/size", s2 === '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><rect fill="#123456"></rect></svg>', s2);
+  const st = node("svg", { width: "10", height: "10" }, [node("style", {}, [text(".a{fill:currentColor}")])], { color: "rgb(5, 6, 7)" }, [0, 0, 10, 10]);
+  const s3 = walk(node("body", {}, [st], {}, [0, 0, 400, 300])).nodes.find((n) => n.tag === "svg").svg;
+  check("<style> inside the svg: currentColor -> the svg's color", /\.a\{fill:#050607\}/.test(s3), s3);
+}
 // the walker is embedded into ui.html by the build: no new top-level state beyond functions/vars
 {
   const w = fs.readFileSync(path.join(__dirname, "..", "figma-plugin-src", "html-walk.js"), "utf8");

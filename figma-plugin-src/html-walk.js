@@ -123,9 +123,39 @@ function htmlWalkOverflow(cs) {
   return x + " " + y;
 }
 
+// T-133: "currentColor" in fill / stroke / stop-color / flood-color / lighting-color (attributes and the inline style of the svg and of
+// every nested element, <style> inside the svg too) is replaced by the COMPUTED color of that element, because createNodeFromSvg
+// knows no CSS color context and paints currentColor black. A translucent color adds fill-opacity / stroke-opacity.
+var HTML_WALK_CC = ["fill", "stroke", "stop-color", "flood-color", "lighting-color"];
+function htmlWalkCurrentColor(src, dst, win) {
+  var hasCc = function (s) { return s && /currentcolor/i.test(s); };
+  var el = dst, need = hasCc(el.getAttribute("style"));
+  HTML_WALK_CC.forEach(function (a) { if (hasCc(el.getAttribute(a))) need = true; });
+  var isStyleTag = String(el.tagName).toLowerCase() === "style" && hasCc(el.textContent);
+  if (!need && !isStyleTag) return;
+  var c = htmlWalkColor(win.getComputedStyle(isStyleTag ? src.parentElement || src : src).color);
+  var hex6 = c.hex.length >= 7 ? c.hex.slice(0, 7) : "#000000";
+  var re = /currentcolor/gi;
+  HTML_WALK_CC.forEach(function (a) {
+    if (!hasCc(el.getAttribute(a))) return;
+    el.setAttribute(a, hex6);
+    if (c.a < 1 && (a === "fill" || a === "stroke") && !el.getAttribute(a + "-opacity")) el.setAttribute(a + "-opacity", String(htmlWalkR2(c.a)));
+  });
+  if (hasCc(el.getAttribute("style"))) el.setAttribute("style", el.getAttribute("style").replace(re, hex6));
+  if (isStyleTag) el.textContent = el.textContent.replace(re, hex6);
+}
+function htmlWalkSvgMarkup(el, win) {
+  if (!win || !el.cloneNode || !el.querySelectorAll) return el.outerHTML;
+  var list = function (e) { return [e].concat(Array.prototype.slice.call(e.querySelectorAll("*"))); };
+  var copy = el.cloneNode(true);
+  var src = list(el), dst = list(copy);
+  for (var i = 0; i < dst.length && i < src.length; i++) htmlWalkCurrentColor(src[i], dst[i], win);
+  return copy.outerHTML;
+}
+
 // svg markup with explicit pixel size from the rect (createNodeFromSvg needs width/height) and the xmlns attribute
-function htmlWalkSvg(el, rect) {
-  var s = el.outerHTML;
+function htmlWalkSvg(el, rect, win) {
+  var s = htmlWalkSvgMarkup(el, win);
   var head = s.match(/^<svg\b[^>]*>/i);
   if (!head) return s;
   var h = head[0], nh = h;
@@ -188,7 +218,7 @@ function htmlWalkEl(c, el, parentId, ancDecl, ancTok) {
       style: htmlWalkStyle(cs, rect, false),
       declared: declared, tokens: tokens
     };
-    if (isSvg) node.svg = htmlWalkSvg(el, rect);
+    if (isSvg) node.svg = htmlWalkSvg(el, rect, c.win);
     if (isImg) {
       node.src = el.currentSrc || el.getAttribute("src") || null;
       node.alt = el.getAttribute("alt") || null; // T-135: layer name
