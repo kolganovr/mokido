@@ -149,7 +149,9 @@ Without a token these 7 tools aren't registered at all — see [Tool reference](
 ### Updating
 
 Updating is the same installer run again. It overwrites the copy in `~/.mokido/mcp`, keeps your bridge
-token and client configs, and removes copies left by older versions.
+token and client configs, and removes copies left by older versions. Since 4.5 the server is registered as
+`mokido` (tools `mcp__mokido__*`); an older entry named `figma` is renamed on update, and Claude Code
+permission rules for it follow. Reconnect the server in your client afterwards (Claude Code: `/mcp`).
 
 ```bash
 npx mokido@latest --update

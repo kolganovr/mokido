@@ -67,9 +67,9 @@ async function main() {
 
     check("config file was created", fs.existsSync(cfgPath));
     const cfg = JSON.parse(fs.readFileSync(cfgPath, "utf-8"));
-    check("figma server registered", !!(cfg.mcpServers && cfg.mcpServers.figma));
-    check("command is node", cfg.mcpServers.figma.command === "node");
-    const bridgeToken = cfg.mcpServers.figma.env.FIGMA_BRIDGE_TOKEN;
+    check("mokido server registered", !!(cfg.mcpServers && cfg.mcpServers.mokido) && !cfg.mcpServers.figma);
+    check("command is node", cfg.mcpServers.mokido.command === "node");
+    const bridgeToken = cfg.mcpServers.mokido.env.FIGMA_BRIDGE_TOKEN;
     check("bridge token generated", typeof bridgeToken === "string" && bridgeToken.length > 0);
 
     const canonicalMcp = installLocations(home)[CANONICAL_KEY];
@@ -94,7 +94,7 @@ async function main() {
 
     installOrUpdate({ token: "", isUpdate: false, home, appdata });
     const firstCfg = JSON.parse(fs.readFileSync(cfgPath, "utf-8"));
-    const firstToken = firstCfg.mcpServers.figma.env.FIGMA_BRIDGE_TOKEN;
+    const firstToken = firstCfg.mcpServers.mokido.env.FIGMA_BRIDGE_TOKEN;
 
     // Simulate the user already having an unrelated MCP server configured.
     firstCfg.mcpServers.other_tool = { command: "node", args: ["/somewhere/else.js"] };
@@ -103,13 +103,62 @@ async function main() {
     installOrUpdate({ token: "", isUpdate: true, home, appdata });
     const secondCfg = JSON.parse(fs.readFileSync(cfgPath, "utf-8"));
 
-    check("bridge token unchanged across --update", secondCfg.mcpServers.figma.env.FIGMA_BRIDGE_TOKEN === firstToken);
+    check("bridge token unchanged across --update", secondCfg.mcpServers.mokido.env.FIGMA_BRIDGE_TOKEN === firstToken);
     fs.rmSync(path.join(home, ".mokido", "bridge_token.txt"));
     installOrUpdate({ token: "", isUpdate: true, home, appdata });
     check("token from a config is saved to ~/.mokido/bridge_token.txt",
       fs.readFileSync(path.join(home, ".mokido", "bridge_token.txt"), "utf-8").trim() === firstToken);
     check("unrelated mcp server survives --update", !!secondCfg.mcpServers.other_tool);
     check("a .bak backup was written", fs.existsSync(`${cfgPath}.bak`));
+
+    fs.rmSync(home, { recursive: true, force: true });
+  }
+
+  console.log("\n== T-141: our 'figma' entry becomes 'mokido', a foreign one stays ==");
+  {
+    const home = mkTempDir("figma-mcp-home-");
+    const appdata = path.join(home, "AppData", "Roaming");
+    const desktopCfg = seedClaudeDesktopConfigPath(home, appdata);
+    fs.writeFileSync(desktopCfg, JSON.stringify({ mcpServers: {
+      figma: { command: "node", args: [path.join(home, ".figma-mcp-bridge", "mcp", "figma", "index.js")],
+        env: { FIGMA_PERSONAL_ACCESS_TOKEN: "pat-old", FIGMA_BRIDGE_TOKEN: "tok-old", EXTRA: "1" }, disabledTools: ["figma_rollback"] },
+    } }));
+    const codeCfg = path.join(home, ".claude.json");
+    fs.writeFileSync(codeCfg, JSON.stringify({ numStartups: 3, mcpServers: {
+      figma: { command: "node", args: ["C:/u/.mokido/mcp/figma/index.js"], env: { FIGMA_BRIDGE_TOKEN: "tok-old" } },
+    } }));
+    fs.mkdirSync(path.join(home, ".claude"), { recursive: true });
+    const settings = path.join(home, ".claude", "settings.json");
+    fs.writeFileSync(settings, JSON.stringify({ theme: "dark", permissions: {
+      allow: ["mcp__figma__figma_inspect", "mcp__figmatic__x", "Bash(ls)", "mcp__mokido__figma_inspect"], deny: ["mcp__figma"] } }));
+    const cursorDir = path.join(home, ".cursor");
+    fs.mkdirSync(cursorDir, { recursive: true });
+    const cursorCfg = path.join(cursorDir, "mcp.json");
+    fs.writeFileSync(cursorCfg, JSON.stringify({ mcpServers: { figma: { url: "https://mcp.figma.com/mcp" } } }));
+
+    installOrUpdate({ token: "", isUpdate: true, home, appdata });
+
+    const d = JSON.parse(fs.readFileSync(desktopCfg, "utf-8")).mcpServers;
+    check("old 'figma' key gone, 'mokido' added", !d.figma && !!d.mokido, Object.keys(d));
+    check("PAT, bridge token and extra env carried over", d.mokido.env.FIGMA_PERSONAL_ACCESS_TOKEN === "pat-old" && d.mokido.env.FIGMA_BRIDGE_TOKEN === "tok-old" && d.mokido.env.EXTRA === "1", d.mokido.env);
+    check("client keys of the old entry carried over", Array.isArray(d.mokido.disabledTools) && d.mokido.disabledTools[0] === "figma_rollback");
+    const c = JSON.parse(fs.readFileSync(codeCfg, "utf-8"));
+    check("~/.claude.json renamed, other settings kept", !c.mcpServers.figma && !!c.mcpServers.mokido && c.numStartups === 3);
+    const s = JSON.parse(fs.readFileSync(settings, "utf-8"));
+    check("permission rules renamed and deduplicated", JSON.stringify(s.permissions.allow) === JSON.stringify(["mcp__mokido__figma_inspect", "mcp__figmatic__x", "Bash(ls)"]), s.permissions.allow);
+    check("whole-server rule renamed", s.permissions.deny[0] === "mcp__mokido", s.permissions.deny);
+    check("settings.json backed up, other keys kept", fs.existsSync(settings + ".bak") && s.theme === "dark");
+    const cur = JSON.parse(fs.readFileSync(cursorCfg, "utf-8")).mcpServers;
+    check("foreign 'figma' server (Figma's own) is left alone", cur.figma && cur.figma.url === "https://mcp.figma.com/mcp" && !!cur.mokido);
+
+    // A foreign 'figma' in ~/.claude.json: the permission rules may be its, so they stay.
+    fs.writeFileSync(codeCfg, JSON.stringify({ mcpServers: { figma: { type: "http", url: "https://mcp.figma.com/mcp" } } }));
+    fs.writeFileSync(settings, JSON.stringify({ permissions: { allow: ["mcp__figma__get_code"] } }));
+    installOrUpdate({ token: "", isUpdate: true, home, appdata });
+    const c2 = JSON.parse(fs.readFileSync(codeCfg, "utf-8")).mcpServers;
+    check("foreign figma kept next to mokido in ~/.claude.json", !!c2.figma && !!c2.mokido);
+    check("rules untouched while a foreign figma server is there",
+      JSON.parse(fs.readFileSync(settings, "utf-8")).permissions.allow[0] === "mcp__figma__get_code");
 
     fs.rmSync(home, { recursive: true, force: true });
   }
@@ -292,7 +341,7 @@ async function main() {
     const canonicalIndex = path.join(installLocations(home)[CANONICAL_KEY], "figma", "index.js").split(path.sep).join("/");
     for (const app of ["antigravity", "antigravity-ide"]) {
       const cfg = JSON.parse(fs.readFileSync(path.join(home, ".gemini", app, "mcp_config.json"), "utf-8"));
-      check(`${app} config points at ~/.mokido`, cfg.mcpServers.figma.args[0] === canonicalIndex, cfg.mcpServers.figma.args);
+      check(`${app} config points at ~/.mokido`, cfg.mcpServers.mokido.args[0] === canonicalIndex, cfg.mcpServers.mokido.args);
       check(`${app}: other server in config kept`, !!cfg.mcpServers.other);
       check(`${app}: old server copy removed`, !fs.existsSync(path.join(old[app], "figma", "index.js")) && !fs.existsSync(path.join(old[app], "figma", "optimizer")));
       check(`${app}: old plugin copy and marker removed`, !fs.existsSync(path.join(old[app], "figma-plugin")) && !fs.existsSync(path.join(old[app], "version.json")));

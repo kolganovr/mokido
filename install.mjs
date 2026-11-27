@@ -27,6 +27,79 @@ const { buildLabel } = createRequire(import.meta.url)("./figma/lib/buildinfo.js"
 // ==========================================================================
 const CANONICAL_KEY = "canonical";
 
+// ==========================================================================
+// MCP server name in client configs. Up to 4.5 it was "figma", so Claude
+// Code saw the tools as mcp__figma__* and they clashed with Figma's own MCP
+// server, also usually named "figma". Now it is "mokido" (mcp__mokido__*).
+// An entry under an old name is moved only when it is ours (our bridge
+// token or our figma/index.js); a foreign "figma" server is left alone.
+// ==========================================================================
+const SERVER_KEY = "mokido";
+const LEGACY_SERVER_KEYS = ["figma"];
+
+/** True when a config entry is a Mokido server: it carries our bridge token
+ * or runs a figma/index.js (our install layout). Figma's own MCP server is a
+ * URL or another command and never matches. */
+function isMokidoEntry(entry) {
+  if (!entry || typeof entry !== "object" || Array.isArray(entry)) return false;
+  if (entry.env && typeof entry.env === "object" && "FIGMA_BRIDGE_TOKEN" in entry.env) return true;
+  const args = Array.isArray(entry.args) ? entry.args : [];
+  return args.some((a) => typeof a === "string" && /[\\/]figma[\\/]index\.js$/i.test(a));
+}
+
+/** Our entry in an mcpServers object: the new key first, then an old key
+ * that holds our server. Returns { key, entry } or null. */
+function findMokidoEntry(servers) {
+  if (!servers || typeof servers !== "object") return null;
+  if (servers[SERVER_KEY] && typeof servers[SERVER_KEY] === "object") return { key: SERVER_KEY, entry: servers[SERVER_KEY] };
+  for (const key of LEGACY_SERVER_KEYS) {
+    if (isMokidoEntry(servers[key])) return { key, entry: servers[key] };
+  }
+  return null;
+}
+
+/** Claude Code permission rules name the server: mcp__figma (whole server)
+ * or mcp__figma__<tool>. Renames them to mcp__mokido... in the user settings
+ * files, so tools allowed before the rename stay allowed. Called only when
+ * no foreign "figma" server is left in ~/.claude.json, so the old rules can
+ * only have meant ours. Returns the files changed. */
+function migrateClaudePermissions(home) {
+  const changed = [];
+  const re = new RegExp("^mcp__(" + LEGACY_SERVER_KEYS.join("|") + ")(?=$|__|\\()");
+  for (const name of ["settings.json", "settings.local.json"]) {
+    const file = path.join(home, ".claude", name);
+    if (!fs.existsSync(file)) continue;
+    let data;
+    try { data = JSON.parse(fs.readFileSync(file, "utf-8")); } catch (e) {
+      console.log(`[!] Skipping ${file}: could not read it (${e.message}).`);
+      continue;
+    }
+    const perms = data?.permissions;
+    if (!perms || typeof perms !== "object") continue;
+    let touched = false;
+    for (const list of ["allow", "ask", "deny"]) {
+      if (!Array.isArray(perms[list])) continue;
+      const next = [];
+      for (const rule of perms[list]) {
+        const renamed = typeof rule === "string" ? rule.replace(re, "mcp__" + SERVER_KEY) : rule;
+        if (renamed !== rule) touched = true;
+        if (!next.includes(renamed)) next.push(renamed);
+      }
+      perms[list] = next;
+    }
+    if (!touched) continue;
+    try {
+      fs.copyFileSync(file, `${file}.bak`);
+      atomicWriteJson(file, data);
+      changed.push(file);
+      console.log(`[✓] Permission rules mcp__figma* renamed to mcp__${SERVER_KEY}* in ${file}`);
+    } catch (e) {
+      console.log(`[!] Failed to write ${file}: ${e.message}`);
+    }
+  }
+  return changed;
+}
+
 /** Maps an install location key -> the directory its server+plugin copy
  * lives in. Only the canonical copy is installed now. */
 function installLocations(home) {
@@ -35,20 +108,21 @@ function installLocations(home) {
   };
 }
 
-/** Config files earlier versions wrote a `figma` entry into although no
+/** Config files earlier versions wrote our entry into although no
  * client reads them: agy CLI reads ~/.gemini/config/mcp_config.json, its
  * antigravity-cli/ folder only gets tool schemas and conversations. */
 function legacyConfigs(home) {
   return [path.join(home, ".gemini", "antigravity-cli", "mcp_config.json")];
 }
 
-/** Drops our `figma` entry from a config nothing reads; the file goes too
- * when nothing else is left in it. */
+/** Drops our entry (under the new or an old name) from a config nothing
+ * reads; the file goes too when nothing else is left in it. */
 function removeLegacyConfigEntry(configFile) {
   let data;
   try { data = JSON.parse(fs.readFileSync(configFile, "utf-8")); } catch (e) { return false; }
-  if (!data?.mcpServers?.figma) return false;
-  delete data.mcpServers.figma;
+  const keys = [SERVER_KEY, ...LEGACY_SERVER_KEYS].filter((k) => data?.mcpServers?.[k]);
+  if (keys.length === 0) return false;
+  for (const k of keys) delete data.mcpServers[k];
   try {
     const onlyEmptyServers = Object.keys(data).length === 1 && Object.keys(data.mcpServers).length === 0;
     if (onlyEmptyServers) fs.rmSync(configFile);
@@ -168,7 +242,7 @@ function getOrCreateBridgeToken(home, existingTargets) {
     if (!fs.existsSync(cfgPath)) continue;
     try {
       const data = JSON.parse(fs.readFileSync(cfgPath, "utf-8"));
-      const token = data?.mcpServers?.figma?.env?.FIGMA_BRIDGE_TOKEN || "";
+      const token = findMokidoEntry(data?.mcpServers)?.entry?.env?.FIGMA_BRIDGE_TOKEN || "";
       if (token) {
         if (!fs.existsSync(tokenFile)) persistBridgeToken(tokenFile, token);
         return token;
@@ -462,6 +536,7 @@ function installOrUpdate({ token = "", isUpdate = false, home, appdata } = {}) {
 
   // 3. Update MCP config files, each pointing at its own server copy.
   const cliToken = token.trim();
+  let claudeCodeClean = false;
 
   for (const target of targets) {
     const configFile = target.path;
@@ -473,12 +548,12 @@ function installOrUpdate({ token = "", isUpdate = false, home, appdata } = {}) {
         configData = JSON.parse(fs.readFileSync(configFile, "utf-8"));
       } catch (e) {
         // A config we cannot parse must NOT be blindly overwritten — writing
-        // a fresh {"mcpServers": {"figma": ...}} over it would silently
+        // a fresh {"mcpServers": {"mokido": ...}} over it would silently
         // destroy every other MCP server (and any other settings) the user
         // had configured there.
         console.log(
           `[!] Skipping ${configFile}: could not read it (${e.message}). ` +
-            `Fix or remove the file, then re-run install.mjs to add the figma server.`
+            `Fix or remove the file, then re-run install.mjs to add the mokido server.`
         );
         continue;
       }
@@ -493,21 +568,32 @@ function installOrUpdate({ token = "", isUpdate = false, home, appdata } = {}) {
       configData.mcpServers = {};
     }
 
-    // Preserve existing Figma personal-access-token if a new one wasn't given.
+    // Our entry, maybe still under the old "figma" name (T-141). Its
+    // personal access token, extra env vars and client keys (Antigravity's
+    // disabledTools and the like) carry over to the "mokido" entry.
+    const servers = configData.mcpServers;
+    const found = findMokidoEntry(servers);
+    const { command: _c, args: _a, env: prevEnv, ...prevExtra } = found?.entry || {};
     let finalToken = cliToken;
-    const existingFigma = configData.mcpServers.figma;
-    if (!finalToken && existingFigma && typeof existingFigma === "object") {
-      finalToken = existingFigma.env?.FIGMA_PERSONAL_ACCESS_TOKEN || "";
-    }
+    if (!finalToken) finalToken = prevEnv?.FIGMA_PERSONAL_ACCESS_TOKEN || "";
 
-    configData.mcpServers.figma = {
+    const entry = {
+      ...prevExtra,
       command: "node",
       args: [indexJsPath],
       env: {
+        ...(prevEnv && typeof prevEnv === "object" ? prevEnv : {}),
         FIGMA_PERSONAL_ACCESS_TOKEN: finalToken,
         FIGMA_BRIDGE_TOKEN: bridgeToken,
       },
     };
+    const moved = [];
+    for (const key of LEGACY_SERVER_KEYS) {
+      if (isMokidoEntry(servers[key])) { delete servers[key]; moved.push(key); }
+    }
+    servers[SERVER_KEY] = entry;
+    if (moved.length) console.log(`[✓] Server entry renamed ${moved.join(", ")} -> ${SERVER_KEY} in ${configFile} (tools are now mcp__${SERVER_KEY}__*)`);
+    if (path.basename(configFile) === ".claude.json" && !LEGACY_SERVER_KEYS.some((k) => servers[k])) claudeCodeClean = true;
 
     try {
       // Back up whatever was there before touching it — this file may hold
@@ -521,6 +607,10 @@ function installOrUpdate({ token = "", isUpdate = false, home, appdata } = {}) {
       console.log(`[!] Failed to write ${configFile}: ${e.message}`);
     }
   }
+
+  // Claude Code permission rules follow the server's new name, unless a
+  // foreign "figma" server is still in ~/.claude.json and may own them.
+  if (claudeCodeClean) migrateClaudePermissions(home);
 
   // 4. Remove the copies older versions installed, now that no config we
   // wrote points at them.
@@ -673,13 +763,17 @@ function runDoctor(home, appdata) {
     if (fs.existsSync(cfg)) {
       try {
         const d = JSON.parse(fs.readFileSync(cfg, "utf-8"));
-        const figmaEntry = d?.mcpServers?.figma || {};
+        const found = findMokidoEntry(d?.mcpServers);
+        const figmaEntry = found?.entry || {};
         const hasFigma = Object.keys(figmaEntry).length > 0;
         const pat = figmaEntry.env?.FIGMA_PERSONAL_ACCESS_TOKEN || "";
         const bridgeTok = figmaEntry.env?.FIGMA_BRIDGE_TOKEN || "";
+        if (found && found.key !== SERVER_KEY) {
+          console.log(`  [!] ${cfg}: Mokido is still under the old name "${found.key}" (run install.mjs --update to rename it to "${SERVER_KEY}")`);
+        }
         const tokStatus = pat ? "PAT configured" : "no PAT (Live canvas only)";
         const bridgeStatus = bridgeTok ? "bridge token set" : "NO bridge token (insecure)";
-        console.log(`  - ${cfg} [${target.location}] (figma entry: ${hasFigma ? "YES" : "NO"}, ${tokStatus}, ${bridgeStatus})`);
+        console.log(`  - ${cfg} [${target.location}] (${SERVER_KEY} entry: ${hasFigma ? "YES" : "NO"}, ${tokStatus}, ${bridgeStatus})`);
       } catch (e) {
         console.log(`  - ${cfg} (Error reading: ${e.message})`);
       }
@@ -752,7 +846,7 @@ function reportRunningServer(result, expectedVersion) {
     } else {
       console.log(`    it was started before this update, so the plugin will report it instead of v${expectedVersion}.`);
     }
-    console.log("    Restart the MCP server in the agent session that started it (Claude Code: /mcp > figma > Reconnect),");
+    console.log("    Restart the MCP server in the agent session that started it (Claude Code: /mcp > mokido > Reconnect),");
     console.log(`    or close that session${result.pid ? `, or stop the process: ${process.platform === "win32" ? `taskkill /PID ${result.pid}` : `kill ${result.pid}`}` : ""}.`);
   } else if (result.status === "ok") {
     console.log(`[✓] Running server on port 8765 is v${result.version}${result.codeHash ? ` (code ${result.codeHash})` : ""}`);
@@ -803,6 +897,11 @@ if (isMainModule) {
 
 export {
   CANONICAL_KEY,
+  SERVER_KEY,
+  LEGACY_SERVER_KEYS,
+  isMokidoEntry,
+  findMokidoEntry,
+  migrateClaudePermissions,
   installLocations,
   legacyLocations,
   removeLegacyCopy,
