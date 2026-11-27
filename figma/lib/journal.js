@@ -1,7 +1,7 @@
 const fs = require("fs");
 const os = require("os");
 const path = require("path");
-const { SERVER_VERSION, BRIDGE_TOKEN } = require("./config");
+const { SERVER_BUILD, BRIDGE_TOKEN } = require("./config");
 const { state } = require("./state");
 
 // Process journal (ADR-002, T-008): a few lines per server process in a file, so
@@ -82,7 +82,7 @@ function startJournal() {
   if (!file) return false;
   active = true;
   trimToTail(file);
-  write("start v" + SERVER_VERSION + " node=" + process.version);
+  write("start v" + SERVER_BUILD + " node=" + process.version);
   process.on("exit", (code) => write("process exit code=" + code));
   const crash = (kind) => (err) => {
     logError(kind, err);

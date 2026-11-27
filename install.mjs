@@ -13,6 +13,7 @@ import { createRequire } from "node:module";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const { computeCodeHash } = createRequire(import.meta.url)("./figma/lib/codehash.js");
+const { buildLabel } = createRequire(import.meta.url)("./figma/lib/buildinfo.js");
 
 // ==========================================================================
 // ONE physical copy of the server/plugin, ~/.mokido/mcp, and every MCP config
@@ -330,12 +331,36 @@ function getRepoCommit(pkgRoot) {
   }
 }
 
+/** `git describe` of the checkout this installer runs from, only when the
+ * package root IS the repository root (an npx copy sitting inside some other
+ * repository must not borrow its tags). null when unknown. */
+function getRepoDescribe(pkgRoot) {
+  const git = (args) => execFileSync("git", args, { cwd: pkgRoot, encoding: "utf-8", stdio: ["ignore", "pipe", "ignore"] }).trim();
+  try {
+    if (!samePath(git(["rev-parse", "--show-toplevel"]), pkgRoot)) return null;
+    return git(["describe", "--tags", "--long", "--dirty", "--abbrev=7", "--match", "v[0-9]*"]);
+  } catch {
+    return null;
+  }
+}
+
+/** Bakes the build label (T-140) into the installed ui.html, so the plugin
+ * window shows 4.5.0-dev.58 + commit between releases. */
+function injectPluginBuild(pluginDir, build) {
+  const uiPath = path.join(pluginDir, "ui.html");
+  if (!fs.existsSync(uiPath)) return;
+  const text = fs.readFileSync(uiPath, "utf-8");
+  const marker = 'const PLUGIN_BUILD = "";';
+  if (!text.includes(marker)) return;
+  fs.writeFileSync(uiPath, text.replace(marker, `const PLUGIN_BUILD = ${JSON.stringify(build)};`), "utf-8");
+}
+
 /** Records which commit an installed copy came from, so the server can
  * later notice when main has moved on. Lives beside figma/ and
  * figma-plugin/, not inside either — it's install metadata, not source. */
-function writeVersionMarker(mcpDir, commit) {
+function writeVersionMarker(mcpDir, commit, build) {
   try {
-    atomicWriteJson(path.join(mcpDir, "version.json"), { commit, installedAt: new Date().toISOString() });
+    atomicWriteJson(path.join(mcpDir, "version.json"), { commit, build, installedAt: new Date().toISOString() });
   } catch (e) {
     console.log(`[!] Warning: could not write version marker in ${mcpDir}: ${e.message}`);
   }
@@ -416,6 +441,8 @@ function installOrUpdate({ token = "", isUpdate = false, home, appdata } = {}) {
   const locations = installLocations(home);
   const neededLocations = new Set([...targets.map((t) => t.location), CANONICAL_KEY]);
   const repoCommit = getRepoCommit(pkgRoot);
+  const pkgVersion = JSON.parse(fs.readFileSync(path.join(pkgRoot, "package.json"), "utf-8")).version;
+  const build = buildLabel(pkgVersion, getRepoDescribe(pkgRoot));
 
   const indexJsPaths = {};
   for (const locKey of neededLocations) {
@@ -426,10 +453,11 @@ function installOrUpdate({ token = "", isUpdate = false, home, appdata } = {}) {
     copyTreeClean(path.join(pkgRoot, "figma"), targetFigma);
     copyTreeClean(path.join(pkgRoot, "figma-plugin"), targetPlugin);
     injectBridgeToken(targetPlugin, bridgeToken);
-    writeVersionMarker(mcpDir, repoCommit);
+    if (build !== pkgVersion) injectPluginBuild(targetPlugin, build);
+    writeVersionMarker(mcpDir, repoCommit, build);
 
     indexJsPaths[locKey] = path.join(targetFigma, "index.js").split(path.sep).join("/");
-    console.log(`[✓] MCP Server + Plugin ${actionStr} (${locKey}): ${mcpDir}`);
+    console.log(`[✓] MCP Server + Plugin ${actionStr} (${locKey}): ${mcpDir}${build !== pkgVersion ? ` (build ${build})` : ""}`);
   }
 
   // 3. Update MCP config files, each pointing at its own server copy.
@@ -785,6 +813,8 @@ export {
   injectBridgeToken,
   atomicWriteJson,
   getRepoCommit,
+  getRepoDescribe,
+  injectPluginBuild,
   writeVersionMarker,
   installOrUpdate,
   runDoctor,

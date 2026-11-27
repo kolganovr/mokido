@@ -93,5 +93,7 @@ const ORIGIN_ID = "o_" + require("crypto").randomBytes(6).toString("hex");
 // Paths: FIGMA_DIR is the figma/ folder, PACKAGE_ROOT the package root above it.
 const FIGMA_DIR = path.join(__dirname, "..");
 const PACKAGE_ROOT = path.join(FIGMA_DIR, "..");
+// Build label of an installed copy (T-140): "4.5.0-dev.58+b4ffd0c" between releases, else SERVER_VERSION.
+const SERVER_BUILD = require("./buildinfo").readBuild(PACKAGE_ROOT) || SERVER_VERSION;
 
-module.exports = { FIGMA_TOKEN, BRIDGE_PORT, BRIDGE_TOKEN, ALLOWED_ORIGINS, MAX_WS_MESSAGE_BYTES, MAX_HTTP_BODY_BYTES, TIMEOUTS, SERVER_VERSION, ECONOMY, ORIGIN_ID, envNumber, FIGMA_DIR, PACKAGE_ROOT };
+module.exports = { FIGMA_TOKEN, BRIDGE_PORT, BRIDGE_TOKEN, ALLOWED_ORIGINS, MAX_WS_MESSAGE_BYTES, MAX_HTTP_BODY_BYTES, TIMEOUTS, SERVER_VERSION, SERVER_BUILD, ECONOMY, ORIGIN_ID, envNumber, FIGMA_DIR, PACKAGE_ROOT };

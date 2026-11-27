@@ -1,6 +1,6 @@
 const crypto = require("crypto");
 const http = require("http");
-const { BRIDGE_PORT, ALLOWED_ORIGINS, MAX_WS_MESSAGE_BYTES, MAX_HTTP_BODY_BYTES, SERVER_VERSION, TIMEOUTS, ECONOMY, FIGMA_DIR } = require("./config");
+const { BRIDGE_PORT, ALLOWED_ORIGINS, MAX_WS_MESSAGE_BYTES, MAX_HTTP_BODY_BYTES, SERVER_VERSION, SERVER_BUILD, TIMEOUTS, ECONOMY, FIGMA_DIR } = require("./config");
 const { state, wsClients, pendingCommands, wakeClientWaiters } = require("./state");
 const { isAuthorized, isOriginAllowed } = require("./auth");
 const { jobs, settleCommand, errorLocation, failCommandsOfClient, readJobSnapshot, takeLate } = require("./jobs");
@@ -413,6 +413,8 @@ const bridgeServer = http.createServer((req, res) => {
       wsClients: wsClients.size,
       lastPing: state.lastPluginPing,
       serverVersion: SERVER_VERSION,
+      // Only for a copy installed from git between releases (T-140); absent otherwise.
+      serverBuild: SERVER_BUILD !== SERVER_VERSION ? SERVER_BUILD : undefined,
       pid: process.pid,
       // Not copied into any tool reply: figma_list_targets reads only `targets`.
       codeHash: CODE_HASH,

@@ -76,6 +76,9 @@ async function main() {
     check("server copied to canonical location", fs.existsSync(path.join(canonicalMcp, "figma", "index.js")));
     check("plugin copied to canonical location", fs.existsSync(path.join(canonicalMcp, "figma-plugin", "ui.html")));
     check("version marker written", fs.existsSync(path.join(canonicalMcp, "version.json")));
+    const marker = JSON.parse(fs.readFileSync(path.join(canonicalMcp, "version.json"), "utf-8"));
+    const pkgVer = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "package.json"), "utf-8")).version;
+    check("T-140: version marker has a build label (release or dev)", typeof marker.build === "string" && (marker.build === pkgVer || /-dev\.\d+\+[0-9a-f]+/.test(marker.build)), marker);
 
     const uiHtml = fs.readFileSync(path.join(canonicalMcp, "figma-plugin", "ui.html"), "utf-8");
     check("bridge token baked into ui.html", uiHtml.includes(bridgeToken));
