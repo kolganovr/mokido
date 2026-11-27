@@ -256,8 +256,7 @@
     .VerNum { font: var(--mk-text-title-16-semibold); font-family: var(--mk-font-mono); letter-spacing: 0; font-variant-numeric: tabular-nums; color: var(--mk-text); }
     .VerNum.warn { color: var(--mk-status-warn); }
     .VerNum.none { color: var(--mk-text-disabled); }
-    .VerNum.dev { font-size: 13px; }
-    .VerSha { display: block; font: var(--mk-text-label-11-medium); font-family: var(--mk-font-mono); color: var(--mk-text-muted); }
+    .VerSha { display: block; white-space: nowrap; font: var(--mk-text-label-11-medium); font-family: var(--mk-font-mono); letter-spacing: 0; color: var(--mk-text-muted); }
     .Chip {
       margin-left: auto; flex: none; padding: 3px 8px; border-radius: var(--mk-radius-pill); white-space: nowrap;
       font: var(--mk-text-body-11); font-weight: 500; background: var(--mk-bg-subtle); color: var(--mk-text-muted);
@@ -1648,18 +1647,17 @@ function htmlWalk(doc, opts) {
       connectWebSocket(true);
     }
 
-    // "4.5.0-dev.58+b4ffd0c.dirty" -> 4.5.0-dev.58 with the commit (and * for local edits) on a small line under it.
+    // "4.5.0-dev.58+b4ffd0c.dirty" -> 4.5.0 as usual, "dev.58 · b4ffd0c *" on a small line under it (* = local edits).
     function setVerNum(el, label, cls) {
-      const i = label.indexOf('+');
-      el.textContent = i < 0 ? label : label.slice(0, i);
-      el.className = 'VerNum' + cls + (label.indexOf('-dev.') > 0 ? ' dev' : '');
-      if (i >= 0) {
-        const sha = document.createElement('span');
-        sha.className = 'VerSha';
-        sha.textContent = label.slice(i + 1).replace(/\.dirty$/, ' *');
-        el.title = label;
-        el.appendChild(sha);
-      } else el.title = '';
+      const m = /^(\d+\.\d+\.\d+)-([^+]+)(?:\+(.+))?$/.exec(label);
+      el.className = 'VerNum' + cls;
+      el.title = m ? label : '';
+      el.textContent = m ? m[1] : label;
+      if (!m) return;
+      const sub = document.createElement('span');
+      sub.className = 'VerSha';
+      sub.textContent = m[2] + (m[3] ? ' · ' + m[3].replace(/\.dirty$/, ' *') : '');
+      el.appendChild(sub);
     }
 
     function renderSettings() {
